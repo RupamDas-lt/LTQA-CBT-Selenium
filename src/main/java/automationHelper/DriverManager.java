@@ -5,6 +5,7 @@ import factory.Locator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -21,9 +22,12 @@ import utility.EnvSetup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.HTTPS;
+import static utility.FrameworkConstants.SESSION_ID;
 
 public class DriverManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(DriverManager.class);
@@ -77,7 +81,7 @@ public class DriverManager extends BaseClass {
   }
 
   private String getGridUrl() {
-    return HTTPS + USER_NAME + ":" + ACCESS_KEY + "@" + GRID_URL + "/wd/hub";
+    return HTTPS + testUserName.get() + ":" + testAccessKey.get() + "@" + testGridUrl.get() + "/wd/hub";
   }
 
   private void createRemoteTestDriver() {
@@ -86,6 +90,7 @@ public class DriverManager extends BaseClass {
     try {
       driver = new RemoteWebDriver(new URL(gridUrl), capabilities);
       TEST_SESSION_ID.set(driver.getSessionId().toString());
+      EnvSetup.TEST_REPORT.get().put(SESSION_ID, TEST_SESSION_ID.get());
       ltLogger.info("Remote driver created. Test session ID: {}", TEST_SESSION_ID.get());
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
@@ -116,5 +121,21 @@ public class DriverManager extends BaseClass {
   public boolean isDisplayed(Locator locator) {
     ltLogger.info("Finding if element is displayed with locator: {}", locator.toString());
     return driver.findElement(toBy(locator)).isDisplayed();
+  }
+
+  public Set<Cookie> getCookies() {
+    Set<Cookie> cookies = driver.manage().getCookies();
+    ltLogger.info("Found cookies: {}", cookies.toString());
+    return cookies;
+  }
+
+  public Set<String> getCookieNames() {
+    Set<Cookie> cookies = driver.manage().getCookies();
+    Set<String> cookieNames = new HashSet<>();
+    for (Cookie cookie : cookies) {
+      cookieNames.add(cookie.getName());
+    }
+    ltLogger.info("Found cookies names: {}", cookieNames);
+    return cookieNames;
   }
 }

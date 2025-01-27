@@ -21,6 +21,11 @@ public class EnvSetup {
   public static final String USER_PASS = config.get("test_env_pass");
   public static final String GRID_URL = config.get("test_env_hub_url");
 
+  public static final ThreadLocal<String> testUserName = new ThreadLocal<>();
+  public static final ThreadLocal<String> testAccessKey = new ThreadLocal<>();
+  public static final ThreadLocal<String> testEmail = new ThreadLocal<>();
+  public static final ThreadLocal<String> testPassword = new ThreadLocal<>();
+  public static final ThreadLocal<String> testGridUrl = new ThreadLocal<>();
   public static final ThreadLocal<WebDriver> testDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<WebDriver> clientDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<MutableCapabilities> TEST_CAPS = new ThreadLocal<>();
@@ -28,6 +33,7 @@ public class EnvSetup {
   public static final ThreadLocal<HashMap<String, Object>> GIVEN_TEST_CAPS_MAP = new ThreadLocal<HashMap<String, Object>>();
   public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();
   public static final ThreadLocal<String> TEST_SESSION_ID = new ThreadLocal<>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = new ThreadLocal<>();
 
   public static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {
