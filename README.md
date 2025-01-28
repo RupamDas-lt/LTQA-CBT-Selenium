@@ -41,22 +41,43 @@ To rerun failed tests:
     - `local`: Run tests on the local machine instead of a remote grid.
 
 - **`RUN_N_TIMES`**: Specifies how many times to rerun the same scenario. Default value is `1`. Example:
-  ```bash
+
+```bash
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DRUN_N_TIMES=5
-  ```
+```
 
 - **`PARALLEL`**: Sets concurrency for running tests. Example:
-  ```bash
+
+```bash
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DPARALLEL=3
-  ```
+```
 
 - **`CUSTOM_USER_NAME`, `CUSTOM_USER_KEY`, `CUSTOM_USER_EMAIL`, `CUSTOM_USER_PASS`, `CUSTOM_GRID_URL`**: Use these
   flags to provide custom configurations if you want to run the tests with a custom user not defined in the
   `cucumber.yaml` file.
   Example:
-  ```bash
+
+```bash
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DCUSTOM_USER_NAME=username -DCUSTOM_USER_KEY=key -DCUSTOM_GRID_URL=gridUrl
-  ```
+```
+
+---
+
+## Tunnel
+
+- Install brew and wget
+
+```bash
+  brew install wget
+```
+
+- **Setup Tunnel Binary**: We can execute Utility/Bash/SetupTunnelBinary.sh to setup tunnel binary in the required
+  directory. For setting up binary of specific ENV we can pass --env flag value as stage or prod, by default it will
+  download the Prod tunnel binary:
+
+```bash
+  bash Utility/Bash/SetupTunnelBinary.sh --env stage
+```
 
 ---
 

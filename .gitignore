@@ -36,3 +36,5 @@ src/test/resources/cucumber.yaml
 rerun/
 
 logs
+
+LT_Tunnel_Binary/**
