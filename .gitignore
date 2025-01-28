@@ -34,3 +34,5 @@ build/
 src/test/resources/cucumber.yaml
 
 rerun/
+
+logs
