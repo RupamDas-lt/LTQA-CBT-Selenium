@@ -1,0 +1,141 @@
+package automationHelper;
+
+import factory.BrowserType;
+import factory.Locator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
+import utility.BaseClass;
+import utility.EnvSetup;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+
+import static utility.EnvSetup.*;
+import static utility.FrameworkConstants.HTTPS;
+import static utility.FrameworkConstants.SESSION_ID;
+
+public class DriverManager extends BaseClass {
+  private final Logger ltLogger = LogManager.getLogger(DriverManager.class);
+  RemoteWebDriver driver;
+  MutableCapabilities capabilities;
+  String gridUrl;
+
+  public static By toBy(Locator locator) {
+    return switch (locator.type()) {
+      case CSS -> By.cssSelector(locator.value());
+      case XPATH -> By.xpath(locator.value());
+      case ID -> By.id(locator.value());
+      case NAME -> By.name(locator.value());
+      case CLASS_NAME -> By.className(locator.value());
+      case TAG_NAME -> By.tagName(locator.value());
+      case LINK_TEXT -> By.linkText(locator.value());
+      case PARTIAL_LINK_TEXT -> By.partialLinkText(locator.value());
+    };
+  }
+
+  public void createTestDriver() {
+    capabilities = EnvSetup.TEST_CAPS.get();
+    ltLogger.info("Test caps used passed by user: {}", capabilities.asMap().toString());
+    if (TEST_ENV.equals("local"))
+      createLocalTestDriver();
+    else
+      createRemoteTestDriver();
+    testDriver.set(driver);
+  }
+
+  private void createLocalTestDriver() {
+    String browserName = (String) EnvSetup.GIVEN_TEST_CAPS_MAP.get().get("browserName");
+    BrowserType browserType = BrowserType.valueOf(browserName.toUpperCase());
+    ltLogger.info("Creating local driver for browser {}, with caps: {}", browserType, capabilities.asMap().toString());
+    switch (browserType) {
+    case FIREFOX:
+      driver = new FirefoxDriver((FirefoxOptions) capabilities);
+      return;
+    case CHROME:
+      driver = new ChromeDriver((ChromeOptions) capabilities);
+      return;
+    case EDGE:
+      driver = new EdgeDriver((EdgeOptions) capabilities);
+      return;
+    case SAFARI:
+      driver = new SafariDriver((SafariOptions) capabilities);
+      return;
+    default:
+      throw new IllegalArgumentException("Unsupported browser: " + browserName);
+    }
+  }
+
+  private String getGridUrl() {
+    return HTTPS + testUserName.get() + ":" + testAccessKey.get() + "@" + testGridUrl.get() + "/wd/hub";
+  }
+
+  private void createRemoteTestDriver() {
+    gridUrl = getGridUrl();
+    ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
+    try {
+      driver = new RemoteWebDriver(new URL(gridUrl), capabilities);
+      TEST_SESSION_ID.set(driver.getSessionId().toString());
+      EnvSetup.TEST_REPORT.get().put(SESSION_ID, TEST_SESSION_ID.get());
+      ltLogger.info("Remote driver created. Test session ID: {}", TEST_SESSION_ID.get());
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void getURL(String url) {
+    ltLogger.info("Opening URL: {}", url);
+    driver.get(url);
+  }
+
+  public void quit() {
+    driver.quit();
+  }
+
+  public WebElement findElement(Locator locator) {
+    ltLogger.info("Finding element with locator: {}", locator.toString());
+    return driver.findElement(toBy(locator));
+  }
+
+  public String getText(Locator locator) {
+    ltLogger.info("Finding text with locator: {}", locator.toString());
+    String text = driver.findElement(toBy(locator)).getText();
+    ltLogger.info("Found text from element: {}", text);
+    return text;
+  }
+
+  public boolean isDisplayed(Locator locator) {
+    ltLogger.info("Finding if element is displayed with locator: {}", locator.toString());
+    return driver.findElement(toBy(locator)).isDisplayed();
+  }
+
+  public Set<Cookie> getCookies() {
+    Set<Cookie> cookies = driver.manage().getCookies();
+    ltLogger.info("Found cookies: {}", cookies.toString());
+    return cookies;
+  }
+
+  public Set<String> getCookieNames() {
+    Set<Cookie> cookies = driver.manage().getCookies();
+    Set<String> cookieNames = new HashSet<>();
+    for (Cookie cookie : cookies) {
+      cookieNames.add(cookie.getName());
+    }
+    ltLogger.info("Found cookies names: {}", cookieNames);
+    return cookieNames;
+  }
+}
