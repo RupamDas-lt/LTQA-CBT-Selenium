@@ -1,0 +1,15 @@
+stage:
+  test_env_username: "<LT_STAGE_USER_NAME>"
+  test_env_key: "<LT_STAGE_ACCESS_KEY>"
+  test_env_email: "<LT_STAGE_EMAIL_ID>"
+  test_env_pass: "<LT_STAGE_EMAIL_PASS>"
+  test_env_hub_url: "stage-hub.lambdatestinternal.com"
+  test_env_api_url: "stage-api.lambdatestinternal.com"
+
+prod:
+  test_env_username: "<LT_PROD_USER_NAME>"
+  test_env_key: "<LT_PROD_ACCESS_KEY>"
+  test_env_email: "<LT_PROD_EMAIL_ID>"
+  test_env_pass: "<LT_PROD_EMAIL_PASS>"
+  test_env_hub_url: "hub.lambdatest.com"
+  test_env_api_url: "api.lambdatest.com"
