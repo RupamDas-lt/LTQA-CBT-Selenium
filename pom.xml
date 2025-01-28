@@ -16,7 +16,11 @@
         <cucumber.version>7.20.1</cucumber.version>
         <cucumber.testng.version>7.20.1</cucumber.testng.version>
         <surefire.plugin.version>3.5.2</surefire.plugin.version>
+        <!--        Plugins for log4j       -->
         <log4j.core.version>2.24.3</log4j.core.version>
+        <log4j.slf4j.impl.version>2.24.3</log4j.slf4j.impl.version>
+        <jackson.databin.version>2.18.2</jackson.databin.version>
+        <!--        /Plugins for log4j       -->
         <selenium.version>4.27.0</selenium.version>
         <mysql.connector.version>9.1.0</mysql.connector.version>
     </properties>
@@ -52,11 +56,32 @@
             <artifactId>log4j-api</artifactId>
             <version>${log4j.core.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.slf4j.impl.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.databin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.databin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>${jackson.databin.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <dependency>
