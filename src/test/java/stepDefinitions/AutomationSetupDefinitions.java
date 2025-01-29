@@ -34,8 +34,12 @@ public class AutomationSetupDefinitions {
     return StringUtils.isNullOrEmpty(System.getProperty(property, "")) ? defaultValue : System.getProperty(property);
   }
 
-  @Then("I start tunnel")
-  public void iStartTunnel() {
-    automationHelper.startTunnel();
+  @Then("^I ([a-zA-Z0-9_=,: ]+) tunnel$")
+  public void iStartTunnel(String startOrStop) {
+    if (startOrStop.equals("start")) {
+      automationHelper.startTunnel();
+    } else if (startOrStop.equals("stop")) {
+      automationHelper.stopTunnel();
+    }
   }
 }

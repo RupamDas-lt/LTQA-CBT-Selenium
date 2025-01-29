@@ -5,6 +5,7 @@ Feature: Trial
     Given Setup user details
     Then I start tunnel
     Then I start session to test basicAuthentication with <capabilities>
+    Then I stop tunnel
 
     Examples:
       | capabilities                                  |

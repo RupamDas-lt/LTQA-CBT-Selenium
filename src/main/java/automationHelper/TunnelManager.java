@@ -1,85 +1,74 @@
 package automationHelper;
 
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.BaseClass;
 
-import java.util.HashMap;
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static utility.EnvSetup.*;
-import static utility.FrameworkConstants.CUSTOM_TUNNEL_FLAGS;
-import static utility.FrameworkConstants.OS_NAME;
+import static utility.FrameworkConstants.*;
 
 public class TunnelManager extends BaseClass implements Runnable {
 
-  //  Constants
-  private static final String tunnelBinaryParentDir = "./LT_Tunnel_Binary";
-  private static final String tunnelBinaryPathWin = "/Windows/LT.exe";
-  private static final String tunnelBinaryPathMac = "/Mac/LT";
-  private static final String tunnelBinaryPathLinux = "/Linux/LT";
-  private static final String tunnelBinaryPath = getTunnelBinaryPath();
-  private static final String[] TUNNEL_MODES = new String[] { "tcp", "ssh" };
+  // Tunnel Constants
+  private static final String TUNNEL_BINARY_PARENT_DIR = "./LT_Tunnel_Binary";
+  private static final Map<String, String> TUNNEL_BINARY_PATHS = Map.of("win", "/Windows/LT.exe", "mac", "/Mac/LT",
+    "linux", "/Linux/LT");
+  private static final String[] TUNNEL_MODES = { "tcp", "ssh" };
   private final Logger ltLogger = LogManager.getLogger(TunnelManager.class);
-  private final String TUNNEL_NAME = getRandomAlphaNumericString(30);
-  private final String LOG_FILE_PATH = "logs/tunnelLogs/" + TUNNEL_NAME + ".log";
-  private final HashMap<String, Object> defaultTunnelFlagsMap;
 
-  // Tunnel flags
-  private final HashMap<String, Object> tunnelFlagsMap = new HashMap<>();
+  // Tunnel Flag Details
+  private final String tunnelBinaryPath = getTunnelBinaryPath();
   private final String customTunnelFlagsString = System.getProperty(CUSTOM_TUNNEL_FLAGS, "");
-  // variables
+  private final Map<String, Object> defaultTunnelFlags;
+  private final String availableOpenPort;
+  private String tunnelName = getRandomAlphaNumericString(30);
+  // Variables
   private String tunnelRunCommand;
+  private Thread thread;
 
-  TunnelManager() {
-    defaultTunnelFlagsMap = new HashMap<>() {{
-      put("key", testAccessKey.get());
-      put("user", testUserName.get());
-      put("tunnelName", TUNNEL_NAME);
-      put("maxDataConnections", "1");
-      put("verbose", null);
-      put("mode", TUNNEL_MODES[new Random().nextInt(TUNNEL_MODES.length)]);
-      put("infoAPIPort", getOpenPort());
-      put("logFile", LOG_FILE_PATH);
-      put("mitm", null);
-    }};
-    if (TEST_ENV.contains("stage"))
-      defaultTunnelFlagsMap.put("env", TEST_ENV);
+  public TunnelManager() {
+    availableOpenPort = getOpenPort();
+    String logFilePath = "logs/tunnelLogs/" + tunnelName + ".log";
+    defaultTunnelFlags = new HashMap<>(
+      Map.of("key", testAccessKey.get(), "user", testUserName.get(), "tunnelName", tunnelName, "maxDataConnections",
+        "1", "verbose", "", "mode", TUNNEL_MODES[new Random().nextInt(TUNNEL_MODES.length)], "infoAPIPort",
+        availableOpenPort, "logFile", logFilePath, "mitm", ""));
+    if (TEST_ENV.contains("stage")) {
+      defaultTunnelFlags.put("env", TEST_ENV);
+    }
   }
 
   private static String getTunnelBinaryPath() {
-    String clientOS = System.getProperty(OS_NAME).toLowerCase();
-    String tunnelBinaryPath = null;
-    if (clientOS.toLowerCase().contains("win"))
-      tunnelBinaryPath = tunnelBinaryParentDir + tunnelBinaryPathWin;
-    else if (clientOS.toLowerCase().contains("mac"))
-      tunnelBinaryPath = tunnelBinaryParentDir + tunnelBinaryPathMac;
-    else if (clientOS.toLowerCase().contains("linux"))
-      tunnelBinaryPath = tunnelBinaryParentDir + tunnelBinaryPathLinux;
-    return tunnelBinaryPath;
+    String osKey = System.getProperty(OS_NAME).toLowerCase();
+    return TUNNEL_BINARY_PARENT_DIR + TUNNEL_BINARY_PATHS.entrySet().stream()
+      .filter(entry -> osKey.contains(entry.getKey())).map(Map.Entry::getValue).findFirst()
+      .orElseThrow(() -> new IllegalStateException("Unsupported OS: " + osKey));
   }
 
   private String constructTunnelRunCommand(String params) {
-    StringBuilder command = new StringBuilder();
-    tunnelFlagsMap.putAll(defaultTunnelFlagsMap);
-    HashMap<String, Object> getTunnelFlagsMap = getHashMapFromString(params, "--", " ");
-    for (String key : getTunnelFlagsMap.keySet()) {
-      tunnelFlagsMap.put(key.trim(), getTunnelFlagsMap.get(key).toString().trim());
-    }
-    HashMap<String, Object> getCustomTunnelFlagsMap = getHashMapFromString(customTunnelFlagsString, "--", " ");
-    for (String key : getCustomTunnelFlagsMap.keySet()) {
-      tunnelFlagsMap.put(key.trim(), getCustomTunnelFlagsMap.get(key).toString().trim());
-    }
-    command.append(tunnelBinaryPath);
-    ltLogger.info("Tunnel flags: {}", tunnelFlagsMap);
-    for (String key : tunnelFlagsMap.keySet()) {
-      command.append(" ").append("--").append(key);
-      if (tunnelFlagsMap.get(key) != null)
-        command.append(" ").append(tunnelFlagsMap.get(key).toString().trim());
-    }
-    String commandString = command.toString();
-    ltLogger.info("Tunnel run command: {}", commandString);
-    return commandString;
+    Map<String, Object> tunnelFlags = new HashMap<>(defaultTunnelFlags);
+    tunnelFlags.putAll(getHashMapFromString(params, "--", " "));
+    tunnelFlags.putAll(getHashMapFromString(customTunnelFlagsString, "--", " "));
+
+    String command = tunnelBinaryPath + " " + tunnelFlags.entrySet().stream().map(
+      entry -> "--" + entry.getKey() + ((entry.getValue() != null && !entry.getValue().toString().isEmpty()) ?
+        " " + entry.getValue() :
+        "")).collect(Collectors.joining(" "));
+
+    tunnelName = tunnelFlags.get("tunnelName").toString();
+    TUNNEL_NAME.set(tunnelName);
+    ltLogger.info("Tunnel run command: {}", command);
+    return command;
   }
 
   @Override
@@ -91,5 +80,93 @@ public class TunnelManager extends BaseClass implements Runnable {
     tunnelRunCommand = constructTunnelRunCommand(params);
     TUNNEL_START_COMMAND.set(tunnelRunCommand);
     ltLogger.info("Tunnel started with command: {}", tunnelRunCommand);
+    if (thread == null) {
+      thread = new Thread(this, tunnelName);
+      thread.start();
+    }
   }
+
+  public String state() {
+    return thread.getState().toString();
+  }
+
+  @SneakyThrows
+  public boolean checkTunnelInfoAPIServerIsInitiated() {
+    boolean isAPIServerStarted = true;
+    for (int i = 0; i < 5; i++) {
+      if (getCommandStdOutput().contains("Failed to start api server on port")) {
+        ltLogger.warn("Tunnel info API server status: {}", getCommandStdOutput());
+        ltLogger.info("APIServer is not started with {} port. So re-launching the tunnel with new port",
+          availableOpenPort);
+        isAPIServerStarted = false;
+        clearGetCommandStdOutput();
+        break;
+      }
+      TimeUnit.SECONDS.sleep(3);
+    }
+    return isAPIServerStarted;
+  }
+
+  @SneakyThrows
+  public boolean getTunnelStatusFromAPIServer() {
+    String url = LOCAL_HOST_URL + availableOpenPort + TUNNEL_INFO_API_PATH;
+    ltLogger.info("Tunnel info API URL: {}", url);
+
+    ApiHelper apiHelper = new ApiHelper();
+    int maxRetries = 10;
+    int retryDelay = 5;
+
+    return IntStream.range(0, maxRetries).mapToObj(i -> {
+        try {
+          Response tunnelResponse = apiHelper.httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, url, null,
+            ContentType.JSON, null, null, 0);
+          ltLogger.info("Tunnel info API server response -> {}", tunnelResponse.asString());
+          if (tunnelResponse.asString().contains("\"status\":\"SUCCESS\"") && tunnelResponse.asString()
+            .contains(tunnelName)) {
+            return true;
+          }
+        } catch (Exception e) {
+          ltLogger.error("Exception Occurred -> {}", e.getMessage());
+        }
+
+        if (i < maxRetries - 1) {
+          ltLogger.info("Looks like Tunnel is not started. Sleeping for {} seconds...", retryDelay);
+          try {
+            TimeUnit.SECONDS.sleep(retryDelay);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        return false;
+      }).filter(Boolean::booleanValue).findFirst()
+      .orElseThrow(() -> new RuntimeException("Tunnel is not started even after waiting for 120 seconds"));
+  }
+
+  public boolean isTunnelStarted() {
+    return getCommandStdOutput().contains("You can start testing now");
+  }
+
+  private ProcessBuilder stopTunnelCLI() {
+    List<String> stopTunnelCLICommand = Arrays.asList("/bin/sh", "-c",
+      "ps -ef | grep '" + tunnelName + "' | grep -v grep | awk '{print $2}' | xargs kill -9");
+    this.ltLogger.info("Tunnel Stop Command :- {}", stopTunnelCLICommand);
+    return new ProcessBuilder(stopTunnelCLICommand);
+  }
+
+  @SneakyThrows
+  public void stopTunnel() {
+    ProcessBuilder stopTunnelCLICommand = stopTunnelCLI();
+    Process process = stopTunnelCLICommand.start();
+    ltLogger.info("Reading tunnel stop process error output (if any) ...");
+
+    try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+      String line;
+      while ((line = errorReader.readLine()) != null) {
+        ltLogger.error(line);
+      }
+    }
+    int exitCode = process.waitFor();
+    ltLogger.info("Process exited with code :- {}", exitCode);
+  }
+
 }

@@ -15,8 +15,8 @@ import java.util.Random;
 public class BaseClass {
 
   private final Logger ltLogger = LogManager.getLogger(BaseClass.class);
-  private final StringBuilder commandStdOutput = new StringBuilder();
   private final StringBuilder commandErrOutput = new StringBuilder();
+  private StringBuilder commandStdOutput = new StringBuilder();
 
   public static String getRandomLowerUpperCaseOfSpecificString(String string) {
     Random random = new Random();
@@ -90,4 +90,13 @@ public class BaseClass {
     serverSocket.close();
     return String.valueOf(serverSocket.getLocalPort());
   }
+
+  public String getCommandStdOutput() {
+    return commandStdOutput.toString();
+  }
+
+  public void clearGetCommandStdOutput() {
+    commandStdOutput = new StringBuilder();
+  }
+
 }

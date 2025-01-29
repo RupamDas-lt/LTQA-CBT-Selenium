@@ -23,6 +23,7 @@
         <!--        /Plugins for log4j       -->
         <selenium.version>4.27.0</selenium.version>
         <mysql.connector.version>9.1.0</mysql.connector.version>
+        <rest.assured.version>5.5.0</rest.assured.version>
     </properties>
 
     <dependencies>
@@ -108,6 +109,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest.assured.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

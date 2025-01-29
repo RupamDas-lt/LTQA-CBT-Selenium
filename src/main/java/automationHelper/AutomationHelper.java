@@ -16,6 +16,7 @@ public class AutomationHelper {
 
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager();
+  TunnelManager tunnelManager;
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -72,7 +73,11 @@ public class AutomationHelper {
   }
 
   public void startTunnel() {
-    TunnelManager tunnelManager = new TunnelManager();
+    tunnelManager = new TunnelManager();
     tunnelManager.startTunnel("", 1);
+  }
+
+  public void stopTunnel() {
+    tunnelManager.stopTunnel();
   }
 }
