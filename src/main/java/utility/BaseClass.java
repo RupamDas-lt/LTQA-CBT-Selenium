@@ -1,15 +1,22 @@
 package utility;
 
 import com.mysql.cj.util.StringUtils;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Random;
 
 public class BaseClass {
 
   private final Logger ltLogger = LogManager.getLogger(BaseClass.class);
+  private final StringBuilder commandStdOutput = new StringBuilder();
+  private final StringBuilder commandErrOutput = new StringBuilder();
 
   public static String getRandomLowerUpperCaseOfSpecificString(String string) {
     Random random = new Random();
@@ -21,21 +28,66 @@ public class BaseClass {
     return String.valueOf(chars);
   }
 
-  public HashMap<String, Object> getHashMapFromString(String string, String... separator) {
+  public String getRandomAlphaNumericString(int length) {
+    String alphaNumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    Random random = new Random();
+    StringBuilder strBuilder = new StringBuilder(length);
+    for (int i = 0; i < length; i++) {
+      int randomIndex = random.nextInt(alphaNumericChars.length());
+      strBuilder.append(alphaNumericChars.charAt(randomIndex));
+    }
+    return strBuilder.toString();
+  }
+
+  public void runMacShellCommand(String command) {
+    String s = null;
+    try {
+      Process p = Runtime.getRuntime().exec(command);
+      BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+      while ((s = stdInput.readLine()) != null) {
+        commandStdOutput.append(s);
+        ltLogger.info("standard command output :- {} ", s);
+      }
+      while ((s = stdError.readLine()) != null) {
+        commandErrOutput.append(s);
+        ltLogger.info("Command error output :- {} ", s);
+      }
+    } catch (IOException e) {
+      ltLogger.info("exception happened - here's what I know: ");
+      ltLogger.info(e.getMessage());
+      e.printStackTrace();
+    } catch (Exception e) {
+      ltLogger.info(e.getMessage());
+    }
+  }
+
+  public HashMap<String, Object> getHashMapFromString(String string, String... separators) {
     HashMap<String, Object> hashmapList = new HashMap<>();
     if (StringUtils.isNullOrEmpty(string)) {
       return hashmapList;
     }
 
-    String actualSeparator = separator.length > 0 ? separator[0] : ",";
+    String actualSeparator = separators.length > 0 ? separators[0] : ",";
+    String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
     String[] list = string.split(actualSeparator);
     for (String s : list) {
-      String[] keyValue = s.split("=");
+      String[] keyValue = s.split(keyValueSeparator);
       if (keyValue.length == 2) {
         hashmapList.put(keyValue[0].trim(), keyValue[1].trim());
+      }
+      if (keyValue.length == 1) {
+        hashmapList.put(keyValue[0].trim(), null);
       }
     }
     ltLogger.info("Retrieved hashmap from string: {} is: {}", string, hashmapList);
     return hashmapList;
+  }
+
+  @SneakyThrows
+  public String getOpenPort() {
+    ServerSocket serverSocket = new ServerSocket(0);
+    serverSocket.close();
+    return String.valueOf(serverSocket.getLocalPort());
   }
 }

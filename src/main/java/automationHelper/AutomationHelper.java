@@ -70,4 +70,9 @@ public class AutomationHelper {
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
   }
+
+  public void startTunnel() {
+    TunnelManager tunnelManager = new TunnelManager();
+    tunnelManager.startTunnel("", 1);
+  }
 }

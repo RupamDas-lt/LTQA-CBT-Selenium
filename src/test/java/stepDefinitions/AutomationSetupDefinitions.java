@@ -33,4 +33,9 @@ public class AutomationSetupDefinitions {
   private String getPropertyOrDefault(String property, String defaultValue) {
     return StringUtils.isNullOrEmpty(System.getProperty(property, "")) ? defaultValue : System.getProperty(property);
   }
+
+  @Then("I start tunnel")
+  public void iStartTunnel() {
+    automationHelper.startTunnel();
+  }
 }

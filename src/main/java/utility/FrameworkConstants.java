@@ -5,6 +5,7 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String HTTPS = "https://";
   public static final String HTTP = "http://";
+  public static final String OS_NAME = "os.name";
 
   // ENV variables
   public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";
@@ -12,6 +13,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_USER_EMAIL = "CUSTOM_USER_EMAIL";
   public static final String CUSTOM_USER_PASS = "CUSTOM_USER_PASS";
   public static final String CUSTOM_GRID_URL = "CUSTOM_GRID_URL";
+  public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
