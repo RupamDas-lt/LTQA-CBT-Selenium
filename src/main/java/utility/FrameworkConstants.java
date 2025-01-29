@@ -5,6 +5,18 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String HTTPS = "https://";
   public static final String HTTP = "http://";
+  public static final String OS_NAME = "os.name";
+  public static final String LOCAL_HOST_URL = "http://127.0.0.1:";
+
+  // API Constants
+  public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
+  public static final String GET = "GET";
+  public static final String GET_REDIRECT = "GET_REDIRECT";
+  public static final String GET_WITHOUT_STATUS_CODE_VERIFICATION = "GET_WITHOUT_STATUS_CODE_VERIFICATION";
+  public static final String POST = "POST";
+  public static final String PUT = "PUT";
+  public static final String PATCH = "PATCH";
+  public static final String DELETE = "DELETE";
 
   // ENV variables
   public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";
@@ -12,6 +24,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_USER_EMAIL = "CUSTOM_USER_EMAIL";
   public static final String CUSTOM_USER_PASS = "CUSTOM_USER_PASS";
   public static final String CUSTOM_GRID_URL = "CUSTOM_GRID_URL";
+  public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";

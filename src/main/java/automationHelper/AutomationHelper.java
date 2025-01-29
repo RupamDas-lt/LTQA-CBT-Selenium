@@ -16,6 +16,7 @@ public class AutomationHelper {
 
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager();
+  TunnelManager tunnelManager;
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -69,5 +70,14 @@ public class AutomationHelper {
     }
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+  }
+
+  public void startTunnel() {
+    tunnelManager = new TunnelManager();
+    tunnelManager.startTunnel("", 1);
+  }
+
+  public void stopTunnel() {
+    tunnelManager.stopTunnel();
   }
 }
