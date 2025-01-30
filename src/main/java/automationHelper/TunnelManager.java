@@ -76,7 +76,7 @@ public class TunnelManager extends BaseClass implements Runnable {
     runMacShellCommand(tunnelRunCommand);
   }
 
-  public void startTunnel(String params, int retryCount) {
+  public void startTunnel(String params) {
     tunnelRunCommand = constructTunnelRunCommand(params);
     TUNNEL_START_COMMAND.set(tunnelRunCommand);
     ltLogger.info("Tunnel started with command: {}", tunnelRunCommand);
@@ -113,33 +113,33 @@ public class TunnelManager extends BaseClass implements Runnable {
     ltLogger.info("Tunnel info API URL: {}", url);
 
     ApiHelper apiHelper = new ApiHelper();
-    int maxRetries = 10;
+    int maxRetries = 12;
     int retryDelay = 5;
 
     return IntStream.range(0, maxRetries).mapToObj(i -> {
-        try {
-          Response tunnelResponse = apiHelper.httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, url, null,
-            ContentType.JSON, null, null, 0);
-          ltLogger.info("Tunnel info API server response -> {}", tunnelResponse.asString());
-          if (tunnelResponse.asString().contains("\"status\":\"SUCCESS\"") && tunnelResponse.asString()
-            .contains(tunnelName)) {
-            return true;
-          }
-        } catch (Exception e) {
-          ltLogger.error("Exception Occurred -> {}", e.getMessage());
+      try {
+        Response tunnelResponse = apiHelper.httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, url, null,
+          ContentType.JSON, null, null, 0);
+        ltLogger.info("Tunnel info API server response -> {}", tunnelResponse.asString());
+        if (tunnelResponse.asString().contains("\"status\":\"SUCCESS\"") && tunnelResponse.asString()
+          .contains(tunnelName)) {
+          return true;
         }
+      } catch (Exception e) {
+        ltLogger.error("Exception Occurred -> {}", e.getMessage());
+      }
 
-        if (i < maxRetries - 1) {
-          ltLogger.info("Looks like Tunnel is not started. Sleeping for {} seconds...", retryDelay);
-          try {
-            TimeUnit.SECONDS.sleep(retryDelay);
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
+      if (i < maxRetries - 1) {
+        ltLogger.info("Looks like Tunnel is not started. Sleeping for {} seconds...", retryDelay);
+        try {
+          TimeUnit.SECONDS.sleep(retryDelay);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
         }
-        return false;
-      }).filter(Boolean::booleanValue).findFirst()
-      .orElseThrow(() -> new RuntimeException("Tunnel is not started even after waiting for 120 seconds"));
+      }
+      return false;
+    }).filter(Boolean::booleanValue).findFirst().orElseThrow(() -> new RuntimeException(
+      "Tunnel is not started even after waiting for 60 seconds.\nTunnel logs: " + getCommandStdOutput()));
   }
 
   public boolean isTunnelStarted() {

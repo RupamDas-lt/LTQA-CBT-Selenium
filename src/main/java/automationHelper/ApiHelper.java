@@ -33,11 +33,17 @@ public class ApiHelper extends BaseClass {
       r -> r.delete(uri).then().statusCode(expectedStatus).extract().response(), PATCH,
       r -> r.patch(uri).then().statusCode(expectedStatus).extract().response(), GET_REDIRECT,
       r -> r.redirects().follow(false).get(uri).then().extract().response(), GET_WITHOUT_STATUS_CODE_VERIFICATION,
-      RequestSpecification::get);
+      r -> r.get(uri).then().extract().response());
 
     return methodMap.getOrDefault(method, reqType -> {
       throw new IllegalArgumentException("Unsupported HTTP method: " + method);
     }).apply(req);
+  }
+
+  public int getStatusCode(String uri, String body, ContentType contentType, Map<String, Object> headers,
+    Map<String, Object> queryParam) {
+    return httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, body, contentType, headers, queryParam,
+      0).getStatusCode();
   }
 
 }
