@@ -1,5 +1,6 @@
 package automationHelper;
 
+import com.mysql.cj.util.StringUtils;
 import factory.BrowserType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,8 +15,7 @@ import utility.EnvSetup;
 
 import java.util.HashMap;
 
-import static utility.EnvSetup.GIVEN_TEST_CAPS_MAP;
-import static utility.EnvSetup.TEST_ENV;
+import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.LT_OPTIONS;
 
 public class CapabilityManager extends BaseClass {
@@ -60,6 +60,8 @@ public class CapabilityManager extends BaseClass {
   public void buildTestCapability(String capabilityString, String... capsType) {
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
     HashMap<String, Object> capabilityMap = getHashMapFromString(capabilityString);
+    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault("tunnel", "")))
+      capabilityMap.put("tunnelName", TUNNEL_NAME.get());
     GIVEN_TEST_CAPS_MAP.set(capabilityMap);
     if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch"))
       createTestCapsWithFirstMatch((HashMap<String, Object>) capabilityMap.clone());

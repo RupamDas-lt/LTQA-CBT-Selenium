@@ -3,12 +3,12 @@ package automationHelper;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testng.Assert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import static utility.FrameworkConstants.*;
-import static utility.UrlsAndLocators.BASIC_AUTH;
-import static utility.UrlsAndLocators.basicAuthHeading;
+import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper {
 
@@ -17,6 +17,7 @@ public class AutomationHelper {
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager();
   TunnelManager tunnelManager;
+  ApiHelper apiHelper = new ApiHelper();
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -31,6 +32,8 @@ public class AutomationHelper {
 
   private void runTestActions(String actionName) {
     switch (actionName) {
+    case "local":
+      testLocalUrlWithTunnel();
     case "basicAuthentication":
       basicAuthentication();
       break;
@@ -49,6 +52,17 @@ public class AutomationHelper {
   }
 
   private void baseTest() {
+  }
+
+  private void testLocalUrlWithTunnel() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    int httpServerStatus = apiHelper.getStatusCode(LOCAL_URL, null, null, null, null);
+    Assert.assertEquals(httpServerStatus, 200,
+      "Please start http server on port 8000 to start verifying tunnel. Expected status code: 200, original status code: " + httpServerStatus);
+    driverManager.getURL(LOCAL_URL);
+    boolean localUrlStatus = driverManager.isDisplayed(localUrlHeading);
+    softAssert.assertTrue(localUrlStatus, "Local Url Not Displayed");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void startSessionWithSpecificCapabilities(String testCapability, String testActions) {
@@ -73,8 +87,18 @@ public class AutomationHelper {
   }
 
   public void startTunnel() {
-    tunnelManager = new TunnelManager();
-    tunnelManager.startTunnel("", 1);
+    int maxTunnelStartRetry = 2;
+    while (maxTunnelStartRetry > 0) {
+      tunnelManager = new TunnelManager();
+      tunnelManager.startTunnel("");
+      boolean tunnelInfoAPIServerStatus = tunnelManager.checkTunnelInfoAPIServerIsInitiated();
+      boolean tunnelCLIStatus = tunnelManager.getTunnelStatusFromAPIServer();
+      ltLogger.info("Tunnel info API server status {}, Tunnel CLI status {}", tunnelInfoAPIServerStatus,
+        tunnelCLIStatus);
+      if (tunnelInfoAPIServerStatus && tunnelCLIStatus)
+        break;
+      maxTunnelStartRetry--;
+    }
   }
 
   public void stopTunnel() {
