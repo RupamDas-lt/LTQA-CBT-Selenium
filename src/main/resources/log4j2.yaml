@@ -1,5 +1,6 @@
 Configuration:
   name: Default
+  packages: "com.epam.ta.reportportal.log4j.appender"
 
   Appenders:
     Console:
@@ -20,9 +21,14 @@ Configuration:
       DefaultRolloverStrategy:
         max: 10
 
+    ReportPortalLog4j2Appender:
+      name: ReportPortalAppender
+      PatternLayout:
+        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{2} - %msg%n"
 
   Loggers:
     Root:
       level: info
       AppenderRef:
         - ref: RollingFileAppender
+        - ref: ReportPortalAppender
