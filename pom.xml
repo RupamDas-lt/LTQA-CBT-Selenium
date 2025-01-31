@@ -24,7 +24,22 @@
         <selenium.version>4.27.0</selenium.version>
         <mysql.connector.version>9.1.0</mysql.connector.version>
         <rest.assured.version>5.5.0</rest.assured.version>
+        <!--        Dependencies for reportPortal       -->
+        <rp.java.cucumber.version>5.3.2</rp.java.cucumber.version>
+        <rp.epam.log4j.version>5.2.3</rp.epam.log4j.version>
+        <!--        /Dependencies for reportPortal       -->
     </properties>
+
+    <repositories>
+        <repository>
+            <id>bintray-epam-reportportal</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/epam/reportportal</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- Cucumber Java -->
@@ -115,7 +130,17 @@
             <artifactId>rest-assured</artifactId>
             <version>${rest.assured.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.epam.reportportal</groupId>
+            <artifactId>agent-java-cucumber6</artifactId>
+            <version>${rp.java.cucumber.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.epam.reportportal/logger-java-log4j -->
+        <dependency>
+            <groupId>com.epam.reportportal</groupId>
+            <artifactId>logger-java-log4j</artifactId>
+            <version>${rp.epam.log4j.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
