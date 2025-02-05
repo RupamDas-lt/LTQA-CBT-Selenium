@@ -12,11 +12,15 @@ public class FrameworkConstants extends BaseClass {
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
   public static final String GET = "GET";
   public static final String GET_REDIRECT = "GET_REDIRECT";
-  public static final String GET_WITHOUT_STATUS_CODE_VERIFICATION = "GET_WITHOUT_STATUS_CODE_VERIFICATION";
   public static final String POST = "POST";
   public static final String PUT = "PUT";
   public static final String PATCH = "PATCH";
   public static final String DELETE = "DELETE";
+  public static final String GET_WITHOUT_STATUS_CODE_VERIFICATION = "GET_WITHOUT_STATUS_CODE_VERIFICATION";
+  public static final String POST_WITHOUT_STATUS_CODE_VERIFICATION = "POST_WITHOUT_STATUS_CODE_VERIFICATION";
+  public static final String PUT_WITHOUT_STATUS_CODE_VERIFICATION = "PUT_WITHOUT_STATUS_CODE_VERIFICATION";
+  public static final String PATCH_WITHOUT_STATUS_CODE_VERIFICATION = "PATCH_WITHOUT_STATUS_CODE_VERIFICATION";
+  public static final String DELETE_WITHOUT_STATUS_CODE_VERIFICATION = "DELETE_WITHOUT_STATUS_CODE_VERIFICATION";
 
   // ENV variables
   public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";

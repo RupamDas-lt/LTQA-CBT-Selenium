@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class BaseClass {
 
@@ -97,6 +98,26 @@ public class BaseClass {
 
   public void clearGetCommandStdOutput() {
     commandStdOutput = new StringBuilder();
+  }
+
+  public String createStringBodyFromHashMap(HashMap<String, String> hashmap) {
+    StringBuilder stringBuilder = new StringBuilder("{");
+    hashmap.forEach((key, value) -> stringBuilder.append("\"").append(key).append("\":\"").append(value).append("\","));
+    // Remove the trailing comma if the map is not empty
+    if (!hashmap.isEmpty()) {
+      stringBuilder.setLength(stringBuilder.length() - 1);
+    }
+    stringBuilder.append("}");
+    return stringBuilder.toString();
+  }
+
+  public void waitForTime(int seconds) {
+    try {
+      TimeUnit.SECONDS.sleep(seconds);
+      ltLogger.info("Sleeping for {} seconds", seconds);
+    } catch (InterruptedException e) {
+      ltLogger.error("Unexpected error while waiting for sleep {}", e.getMessage());
+    }
   }
 
 }
