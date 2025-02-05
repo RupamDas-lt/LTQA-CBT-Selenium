@@ -1,4 +1,4 @@
-package automationHelper;
+package TestManagers;
 
 import com.mysql.cj.util.StringUtils;
 import factory.BrowserType;
