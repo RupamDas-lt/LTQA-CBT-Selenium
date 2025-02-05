@@ -1,5 +1,6 @@
 package automationHelper;
 
+import TestManagers.ApiManager;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
