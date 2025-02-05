@@ -21,6 +21,7 @@ import static utility.FrameworkConstants.LT_OPTIONS;
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
   MutableCapabilities capabilities;
+  String capsString;
 
   private void createTestCapsWithFirstMatch(HashMap<String, Object> capsHash) {
     String browserName = capsHash.get("browserName").toString();
@@ -57,11 +58,18 @@ public class CapabilityManager extends BaseClass {
     capabilities = desiredCapabilities;
   }
 
-  public void buildTestCapability(String capabilityString, String... capsType) {
-    String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
-    HashMap<String, Object> capabilityMap = getHashMapFromString(capabilityString);
+  private void setCustomValues(HashMap<String, Object> capabilityMap) {
     if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault("tunnel", "")))
       capabilityMap.put("tunnelName", TUNNEL_NAME.get());
+    if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault("name", "")))
+      capabilityMap.put("name", capsString);
+  }
+
+  public void buildTestCapability(String capabilityString, String... capsType) {
+    capsString = capabilityString;
+    String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
+    HashMap<String, Object> capabilityMap = getHashMapFromString(capabilityString);
+    setCustomValues(capabilityMap);
     GIVEN_TEST_CAPS_MAP.set(capabilityMap);
     if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch"))
       createTestCapsWithFirstMatch((HashMap<String, Object>) capabilityMap.clone());
