@@ -1,5 +1,8 @@
 package automationHelper;
 
+import TestManagers.CapabilityManager;
+import TestManagers.DriverManager;
+import TestManagers.TunnelManager;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +20,7 @@ public class AutomationHelper {
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager();
   TunnelManager tunnelManager;
-  ApiHelper apiHelper = new ApiHelper();
+  AutomationAPIHelper apiHelper = new AutomationAPIHelper();
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -92,7 +95,13 @@ public class AutomationHelper {
       tunnelManager = new TunnelManager();
       tunnelManager.startTunnel("");
       boolean tunnelInfoAPIServerStatus = tunnelManager.checkTunnelInfoAPIServerIsInitiated();
-      boolean tunnelCLIStatus = tunnelManager.getTunnelStatusFromAPIServer();
+      boolean tunnelCLIStatus;
+      try {
+        tunnelCLIStatus = tunnelManager.getTunnelStatusFromAPIServer();
+      } catch (Exception e) {
+        ltLogger.error("Encountered error while checking Tunnel Status: {}", e.getMessage());
+        tunnelCLIStatus = false;
+      }
       ltLogger.info("Tunnel info API server status {}, Tunnel CLI status {}", tunnelInfoAPIServerStatus,
         tunnelCLIStatus);
       if (tunnelInfoAPIServerStatus && tunnelCLIStatus)
