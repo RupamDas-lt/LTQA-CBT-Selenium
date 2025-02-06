@@ -6,7 +6,8 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.cucumber.plugin.event.Result;
-import lombok.SneakyThrows;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
@@ -16,12 +17,15 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 
-public class Hooks {
-  AutomationAPIHelper apiHelper = new AutomationAPIHelper();
+import static utility.FrameworkConstants.COMPLETED;
+import static utility.FrameworkConstants.FAILED;
 
-  String errorStackTrace;
-  String errorMessage;
-  String testStatus = "passed";
+public class Hooks {
+  private final Logger ltLogger = LogManager.getLogger(Hooks.class);
+  private final AutomationAPIHelper apiHelper = new AutomationAPIHelper();
+  private String errorStackTrace;
+  private String errorMessage = "";
+  private String testStatus = "passed";
 
   @Before
   public void beforeScenario() {
@@ -31,16 +35,21 @@ public class Hooks {
     EnvSetup.TEST_REPORT.set(new HashMap<>());
   }
 
-  private void getTestRunStatus(Scenario scenario) {
+  // Helper method to get stack trace as a string
+  private String getStackTrace(Throwable error) {
+    StringWriter sw = new StringWriter();
+    error.printStackTrace(new PrintWriter(sw));
+    return sw.toString();
+  }
+
+  private void updateTestStatusIfNeeded(Scenario scenario) {
     Result failResult = null;
 
     try {
-      // Get the delegate from the scenario
       Field delegate = scenario.getClass().getDeclaredField("delegate");
       delegate.setAccessible(true);
       TestCaseState testCaseState = (TestCaseState) delegate.get(scenario);
 
-      // Get the test case results from the delegate
       Field stepResults = testCaseState.getClass().getDeclaredField("stepResults");
       stepResults.setAccessible(true);
 
@@ -52,40 +61,56 @@ public class Hooks {
         }
       }
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      e.printStackTrace();  // Optional: Handle logging for reflection failures
     }
-    assert failResult != null;
-    Throwable error = failResult.getError();
-    StringWriter sw = new StringWriter();
-    error.printStackTrace(new PrintWriter(sw));
-    errorStackTrace = sw.toString();
-    errorMessage = String.valueOf(failResult.getError());
-    System.out.println("Scenario status: " + scenario.getStatus());
-    System.out.println("Scenario name: " + scenario.getName());
-    System.out.println("After test executed even after error occurred. Error: " + errorMessage);
+
+    if (failResult != null) {
+      errorMessage = String.valueOf(failResult.getError());
+      errorStackTrace = getStackTrace(failResult.getError());
+      ltLogger.debug("Scenario failed with error: {}", errorMessage);
+    }
   }
 
   private void setTestStatus() {
     HashMap<String, String> updatedPayload = new HashMap<>();
     updatedPayload.put("status_ind", testStatus);
-    updatedPayload.put("reason", errorMessage);
+
+    if (FAILED.equalsIgnoreCase(testStatus)) {
+      String formattedErrorMessage = errorMessage.replaceAll("(\r\n|\n|\r)", "\\\\n").replaceAll("\t", "");
+      updatedPayload.put("reason", formattedErrorMessage);
+    }
+
     apiHelper.updateSessionDetailsViaAPI(EnvSetup.TEST_SESSION_ID.get(), updatedPayload);
   }
 
-  @SneakyThrows
-  @After
+  @After(order = 1)
   public void afterScenario(Scenario scenario) {
     try {
       EnvSetup.testDriver.get().quit();
     } catch (Exception ignored) {
+      // Driver quit failure can be safely ignored
     }
-    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    softAssert.assertAll();
-    System.out.println("Test report: " + EnvSetup.TEST_REPORT.get());
-    getTestRunStatus(scenario);
+
+    ltLogger.info("Test report: {}", EnvSetup.TEST_REPORT.get());
+    updateTestStatusIfNeeded(scenario);
+
     apiHelper.waitForTime(5);
-    if (apiHelper.getSpecificSessionDetailsViaAPI(EnvSetup.TEST_SESSION_ID.get()).equalsIgnoreCase("completed")) {
+
+    if (COMPLETED.equalsIgnoreCase(
+      apiHelper.getSpecificSessionDetailsViaAPI(EnvSetup.TEST_SESSION_ID.get(), "status_ind"))) {
       setTestStatus();
+    }
+  }
+
+  @After(order = 2)
+  public void assertAll() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    try {
+      softAssert.assertAll();
+    } catch (AssertionError e) {
+      errorMessage = e.getLocalizedMessage();
+      testStatus = "failed";
+      ltLogger.debug("Assertion error: {}", errorMessage);
     }
   }
 }

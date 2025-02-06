@@ -35,4 +35,11 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_EXECUTION_TIME = "test_execution_time";
   public static final String TEST_STOP_TIME = "test_stop_time";
   public static final String SESSION_ID = "test_session_id";
+
+  // Test Status
+  public static final String COMPLETED = "completed";
+  public static final String IGNORED = "ignored";
+  public static final String FAILED = "failed";
+  public static final String PASSED = "passed";
+  public static final String SKIPPED = "skipped";
 }
