@@ -28,7 +28,6 @@ public abstract class ApiManager extends BaseClass {
       "Hitting Method: {} on URI: {} with Body: {}, Headers: {}, Query Param: {}, Content Type: {}, Expected Status is: {}, Username is: {} and Password is: {}",
       method, uri, body, headers, queryParam, contentType, expectedStatus, username, password);
 
-    // Add Basic Auth header if username or password is provided
     if (!username.isEmpty() || !password.isEmpty()) {
       if (headers == null) {
         headers = new HashMap<>();
@@ -39,28 +38,21 @@ public abstract class ApiManager extends BaseClass {
       ltLogger.info("Updated Request Headers: {}", headers);
     }
 
-    // Initialize the request
     RequestSpecification req = RestAssured.given().headers(headers != null ? headers : Map.of())
       .queryParams(queryParam != null ? queryParam : Map.of()).body(body != null ? body : "")
       .contentType(contentType != null ? contentType : ContentType.JSON);
 
-    // Determine if status code verification is required
     boolean verifyStatusCode = !method.endsWith("_WITHOUT_STATUS_CODE_VERIFICATION");
 
-    // Map HTTP methods to their corresponding REST Assured actions
     Map<String, Function<RequestSpecification, Response>> methodMap = Map.of(GET, r -> r.get(uri), POST,
       r -> r.post(uri), PUT, r -> r.put(uri), DELETE, r -> r.delete(uri), PATCH, r -> r.patch(uri), GET_REDIRECT,
       r -> r.redirects().follow(false).get(uri));
 
-    // Get the appropriate HTTP method action
     Function<RequestSpecification, Response> action = methodMap.getOrDefault(
-      method.replace("_WITHOUT_STATUS_CODE_VERIFICATION", ""),
-      // Remove the suffix to match the method
-      reqType -> {
+      method.replace("_WITHOUT_STATUS_CODE_VERIFICATION", ""), reqType -> {
         throw new IllegalArgumentException("Unsupported HTTP method: " + method);
       });
 
-    // Execute the request and handle status code verification
     Response response = action.apply(req);
     if (verifyStatusCode) {
       response.then().statusCode(expectedStatus);
