@@ -20,6 +20,7 @@ public class EnvSetup {
   public static final String USER_EMAIL = config.get("test_env_email");
   public static final String USER_PASS = config.get("test_env_pass");
   public static final String GRID_URL = config.get("test_env_hub_url");
+  public static final String API_URL_BASE = config.get("test_env_api_url");
 
   // Test user configs
   public static final ThreadLocal<String> testUserName = new ThreadLocal<>();
@@ -41,7 +42,7 @@ public class EnvSetup {
   public static final ThreadLocal<String> TUNNEL_NAME = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
 
-  public static Map<String, String> getEnvConfig() {
+  private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {
       return new HashMap<>();
     }

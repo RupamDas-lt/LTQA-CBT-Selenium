@@ -1,5 +1,7 @@
 package utility;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class BaseClass {
 
@@ -26,6 +29,16 @@ public class BaseClass {
         chars[i] = Character.toLowerCase(chars[i]);
     }
     return String.valueOf(chars);
+  }
+
+  public static <T> T convertJsonStringToPojo(String jsonString, TypeToken<T> type) {
+    Object object = null;
+    try {
+      object = new Gson().fromJson(jsonString, type.getType());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return (T) object;
   }
 
   public String getRandomAlphaNumericString(int length) {
@@ -99,4 +112,23 @@ public class BaseClass {
     commandStdOutput = new StringBuilder();
   }
 
+  public String createStringBodyFromHashMap(HashMap<String, String> hashmap) {
+    StringBuilder stringBuilder = new StringBuilder("{");
+    hashmap.forEach((key, value) -> stringBuilder.append("\"").append(key).append("\":\"").append(value).append("\","));
+    // Remove the trailing comma if the map is not empty
+    if (!hashmap.isEmpty()) {
+      stringBuilder.setLength(stringBuilder.length() - 1);
+    }
+    stringBuilder.append("}");
+    return stringBuilder.toString();
+  }
+
+  public void waitForTime(int seconds) {
+    try {
+      TimeUnit.SECONDS.sleep(seconds);
+      ltLogger.info("Sleeping for {} seconds", seconds);
+    } catch (InterruptedException e) {
+      ltLogger.error("Unexpected error while waiting for sleep {}", e.getMessage());
+    }
+  }
 }

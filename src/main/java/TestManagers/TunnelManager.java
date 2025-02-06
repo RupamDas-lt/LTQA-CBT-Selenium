@@ -1,7 +1,6 @@
-package automationHelper;
+package TestManagers;
 
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
+import automationHelper.AutomationAPIHelper;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,17 +111,15 @@ public class TunnelManager extends BaseClass implements Runnable {
     String url = LOCAL_HOST_URL + availableOpenPort + TUNNEL_INFO_API_PATH;
     ltLogger.info("Tunnel info API URL: {}", url);
 
-    ApiHelper apiHelper = new ApiHelper();
+    AutomationAPIHelper apiManager = new AutomationAPIHelper();
     int maxRetries = 12;
     int retryDelay = 5;
 
     return IntStream.range(0, maxRetries).mapToObj(i -> {
       try {
-        Response tunnelResponse = apiHelper.httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, url, null,
-          ContentType.JSON, null, null, 0);
-        ltLogger.info("Tunnel info API server response -> {}", tunnelResponse.asString());
-        if (tunnelResponse.asString().contains("\"status\":\"SUCCESS\"") && tunnelResponse.asString()
-          .contains(tunnelName)) {
+        String tunnelResponse = apiManager.getRequestAsString(url);
+        ltLogger.info("Tunnel info API server response -> {}", tunnelResponse);
+        if (tunnelResponse.contains("\"status\":\"SUCCESS\"") && tunnelResponse.contains(tunnelName)) {
           return true;
         }
       } catch (Exception e) {

@@ -1,4 +1,4 @@
-package automationHelper;
+package TestManagers;
 
 import factory.BrowserType;
 import factory.Locator;
