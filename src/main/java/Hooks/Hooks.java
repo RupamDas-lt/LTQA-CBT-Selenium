@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 
+import static utility.EnvSetup.TEST_REPORT;
 import static utility.FrameworkConstants.COMPLETED;
 import static utility.FrameworkConstants.FAILED;
 
@@ -25,6 +26,7 @@ public class Hooks {
   private final AutomationAPIHelper apiHelper = new AutomationAPIHelper();
   private String errorStackTrace;
   private String errorMessage = "";
+  private String scenarioName;
   private String testStatus = "passed";
 
   @Before
@@ -32,7 +34,7 @@ public class Hooks {
     CustomSoftAssert softAssert = new CustomSoftAssert();
     EnvSetup.SOFT_ASSERT.set(softAssert);
     EnvSetup.TEST_SESSION_ID.set("");
-    EnvSetup.TEST_REPORT.set(new HashMap<>());
+    TEST_REPORT.set(new HashMap<>());
     EnvSetup.TEST_ERR_REPORT.set(new HashMap<>());
   }
 
@@ -84,6 +86,13 @@ public class Hooks {
     apiHelper.updateSessionDetailsViaAPI(EnvSetup.TEST_SESSION_ID.get(), updatedPayload);
   }
 
+  private void updateTestReport() {
+    TEST_REPORT.get().put("scenarioName", scenarioName);
+    TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());
+    TEST_REPORT.get().put("accessKey", EnvSetup.testAccessKey.get());
+    TEST_REPORT.get().put("hub", EnvSetup.testGridUrl.get());
+  }
+
   @After(order = 1)
   public void afterScenario(Scenario scenario) {
     try {
@@ -92,7 +101,8 @@ public class Hooks {
       // Driver quit failure can be safely ignored
     }
 
-    ltLogger.info("Test report: {}", EnvSetup.TEST_REPORT.get());
+    scenarioName = scenario.getName();
+    ltLogger.info("Test report: {}", TEST_REPORT.get());
     updateTestStatusIfNeeded(scenario);
 
     apiHelper.waitForTime(5);
@@ -101,6 +111,9 @@ public class Hooks {
       apiHelper.getSpecificSessionDetailsViaAPI(EnvSetup.TEST_SESSION_ID.get(), "status_ind"))) {
       setTestStatus();
     }
+
+    updateTestReport();
+    apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
   }
 
   @After(order = 2)

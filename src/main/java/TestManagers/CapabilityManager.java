@@ -76,6 +76,6 @@ public class CapabilityManager extends BaseClass {
     else
       createTestCapsWithDesiredCaps(capabilityMap);
     EnvSetup.TEST_CAPS.set(capabilities);
-    ltLogger.debug("Test caps set in LocalThread: {}", EnvSetup.TEST_CAPS.get().toString());
+    ltLogger.info("Test caps set in LocalThread: {}", EnvSetup.TEST_CAPS.get().toString());
   }
 }

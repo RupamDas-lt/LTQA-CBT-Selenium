@@ -18,7 +18,7 @@ import static utility.FrameworkConstants.*;
 public abstract class ApiManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(ApiManager.class);
 
-  private Response httpMethod(String method, String uri, String body, ContentType contentType,
+  private Response httpMethod(String method, String uri, Object body, ContentType contentType,
     Map<String, Object> headers, Map<String, Object> queryParam, int expectedStatus, String... basicAuthHeaders) {
 
     String username = basicAuthHeaders.length > 0 ? basicAuthHeaders[0] : "";
@@ -72,9 +72,15 @@ public abstract class ApiManager extends BaseClass {
       password);
   }
 
-  public Response patchRequestWithBasicAuth(String uri, String username, String password, String body) {
+  public Response patchRequestWithBasicAuth(String uri, String username, String password, Object body) {
     return httpMethod(PATCH_WITHOUT_STATUS_CODE_VERIFICATION, uri, body, ContentType.JSON, null, null, 0, username,
       password);
+  }
+
+  public Response putRequestWithURLEncoding(String uri, HashMap<String, Object> body) {
+    RestAssured.urlEncodingEnabled = false;
+    return RestAssured.given().body(body).contentType(ContentType.JSON).put(uri).then().statusCode(200).extract()
+      .response();
   }
 
   public Response getRequest(String uri) {

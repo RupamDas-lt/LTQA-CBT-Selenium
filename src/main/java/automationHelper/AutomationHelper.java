@@ -11,6 +11,7 @@ import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import static utility.EnvSetup.TEST_ERR_REPORT;
+import static utility.EnvSetup.TEST_REPORT;
 import static utility.FrameworkConstants.*;
 import static utility.UrlsAndLocators.*;
 
@@ -26,7 +27,8 @@ public class AutomationHelper {
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
     capabilityManager.buildTestCapability(testCapability);
-    ltLogger.info("Test Caps: {}", EnvSetup.TEST_CAPS.get());
+    ltLogger.info("Test Caps: {}", EnvSetup.TEST_CAPS.get().toJson());
+    TEST_REPORT.get().put("Caps", EnvSetup.TEST_CAPS.get().toJson());
     stopWatch.start();
     driverManager.createTestDriver();
     driverManager.getCookies();
