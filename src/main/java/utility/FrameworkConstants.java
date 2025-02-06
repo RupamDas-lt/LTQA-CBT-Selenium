@@ -42,4 +42,30 @@ public class FrameworkConstants extends BaseClass {
   public static final String FAILED = "failed";
   public static final String PASSED = "passed";
   public static final String SKIPPED = "skipped";
+
+  // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
+  public static final String LAMBDA_STATUS = "lambda-status";
+  public static final String LAMBDA_FILE_EXIST = "lambda-file-exists";
+  public static final String LAMBDA_FILE_STATS = "lambda-file-stats";
+  public static final String LAMBDA_FILE_CONTENT = "lambda-file-content";
+  public static final String LAMBDA_FILE_LIST = "lambda-file-list";
+  public static final String LAMBDA_NAME = "lambda-name";
+  public static final String LAMBDA_BUILD = "lambda-build";
+  public static final String LAMBDA_ACTION = "lambda-action";
+  public static final String LAMBDA_PERFORM_KEYBOARD_EVENTS = "lambda-perform-keyboard-events";
+  public static final String LAMBDA_BREAK_POINT = "lambda-breakpoint";
+  public static final String LAMBDA_SCREENSHOT = "lambda-screenshot";
+  public static final String LAMBDA_FILES_DELETE = "lambda-files-delete";
+  public static final String LAMBDA_THROTTLE_NETWORK = "lambda-throttle-network";
+  public static final String LAMBDA_PING = "lambda-ping";
+  public static final String LAMBDA_EXCEPTIONS = "lambda-exceptions";
+  public static final String LAMBDA_GET_CLIPBOARD = "lambda-get-clipboard";
+  public static final String LAMBDA_SET_CLIPBOARD = "lambda-set-clipboard";
+  public static final String LAMBDA_CLEAR_CLIPBOARD = "lambda-clear-clipboard";
+  public static final String LAMBDA_UNBOUND_PING = "lambda-unbound-ping";
+  public static final String LAMBDA_NETWORK = "lambda:network";
+  public static final String LAMBDA_UPDATE_NAME = "lambdaUpdateName";
+  public static final String LAMBDA_TEST_TAGS = "lambda-test-tags";
+  public static final String LAMBDA_TEST_CASE_START = "lambda-testCase-start";
+  public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
 }

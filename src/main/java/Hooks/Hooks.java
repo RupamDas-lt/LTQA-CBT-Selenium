@@ -33,6 +33,7 @@ public class Hooks {
     EnvSetup.SOFT_ASSERT.set(softAssert);
     EnvSetup.TEST_SESSION_ID.set("");
     EnvSetup.TEST_REPORT.set(new HashMap<>());
+    EnvSetup.TEST_ERR_REPORT.set(new HashMap<>());
   }
 
   // Helper method to get stack trace as a string

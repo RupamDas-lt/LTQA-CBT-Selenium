@@ -39,6 +39,7 @@ public class EnvSetup {
   public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();
   public static final ThreadLocal<String> TEST_SESSION_ID = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = new ThreadLocal<>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_NAME = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
 

@@ -138,4 +138,20 @@ public class DriverManager extends BaseClass {
     ltLogger.info("Found cookies names: {}", cookieNames);
     return cookieNames;
   }
+
+  public void executeScript(String script) {
+    executeScriptAndFetchValue(script);
+  }
+
+  public Object executeScriptAndFetchValue(String script) {
+    try {
+      Object response = driver.executeScript(script);
+      ltLogger.info("JS Script executed successfully. Script: {}", script);
+      ltLogger.info("JS Script response: {}", response == null ? "null" : response.toString());
+      return response;
+    } catch (Exception e) {
+      ltLogger.error("JS Script execution failed. Script: {}", script);
+      return null;
+    }
+  }
 }
