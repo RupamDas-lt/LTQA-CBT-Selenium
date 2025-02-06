@@ -10,6 +10,8 @@ import org.testng.Assert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import static utility.EnvSetup.TEST_ERR_REPORT;
+import static utility.EnvSetup.TEST_REPORT;
 import static utility.FrameworkConstants.*;
 import static utility.UrlsAndLocators.*;
 
@@ -25,7 +27,8 @@ public class AutomationHelper {
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
     capabilityManager.buildTestCapability(testCapability);
-    ltLogger.info("Test Caps: {}", EnvSetup.TEST_CAPS.get());
+    ltLogger.info("Test Caps: {}", EnvSetup.TEST_CAPS.get().toJson());
+    TEST_REPORT.get().put("Caps", EnvSetup.TEST_CAPS.get().toJson());
     stopWatch.start();
     driverManager.createTestDriver();
     driverManager.getCookies();
@@ -34,16 +37,30 @@ public class AutomationHelper {
   }
 
   private void runTestActions(String actionName) {
-    switch (actionName) {
-    case "local":
-      testLocalUrlWithTunnel();
-    case "basicAuthentication":
-      basicAuthentication();
-      break;
-    default:
-      baseTest();
-      break;
+    startTestContext(actionName);
+    try {
+      switch (actionName) {
+      case "local":
+        testLocalUrlWithTunnel();
+      case "basicAuthentication":
+        basicAuthentication();
+        break;
+      default:
+        baseTest();
+        break;
+      }
+    } catch (Exception e) {
+      TEST_ERR_REPORT.get().put(actionName, e.getMessage());
     }
+    endTestContext(actionName);
+  }
+
+  private void startTestContext(String actionName) {
+    driverManager.executeScript(LAMBDA_TEST_CASE_START + "=" + actionName);
+  }
+
+  private void endTestContext(String actionName) {
+    driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + actionName);
   }
 
   private void basicAuthentication() {
@@ -87,6 +104,7 @@ public class AutomationHelper {
     }
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+    EnvSetup.TEST_REPORT.get().put("test_actions_failures", TEST_ERR_REPORT.get());
   }
 
   public void startTunnel() {
