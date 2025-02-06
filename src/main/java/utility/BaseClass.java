@@ -1,5 +1,7 @@
 package utility;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +29,16 @@ public class BaseClass {
         chars[i] = Character.toLowerCase(chars[i]);
     }
     return String.valueOf(chars);
+  }
+
+  public static <T> T convertJsonStringToPojo(String jsonString, TypeToken<T> type) {
+    Object object = null;
+    try {
+      object = new Gson().fromJson(jsonString, type.getType());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return (T) object;
   }
 
   public String getRandomAlphaNumericString(int length) {
@@ -119,5 +131,4 @@ public class BaseClass {
       ltLogger.error("Unexpected error while waiting for sleep {}", e.getMessage());
     }
   }
-
 }

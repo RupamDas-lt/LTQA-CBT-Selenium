@@ -81,7 +81,8 @@ public abstract class ApiManager extends BaseClass {
   }
 
   public Response patchRequestWithBasicAuth(String uri, String username, String password, String body) {
-    return httpMethod(PATCH, uri, body, ContentType.JSON, null, null, 200, username, password);
+    return httpMethod(PATCH_WITHOUT_STATUS_CODE_VERIFICATION, uri, body, ContentType.JSON, null, null, 0, username,
+      password);
   }
 
   public Response getRequest(String uri) {
@@ -94,7 +95,15 @@ public abstract class ApiManager extends BaseClass {
     return response.asString();
   }
 
-  public String getRequestAndExtractJsonPath(String uri, String jsonPath, String userName, String password) {
+  public String getRequestWithBasicAuthAsString(String uri, String userName, String password) {
+    Response response = httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0,
+      userName, password);
+    ltLogger.info("Response of get request with basic auth: {}", response.body().asString());
+    return response.body().asString();
+  }
+
+  public String getRequestWithBasicAuthAndExtractJsonPath(String uri, String jsonPath, String userName,
+    String password) {
     Response response = getRequestWithBasicAuth(uri, userName, password);
     ltLogger.info("Response body: {}", response.body().asString());
     String fieldValue = response.jsonPath().get(jsonPath).toString();
