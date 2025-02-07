@@ -109,4 +109,8 @@ public abstract class ApiManager extends BaseClass {
     return fieldValue;
   }
 
+  public void fetchDataAndWriteResponseToFile(String uri, String filePath) {
+    String responseString = getRequestAsString(uri);
+    writeStringToFile(filePath, responseString);
+  }
 }

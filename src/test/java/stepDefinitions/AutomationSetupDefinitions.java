@@ -16,7 +16,7 @@ public class AutomationSetupDefinitions {
     System.out.println("Trial scenario run");
   }
 
-  @Then("^I start session to test ([a-zA-Z0-9_=,: ]+) with ([a-zA-Z0-9_=,:.+\\- ]+)$")
+  @Then("^I start session to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
   public void startSessionAndPerformActivity(String testActions, String capability) {
     automationHelper.startSessionWithSpecificCapabilities(capability, testActions);
   }

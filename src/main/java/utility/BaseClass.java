@@ -7,9 +7,7 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Random;
@@ -129,6 +127,24 @@ public class BaseClass {
       ltLogger.info("Sleeping for {} seconds", seconds);
     } catch (InterruptedException e) {
       ltLogger.error("Unexpected error while waiting for sleep {}", e.getMessage());
+    }
+  }
+
+  public void writeStringToFile(String filePath, String content) {
+    File file = new File(filePath);
+    File parentDir = file.getParentFile();
+    if (parentDir != null && !parentDir.exists()) {
+      boolean directoriesCreated = parentDir.mkdirs();
+      if (!directoriesCreated) {
+        ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
+      }
+    }
+    try (FileWriter fileWriter = new FileWriter(file)) {
+      fileWriter.write(content);
+      ltLogger.info("Response data written to file: {}", filePath);
+      ltLogger.info("Response data: {}", content);
+    } catch (IOException e) {
+      ltLogger.error("Error writing to file: {}", e.getMessage());
     }
   }
 }

@@ -29,16 +29,20 @@ public class Hooks {
   private String scenarioName;
   private String testStatus = "passed";
 
-  @Before
-  public void beforeScenario() {
+  private void resetEnvironment() {
     CustomSoftAssert softAssert = new CustomSoftAssert();
     EnvSetup.SOFT_ASSERT.set(softAssert);
     EnvSetup.TEST_SESSION_ID.set("");
     TEST_REPORT.set(new HashMap<>());
     EnvSetup.TEST_ERR_REPORT.set(new HashMap<>());
+    EnvSetup.TEST_VERIFICATION_DATA.set(new HashMap<>());
   }
 
-  // Helper method to get stack trace as a string
+  @Before(order = 1)
+  public void beforeScenario() {
+    resetEnvironment();
+  }
+
   private String getStackTrace(Throwable error) {
     StringWriter sw = new StringWriter();
     error.printStackTrace(new PrintWriter(sw));

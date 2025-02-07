@@ -1,5 +1,6 @@
 package runners;
 
+import automationHelper.AutomationAPIHelper;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 import org.testng.annotations.BeforeSuite;
@@ -12,6 +13,7 @@ import java.util.Properties;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static utility.FrameworkConstants.TEST_PREREQUISITES;
 
 @CucumberOptions(features = { "src/test/features" }, glue = { "stepDefinitions", "Hooks" }, plugin = { "pretty",
   "rerun:rerun/failed_scenarios.txt", "json:target/cucumber-reports/CucumberTestReport.json",
@@ -34,7 +36,13 @@ public class TestRunner extends AbstractTestNGCucumberTests {
   }
 
   @BeforeSuite
-  public void initializeReportPortalParameters() {
+  public void beforeSuite() {
+    initializeReportPortalParameters();
+    if (getProperty(TEST_PREREQUISITES, "true").equals("true"))
+      setPrerequisite();
+  }
+
+  private void initializeReportPortalParameters() {
     try (InputStream input = TestRunner.class.getClassLoader().getResourceAsStream("reportportal.properties")) {
       if (input == null) {
         System.err.println("Sorry, unable to find reportportal.properties");
@@ -46,5 +54,10 @@ public class TestRunner extends AbstractTestNGCucumberTests {
     } catch (IOException ex) {
       System.err.println("Unable to set reportportal properties: " + ex);
     }
+  }
+
+  private void setPrerequisite() {
+    AutomationAPIHelper automationAPIHelper = new AutomationAPIHelper();
+    automationAPIHelper.fetchAllGeoLocationsFromCapsGeneratorAndStoreInJsonFile();
   }
 }

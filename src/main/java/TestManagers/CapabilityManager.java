@@ -1,5 +1,7 @@
 package TestManagers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysql.cj.util.StringUtils;
 import factory.BrowserType;
 import org.apache.logging.log4j.LogManager;
@@ -11,15 +13,20 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariOptions;
 import utility.BaseClass;
-import utility.EnvSetup;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 
 import static utility.EnvSetup.*;
+import static utility.FrameworkConstants.GEOLOCATION_DATA_PATH;
 import static utility.FrameworkConstants.LT_OPTIONS;
 
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
+  private final String[] randomValueSupportedCaps = new String[] { "geoLocation" };
   MutableCapabilities capabilities;
   String capsString;
 
@@ -65,17 +72,62 @@ public class CapabilityManager extends BaseClass {
       capabilityMap.put("name", capsString);
   }
 
+  private void setRandomValue(HashMap<String, Object> capabilityMap) {
+    for (String key : capabilityMap.keySet()) {
+      if (capabilityMap.get(key).toString().equals(".*")) {
+        String randomValue = "";
+        switch (key) {
+        case "geoLocation":
+          randomValue = getRandomGeoLocation();
+          break;
+        case "browserName":
+          //          randomValue = getRandomBrowser();
+          break;
+        default:
+          throw new RuntimeException(
+            key + " this capability doesn't support random value. Supported values: " + Arrays.asList(
+              randomValueSupportedCaps));
+        }
+        capabilityMap.put(key, randomValue);
+      }
+    }
+  }
+
+  private String getRandomGeoLocation() {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(new File(GEOLOCATION_DATA_PATH));
+      JsonNode geoDataArray = rootNode.path("geoData");
+      if (geoDataArray.isArray() && !geoDataArray.isEmpty()) {
+        Random random = new Random();
+        int randomIndex = random.nextInt(geoDataArray.size());
+        JsonNode randomGeoObject = geoDataArray.get(randomIndex);
+        TEST_VERIFICATION_DATA.get().put("geoLocation", randomGeoObject.path("countryName").asText());
+        return randomGeoObject.path("countryCode").asText();
+      }
+    } catch (IOException e) {
+      e.printStackTrace(); // Log error
+    }
+
+    return null; // Return null if something goes wrong
+  }
+
   public void buildTestCapability(String capabilityString, String... capsType) {
+    boolean randomCaps = false;
     capsString = capabilityString;
+    if (capabilityString.contains(".*"))
+      randomCaps = true;
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
     HashMap<String, Object> capabilityMap = getHashMapFromString(capabilityString);
     setCustomValues(capabilityMap);
+    if (randomCaps)
+      setRandomValue(capabilityMap);
     GIVEN_TEST_CAPS_MAP.set(capabilityMap);
     if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch"))
       createTestCapsWithFirstMatch((HashMap<String, Object>) capabilityMap.clone());
     else
       createTestCapsWithDesiredCaps(capabilityMap);
-    EnvSetup.TEST_CAPS.set(capabilities);
-    ltLogger.info("Test caps set in LocalThread: {}", EnvSetup.TEST_CAPS.get().toString());
+    TEST_CAPS.set(capabilities);
+    ltLogger.info("Test caps set in LocalThread: {}", TEST_CAPS.get().toString());
   }
 }

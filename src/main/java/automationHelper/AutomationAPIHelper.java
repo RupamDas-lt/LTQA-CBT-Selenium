@@ -11,13 +11,14 @@ import utility.EnvSetup;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import static utility.FrameworkConstants.HTTPS;
-import static utility.FrameworkConstants.SUMO_LOGIC_URL;
+import static utility.FrameworkConstants.*;
 
 public class AutomationAPIHelper extends ApiManager {
 
   // API end-points
   private static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
+  private static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
+
   private final Logger ltLogger = LogManager.getLogger(AutomationAPIHelper.class);
 
   public String constructAPIUrl(String uriBase, String endpoint, String... sessionId) {
@@ -65,5 +66,11 @@ public class AutomationAPIHelper extends ApiManager {
         throw e;
       }
     }
+  }
+
+  public void fetchAllGeoLocationsFromCapsGeneratorAndStoreInJsonFile() {
+    String geoLocationFetchAPI = constructAPIUrl(EnvSetup.API_URL_BASE, GEOLOCATIONS_API_ENDPOINT);
+    ltLogger.info("API for GEO location fetch: {}", geoLocationFetchAPI);
+    fetchDataAndWriteResponseToFile(geoLocationFetchAPI, GEOLOCATION_DATA_PATH);
   }
 }

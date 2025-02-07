@@ -30,6 +30,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_USER_PASS = "CUSTOM_USER_PASS";
   public static final String CUSTOM_GRID_URL = "CUSTOM_GRID_URL";
   public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
+  public static final String TEST_PREREQUISITES = "TEST_PREREQUISITES";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
@@ -69,4 +70,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String LAMBDA_TEST_TAGS = "lambda-test-tags";
   public static final String LAMBDA_TEST_CASE_START = "lambda-testCase-start";
   public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
+
+  // File paths
+  public static final String GEOLOCATION_DATA_PATH = "TestData/geoLocations.json";
 }

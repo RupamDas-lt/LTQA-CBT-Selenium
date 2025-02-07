@@ -42,6 +42,7 @@ public class EnvSetup {
   public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_NAME = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_VERIFICATION_DATA = new ThreadLocal<>();
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {
