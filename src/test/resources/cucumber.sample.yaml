@@ -5,6 +5,7 @@ stage:
   test_env_pass: "<LT_STAGE_EMAIL_PASS>"
   test_env_hub_url: "stage-hub.lambdatestinternal.com"
   test_env_api_url: "stage-api.lambdatestinternal.com"
+  org_id: ""
 
 prod:
   test_env_username: "<LT_PROD_USER_NAME>"
@@ -13,3 +14,4 @@ prod:
   test_env_pass: "<LT_PROD_EMAIL_PASS>"
   test_env_hub_url: "hub.lambdatest.com"
   test_env_api_url: "api.lambdatest.com"
+  org_id: ""
