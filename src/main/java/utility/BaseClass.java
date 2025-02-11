@@ -10,11 +10,17 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.ServerSocket;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class BaseClass {
 
+  // Map of supported types and their corresponding conversion functions
+  private static final Map<Class<?>, Function<String, Object>> typeConverters = Map.of(String.class, v -> v,
+    String[].class, v -> new String[] { v }, Integer.class, v -> v.length(), Boolean.class,
+    v -> new Random().nextBoolean());
   private final Logger ltLogger = LogManager.getLogger(BaseClass.class);
   private final StringBuilder commandErrOutput = new StringBuilder();
   private StringBuilder commandStdOutput = new StringBuilder();
@@ -146,5 +152,38 @@ public class BaseClass {
     } catch (IOException e) {
       ltLogger.error("Error writing to file: {}", e.getMessage());
     }
+  }
+
+  public String constructTimeZoneFromTimeOffset(String timeOffset) {
+    int offset = Math.abs(Integer.parseInt(timeOffset));
+    StringBuilder timezoneHours = new StringBuilder(String.valueOf(offset / 60));
+    StringBuilder timezoneMinutes = new StringBuilder(String.valueOf(offset % 60));
+    while (timezoneHours.length() < 2) {
+      timezoneHours.insert(0, "0");
+    }
+    while (timezoneMinutes.length() < 2) {
+      timezoneMinutes.insert(0, "0");
+    }
+    String UTC;
+    if (Integer.parseInt(timeOffset) > 0)
+      UTC = "UTC-";
+    else
+      UTC = "UTC+";
+    String timeZone = UTC + timezoneHours + ":" + timezoneMinutes;
+    ltLogger.info("Retrieved Time Zone : {} from offset value: {}", timeZone, timeOffset);
+    return timeZone;
+  }
+
+  public void insertToMapWithRandom(Map<String, Object> map, String key, String value, Class<?>... returnTypes) {
+    Random random = new Random();
+    if (map == null || key == null || value == null || returnTypes == null || returnTypes.length == 0) {
+      throw new IllegalArgumentException("Invalid input parameters.");
+    }
+    Class<?> selectedType = returnTypes[random.nextInt(returnTypes.length)];
+    Object returnValue = typeConverters.getOrDefault(selectedType, v -> {
+      throw new IllegalArgumentException("Unsupported type: " + selectedType);
+    }).apply(value);
+
+    map.put(key, returnValue);
   }
 }

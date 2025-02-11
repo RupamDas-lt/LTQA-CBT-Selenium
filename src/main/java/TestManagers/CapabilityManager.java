@@ -13,6 +13,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariOptions;
 import utility.BaseClass;
+import utility.EnvSetup;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +22,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import static utility.EnvSetup.*;
-import static utility.FrameworkConstants.GEOLOCATION_DATA_PATH;
-import static utility.FrameworkConstants.LT_OPTIONS;
+import static utility.FrameworkConstants.*;
 
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
@@ -66,10 +66,13 @@ public class CapabilityManager extends BaseClass {
   }
 
   private void setCustomValues(HashMap<String, Object> capabilityMap) {
-    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault("tunnel", "")))
-      capabilityMap.put("tunnelName", TUNNEL_NAME.get());
-    if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault("name", "")))
-      capabilityMap.put("name", capsString);
+    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")))
+      capabilityMap.put(TUNNEL_NAME, EnvSetup.TEST_TUNNEL_NAME.get());
+    if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TEST_NAME, "")))
+      capabilityMap.put(TEST_NAME, capsString);
+    if (capabilityMap.getOrDefault(LOAD_PUBLIC_EXTENSION, "false").equals("true"))
+      insertToMapWithRandom(capabilityMap, LOAD_PUBLIC_EXTENSION, DASHLANE_EXTENSION_PUBLIC_URL, String.class,
+        String[].class);
   }
 
   private void setRandomValue(HashMap<String, Object> capabilityMap) {
@@ -123,6 +126,9 @@ public class CapabilityManager extends BaseClass {
     if (randomCaps)
       setRandomValue(capabilityMap);
     GIVEN_TEST_CAPS_MAP.set(capabilityMap);
+    IS_EXTENSION_TEST.set(GIVEN_TEST_CAPS_MAP.get().containsKey(LOAD_PUBLIC_EXTENSION) || GIVEN_TEST_CAPS_MAP.get()
+      .containsKey(LOAD_PRIVATE_EXTENSION));
+    ltLogger.info("Is test contains extensions: {}", IS_EXTENSION_TEST.get());
     if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch"))
       createTestCapsWithFirstMatch((HashMap<String, Object>) capabilityMap.clone());
     else

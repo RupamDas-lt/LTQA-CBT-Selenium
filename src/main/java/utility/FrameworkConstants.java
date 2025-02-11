@@ -1,5 +1,13 @@
 package utility;
 
+import factory.Locator;
+import factory.LocatorTypes;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class FrameworkConstants extends BaseClass {
   public static final String LT_OPTIONS = getRandomLowerUpperCaseOfSpecificString("LT:OPTIONS");
 
@@ -7,6 +15,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String HTTP = "http://";
   public static final String OS_NAME = "os.name";
   public static final String LOCAL_HOST_URL = "http://127.0.0.1:";
+  public static final String DASHLANE_EXTENSION_PUBLIC_URL = "https://stage-lambda-devops-use-only.lambdatestinternal.com/magicleap/qa/dashlane-extension.zip";
 
   // API Constants
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
@@ -45,6 +54,13 @@ public class FrameworkConstants extends BaseClass {
   public static final String PASSED = "passed";
   public static final String SKIPPED = "skipped";
 
+  // Test caps
+  public static final String LOAD_PUBLIC_EXTENSION = "loadExtension";
+  public static final String LOAD_PRIVATE_EXTENSION = "lambda:loadExtension";
+  public static final String TUNNEL = "tunnel";
+  public static final String TUNNEL_NAME = "tunnelName";
+  public static final String TEST_NAME = "name";
+
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
   public static final String LAMBDA_FILE_EXIST = "lambda-file-exists";
@@ -73,4 +89,25 @@ public class FrameworkConstants extends BaseClass {
 
   // File paths
   public static final String GEOLOCATION_DATA_PATH = "TestData/geoLocations.json";
+
+  // Test execution data
+  public static final Set<String> validSelfSignedValues = new HashSet<>() {{
+    add("self-signed.\nbadssl.com");
+    add("untrusted-root.\nbadssl.com");
+    add("self-signed.badssl.com");
+    add("SSL.com - Test Website");
+  }};
+  public static final Set<String> consoleLogs = new HashSet<>() {{
+    add("console log is working fine via log command");
+    add("console log is working fine via error command");
+    add("console log is working fine via warn command");
+    add("console log is working fine via info command");
+  }};
+  public static final List<Locator> locatorsForExceptionLogs = new ArrayList<>() {{
+    add(new Locator(LocatorTypes.CSS, "#invalid_css_selector"));
+    add(new Locator(LocatorTypes.XPATH, "//div[class='invalid_XPATH_selector']"));
+  }};
+
+  // JavaScripts
+  public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
 }

@@ -38,11 +38,13 @@ public class EnvSetup {
   // Test utilities
   public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();
   public static final ThreadLocal<String> TEST_SESSION_ID = new ThreadLocal<>();
-  public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = new ThreadLocal<>();
-  public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = new ThreadLocal<>();
-  public static final ThreadLocal<String> TUNNEL_NAME = new ThreadLocal<>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = ThreadLocal.withInitial(HashMap::new);
+  public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = ThreadLocal.withInitial(HashMap::new);
+  public static final ThreadLocal<String> TEST_TUNNEL_NAME = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
-  public static final ThreadLocal<HashMap<String, Object>> TEST_VERIFICATION_DATA = new ThreadLocal<>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_VERIFICATION_DATA = ThreadLocal.withInitial(
+    HashMap::new);
+  public static final ThreadLocal<Boolean> IS_EXTENSION_TEST = new ThreadLocal<>();
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {
