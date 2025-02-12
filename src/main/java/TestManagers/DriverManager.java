@@ -17,13 +17,15 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import utility.BaseClass;
 import utility.EnvSetup;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URI;
+import java.time.Duration;
+import java.util.*;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.HTTPS;
@@ -35,7 +37,7 @@ public class DriverManager extends BaseClass {
   MutableCapabilities capabilities;
   String gridUrl;
 
-  public static By toBy(Locator locator) {
+  private static By toBy(Locator locator) {
     return switch (locator.type()) {
       case CSS -> By.cssSelector(locator.value());
       case XPATH -> By.xpath(locator.value());
@@ -46,6 +48,26 @@ public class DriverManager extends BaseClass {
       case LINK_TEXT -> By.linkText(locator.value());
       case PARTIAL_LINK_TEXT -> By.partialLinkText(locator.value());
     };
+  }
+
+  public WebElement waitForElementToBeVisible(Locator locator, int timeout) {
+    ltLogger.info("Waiting for element via, using ['{}', '{}']", locator.type(), locator.value());
+    Duration setImplicitWait;
+    try {
+      setImplicitWait = driver.manage().timeouts().getImplicitWaitTimeout();
+    } catch (Exception ignore) {
+      setImplicitWait = Duration.ofSeconds(10);
+    }
+
+    driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0));
+
+    try {
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+      By byLocator = toBy(locator);
+      return wait.until(ExpectedConditions.visibilityOfElementLocated(byLocator));
+    } finally {
+      driver.manage().timeouts().implicitlyWait(setImplicitWait);
+    }
   }
 
   public void createTestDriver() {
@@ -88,7 +110,7 @@ public class DriverManager extends BaseClass {
     gridUrl = getGridUrl();
     ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
     try {
-      driver = new RemoteWebDriver(new URL(gridUrl), capabilities);
+      driver = new RemoteWebDriver(URI.create(gridUrl).toURL(), capabilities);
       TEST_SESSION_ID.set(driver.getSessionId().toString());
       EnvSetup.TEST_REPORT.get().put(SESSION_ID, TEST_SESSION_ID.get());
       ltLogger.info("Remote driver created. Test session ID: {}", TEST_SESSION_ID.get());
@@ -100,6 +122,9 @@ public class DriverManager extends BaseClass {
   public void getURL(String url) {
     ltLogger.info("Opening URL: {}", url);
     driver.get(url);
+    Map<String, Object> verificationData = TEST_VERIFICATION_DATA.get();
+    List<String> urlList = (List<String>) verificationData.computeIfAbsent("url", k -> new ArrayList<>());
+    urlList.add(url);
   }
 
   public void quit() {
@@ -111,16 +136,29 @@ public class DriverManager extends BaseClass {
     return driver.findElement(toBy(locator));
   }
 
-  public String getText(Locator locator) {
+  public String getText(Locator locator, int... timeout) {
     ltLogger.info("Finding text with locator: {}", locator.toString());
-    String text = driver.findElement(toBy(locator)).getText();
+    String text;
+    if (timeout == null || timeout.length == 0) {
+      text = driver.findElement(toBy(locator)).getText();
+    } else {
+      text = waitForElementToBeVisible(locator, timeout[0]).getText();
+    }
     ltLogger.info("Found text from element: {}", text);
     return text;
   }
 
-  public boolean isDisplayed(Locator locator) {
+  public boolean isDisplayed(Locator locator, int... timeout) {
     ltLogger.info("Finding if element is displayed with locator: {}", locator.toString());
-    return driver.findElement(toBy(locator)).isDisplayed();
+    try {
+      if (timeout.length == 0)
+        return driver.findElement(toBy(locator)).isDisplayed();
+      return waitForElementToBeVisible(locator, timeout[0]).isDisplayed();
+    } catch (Exception exception) {
+      ltLogger.error("Unable to find element with locator: {}. Exception occurred: {}", locator.toString(),
+        exception.getMessage());
+      return false;
+    }
   }
 
   public Set<Cookie> getCookies() {
@@ -154,4 +192,57 @@ public class DriverManager extends BaseClass {
       return null;
     }
   }
+
+  public String openUrlAndGetLocatorText(String url, Locator locator, int timeout) {
+    getURL(url);
+    String text = null;
+    if (isDisplayed(locator, timeout)) {
+      text = getText(locator);
+      ltLogger.info("Retrieved text from website: {}, with locator: {}, is {}", url, locator.toString(), text);
+    }
+    ltLogger.error("Unable to find text from website: {}, with locator: {}, is {}", url, locator.toString(), text);
+    return text;
+  }
+
+  public void sendKeys(Locator locator, CharSequence keys) {
+    ltLogger.info("Sending {} keys to element using ['{}', '{}']", keys, locator.type(), locator.value());
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    if (element != null) {
+      try {
+        element.sendKeys(keys);
+        ltLogger.info("Successfully sent keys '{}' to the element.", keys);
+      } catch (Exception e) {
+        ltLogger.error("Error sending keys to element '{}': {}", locator.value(), e.getMessage());
+      }
+    } else {
+      ltLogger.error("Element with locator ['{}', '{}'] is not visible after the timeout.", locator.type(),
+        locator.value());
+      throw new RuntimeException(
+        "Send keys failed. Element with locator " + locator + " is not visible after the timeout.");
+    }
+  }
+
+  public void switchToTab(int fromTab, int toTab) {
+    try {
+      if (fromTab < 0 || toTab < 0) {
+        throw new IllegalArgumentException("Tab indices must be non-negative.");
+      }
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+      wait.until(d -> d.getWindowHandles().size() > Math.max(fromTab, toTab));
+      ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
+      if (fromTab >= tabs.size() || toTab >= tabs.size()) {
+        throw new IndexOutOfBoundsException("Invalid tab index. Total tabs: " + tabs.size());
+      }
+      driver.switchTo().window(tabs.get(toTab));
+      ltLogger.info("Successfully switched to tab {}", toTab);
+    } catch (Exception e) {
+      ltLogger.error("ERROR: Failed to switch tabs. {}", e.getMessage());
+      throw e;
+    }
+  }
+
+  public String getCurrentURL() {
+    return driver.getCurrentUrl();
+  }
+
 }

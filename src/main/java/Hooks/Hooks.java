@@ -14,6 +14,7 @@ import utility.EnvSetup;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +25,6 @@ import static utility.FrameworkConstants.FAILED;
 public class Hooks {
   private final Logger ltLogger = LogManager.getLogger(Hooks.class);
   private final AutomationAPIHelper apiHelper = new AutomationAPIHelper();
-  private String errorStackTrace;
   private String errorMessage = "";
   private String scenarioName;
   private String testStatus = "passed";
@@ -68,13 +68,14 @@ public class Hooks {
         }
       }
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();  // Optional: Handle logging for reflection failures
+      System.err.println(Arrays.toString(e.getStackTrace()));
     }
 
     if (failResult != null) {
-      errorMessage = String.valueOf(failResult.getError());
-      errorStackTrace = getStackTrace(failResult.getError());
+      errorMessage = errorMessage + "\n" + failResult.getError();
+      String errorStackTrace = getStackTrace(failResult.getError());
       ltLogger.debug("Scenario failed with error: {}", errorMessage);
+      ltLogger.debug("Scenario failed with stacktrace: {}", errorStackTrace);
     }
   }
 
@@ -129,6 +130,7 @@ public class Hooks {
       errorMessage = e.getLocalizedMessage();
       testStatus = "failed";
       ltLogger.debug("Assertion error: {}", errorMessage);
+      throw e;
     }
   }
 }
