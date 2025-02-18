@@ -40,6 +40,8 @@ public class Hooks {
 
   @Before(order = 1)
   public void beforeScenario() {
+    if (System.getProperty("ENV") == null)
+      throw new RuntimeException("ENV not set");
     resetEnvironment();
   }
 
