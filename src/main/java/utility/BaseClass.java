@@ -85,20 +85,25 @@ public class BaseClass {
       return hashmapList;
     }
 
-    String actualSeparator = separators.length > 0 ? separators[0] : ",";
-    String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
-    String[] list = string.split(actualSeparator);
-    for (String s : list) {
-      String[] keyValue = s.split(keyValueSeparator);
-      if (keyValue.length == 2) {
-        hashmapList.put(keyValue[0].trim(), keyValue[1].trim());
+    try {
+      String actualSeparator = separators.length > 0 ? separators[0] : ",";
+      String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
+      String[] list = string.split(actualSeparator);
+      for (String s : list) {
+        String[] keyValue = s.split(keyValueSeparator);
+        if (keyValue.length == 2) {
+          hashmapList.put(keyValue[0].trim(), keyValue[1].trim());
+        }
+        if (keyValue.length == 1) {
+          hashmapList.put(keyValue[0].trim(), null);
+        }
       }
-      if (keyValue.length == 1) {
-        hashmapList.put(keyValue[0].trim(), null);
-      }
+      ltLogger.info("Retrieved hashmap from string: {} is: {}", string, hashmapList);
+      return hashmapList;
+    } catch (Exception e) {
+      throw new RuntimeException(
+        "Exception occurred while parsing string: " + string + " to hashmap with separator: " + string, e);
     }
-    ltLogger.info("Retrieved hashmap from string: {} is: {}", string, hashmapList);
-    return hashmapList;
   }
 
   @SneakyThrows
