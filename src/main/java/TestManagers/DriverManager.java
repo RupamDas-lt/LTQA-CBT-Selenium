@@ -2,6 +2,7 @@ package TestManagers;
 
 import factory.BrowserType;
 import factory.Locator;
+import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -26,28 +27,40 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.HTTPS;
 import static utility.FrameworkConstants.SESSION_ID;
 
 public class DriverManager extends BaseClass {
+  private static final EnumMap<LocatorTypes, Function<String, By>> LOCATOR_MAP = new EnumMap<>(LocatorTypes.class);
+
+  static {
+    LOCATOR_MAP.put(LocatorTypes.CSS, By::cssSelector);
+    LOCATOR_MAP.put(LocatorTypes.XPATH, By::xpath);
+    LOCATOR_MAP.put(LocatorTypes.ID, By::id);
+    LOCATOR_MAP.put(LocatorTypes.NAME, By::name);
+    LOCATOR_MAP.put(LocatorTypes.CLASS_NAME, By::className);
+    LOCATOR_MAP.put(LocatorTypes.TAG_NAME, By::tagName);
+    LOCATOR_MAP.put(LocatorTypes.LINK_TEXT, By::linkText);
+    LOCATOR_MAP.put(LocatorTypes.PARTIAL_LINK_TEXT, By::partialLinkText);
+  }
+
   private final Logger ltLogger = LogManager.getLogger(DriverManager.class);
   RemoteWebDriver driver;
   MutableCapabilities capabilities;
   String gridUrl;
 
   private static By toBy(Locator locator) {
-    return switch (locator.type()) {
-      case CSS -> By.cssSelector(locator.value());
-      case XPATH -> By.xpath(locator.value());
-      case ID -> By.id(locator.value());
-      case NAME -> By.name(locator.value());
-      case CLASS_NAME -> By.className(locator.value());
-      case TAG_NAME -> By.tagName(locator.value());
-      case LINK_TEXT -> By.linkText(locator.value());
-      case PARTIAL_LINK_TEXT -> By.partialLinkText(locator.value());
-    };
+    putValueToVerificationData("locators", locator.value());
+    return LOCATOR_MAP.get(locator.type()).apply(locator.value());
+  }
+
+  private static void putValueToVerificationData(String key, String value) {
+    Map<String, Object> verificationData = TEST_VERIFICATION_DATA.get();
+    Set<String> set = (Set<String>) verificationData.computeIfAbsent(key, k -> new HashSet<String>());
+    set.add(value);
   }
 
   public WebElement waitForElementToBeVisible(Locator locator, int timeout) {
@@ -81,9 +94,9 @@ public class DriverManager extends BaseClass {
   }
 
   private void createLocalTestDriver() {
-    String browserName = (String) EnvSetup.GIVEN_TEST_CAPS_MAP.get().get("browserName");
+    String browserName = (String) EnvSetup.TEST_CAPS_MAP.get().get("browserName");
     BrowserType browserType = BrowserType.valueOf(browserName.toUpperCase());
-    ltLogger.info("Creating local driver for browser {}, with caps: {}", browserType, capabilities.asMap().toString());
+    ltLogger.info("Creating local driver for browser {}, with caps: {}", browserType, capabilities.asMap());
     switch (browserType) {
     case FIREFOX:
       driver = new FirefoxDriver((FirefoxOptions) capabilities);
@@ -122,9 +135,7 @@ public class DriverManager extends BaseClass {
   public void getURL(String url) {
     ltLogger.info("Opening URL: {}", url);
     driver.get(url);
-    Map<String, Object> verificationData = TEST_VERIFICATION_DATA.get();
-    List<String> urlList = (List<String>) verificationData.computeIfAbsent("url", k -> new ArrayList<>());
-    urlList.add(url);
+    putValueToVerificationData("url", url);
   }
 
   public void quit() {
@@ -138,22 +149,28 @@ public class DriverManager extends BaseClass {
 
   public String getText(Locator locator, int... timeout) {
     ltLogger.info("Finding text with locator: {}", locator.toString());
-    String text;
-    if (timeout == null || timeout.length == 0) {
-      text = driver.findElement(toBy(locator)).getText();
-    } else {
-      text = waitForElementToBeVisible(locator, timeout[0]).getText();
+    int waitTime = Optional.ofNullable(timeout).filter(t -> t.length > 0).map(t -> t[0]).orElse(0);
+    try {
+      WebElement element = (waitTime > 0) ?
+        waitForElementToBeVisible(locator, waitTime) :
+        driver.findElement(toBy(locator));
+      String text = element.getText();
+      ltLogger.info("Found text from element: {}", text);
+      return text;
+    } catch (Exception e) {
+      ltLogger.error("Failed to get text from element with locator: {}. Error: {}", locator.toString(), e.getMessage());
+      throw new RuntimeException("Unable to get text from locator: " + locator, e);
     }
-    ltLogger.info("Found text from element: {}", text);
-    return text;
   }
 
   public boolean isDisplayed(Locator locator, int... timeout) {
     ltLogger.info("Finding if element is displayed with locator: {}", locator.toString());
+    int waitTime = Optional.ofNullable(timeout).filter(t -> t.length > 0).map(t -> t[0]).orElse(0);
     try {
-      if (timeout.length == 0)
-        return driver.findElement(toBy(locator)).isDisplayed();
-      return waitForElementToBeVisible(locator, timeout[0]).isDisplayed();
+      WebElement element = (waitTime > 0) ?
+        waitForElementToBeVisible(locator, waitTime) :
+        driver.findElement(toBy(locator));
+      return element.isDisplayed();
     } catch (Exception exception) {
       ltLogger.error("Unable to find element with locator: {}. Exception occurred: {}", locator.toString(),
         exception.getMessage());
@@ -163,7 +180,7 @@ public class DriverManager extends BaseClass {
 
   public Set<Cookie> getCookies() {
     Set<Cookie> cookies = driver.manage().getCookies();
-    ltLogger.info("Found cookies: {}", cookies.toString());
+    ltLogger.info("Retrieved {} cookies: {}", cookies.size(), cookies);
     return cookies;
   }
 
@@ -182,6 +199,7 @@ public class DriverManager extends BaseClass {
   }
 
   public Object executeScriptAndFetchValue(String script) {
+    putValueToVerificationData("javaScripts", script);
     try {
       Object response = driver.executeScript(script);
       ltLogger.info("JS Script executed successfully. Script: {}", script);
@@ -222,22 +240,16 @@ public class DriverManager extends BaseClass {
     }
   }
 
-  public void switchToTab(int fromTab, int toTab) {
+  public void switchToTab(int tabIndex) {
     try {
-      if (fromTab < 0 || toTab < 0) {
-        throw new IllegalArgumentException("Tab indices must be non-negative.");
-      }
       WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-      wait.until(d -> d.getWindowHandles().size() > Math.max(fromTab, toTab));
+      wait.until(d -> d.getWindowHandles().size() > tabIndex);
       ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
-      if (fromTab >= tabs.size() || toTab >= tabs.size()) {
-        throw new IndexOutOfBoundsException("Invalid tab index. Total tabs: " + tabs.size());
-      }
-      driver.switchTo().window(tabs.get(toTab));
-      ltLogger.info("Successfully switched to tab {}", toTab);
+      driver.switchTo().window(tabs.get(tabIndex));
+      ltLogger.info("Successfully switched to tab {}", tabIndex);
     } catch (Exception e) {
-      ltLogger.error("ERROR: Failed to switch tabs. {}", e.getMessage());
-      throw e;
+      ltLogger.error("Failed to switch to tab {}. Error: {}", tabIndex, e.getMessage());
+      throw new RuntimeException("Failed to switch tabs", e);
     }
   }
 
@@ -245,4 +257,11 @@ public class DriverManager extends BaseClass {
     return driver.getCurrentUrl();
   }
 
+  public void click(Locator locator, int... timeout) {
+    ltLogger.info("Clicking element with locator: {}", locator.toString());
+    if (timeout != null && timeout.length > 0)
+      waitForElementToBeVisible(locator, timeout[0]).click();
+    else
+      driver.findElement(toBy(locator)).click();
+  }
 }

@@ -17,9 +17,7 @@ import utility.EnvSetup;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -83,8 +81,8 @@ public class CapabilityManager extends BaseClass {
         case "geoLocation":
           randomValue = getRandomGeoLocation();
           break;
-        case "browserName":
-          //          randomValue = getRandomBrowser();
+        case "resolution":
+          randomValue = getRandomResolution(capabilityMap.get("platform").toString());
           break;
         default:
           throw new RuntimeException(
@@ -109,31 +107,86 @@ public class CapabilityManager extends BaseClass {
         return randomGeoObject.path("countryCode").asText();
       }
     } catch (IOException e) {
-      e.printStackTrace(); // Log error
+      e.printStackTrace();
     }
 
-    return null; // Return null if something goes wrong
+    return null;
+  }
+
+  private String getRandomResolution(String platform) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(new File(RESOLUTION_DATA_PATH));
+      JsonNode resDataArray;
+      if (platform.toLowerCase().contains("win"))
+        resDataArray = rootNode.path("win");
+      else if (platform.toLowerCase().contains("ubuntu"))
+        resDataArray = rootNode.path("ubuntu");
+      else
+        resDataArray = rootNode.path("mac");
+      if (resDataArray.isArray() && !resDataArray.isEmpty()) {
+        Random random = new Random();
+        int randomIndex = random.nextInt(resDataArray.size());
+        String res = resDataArray.get(randomIndex).asText();
+        TEST_VERIFICATION_DATA.get().put("resolution", res);
+        return res;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public void buildTestCapability(String capabilityString, String... capsType) {
-    boolean randomCaps = false;
-    capsString = capabilityString;
-    if (capabilityString.contains(".*"))
-      randomCaps = true;
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
+    HashMap<String, Object> capabilityMap = buildCapabilityMap(capabilityString);
+    setFinalCapabilities(capabilityMap, expectedCapsType);
+  }
+
+  private HashMap<String, Object> buildCapabilityMap(String capabilityString) {
+    capsString = capabilityString;
+    // Get hashmap from caps string and build caps hashmap
     HashMap<String, Object> capabilityMap = getHashMapFromString(capabilityString);
+    // Set default custom values to caps map
     setCustomValues(capabilityMap);
-    if (randomCaps)
+    // Set random values if applicable
+    if (capabilityString.contains(".*")) {
       setRandomValue(capabilityMap);
-    GIVEN_TEST_CAPS_MAP.set(capabilityMap);
-    IS_EXTENSION_TEST.set(GIVEN_TEST_CAPS_MAP.get().containsKey(LOAD_PUBLIC_EXTENSION) || GIVEN_TEST_CAPS_MAP.get()
-      .containsKey(LOAD_PRIVATE_EXTENSION));
+    }
+    // If user is passing any custom caps as env variable then set them to capabilityMap
+    mergeCustomTestCaps(capabilityMap);
+    // Before creating caps object finally get the platform name based on platform keyword
+    updatePlatform(capabilityMap);
+    return capabilityMap;
+  }
+
+  private void mergeCustomTestCaps(Map<String, Object> capabilityMap) {
+    Optional.ofNullable(System.getProperty(CUSTOM_TEST_CAPS)).filter(caps -> !caps.isEmpty()).ifPresent(customCaps -> {
+      ltLogger.info("Applying custom test capabilities: {}", customCaps);
+      capabilityMap.putAll(getHashMapFromString(customCaps));
+    });
+  }
+
+  private void updatePlatform(Map<String, Object> capabilityMap) {
+    String platform = (String) capabilityMap.get("platform");
+    capabilityMap.put("platform", osKeywordToTemplateNameMap.get(platform));
+    ltLogger.info("Updating platform: {}", platform);
+  }
+
+  private void setFinalCapabilities(HashMap<String, Object> capabilityMap, String expectedCapsType) {
+    TEST_CAPS_MAP.set(capabilityMap);
+    ltLogger.info("Final Test caps: {}", TEST_CAPS_MAP.get());
+    boolean hasExtensions = capabilityMap.containsKey(LOAD_PUBLIC_EXTENSION) || capabilityMap.containsKey(
+      LOAD_PRIVATE_EXTENSION);
+    IS_EXTENSION_TEST.set(hasExtensions);
     ltLogger.info("Is test contains extensions: {}", IS_EXTENSION_TEST.get());
-    if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch"))
-      createTestCapsWithFirstMatch((HashMap<String, Object>) capabilityMap.clone());
-    else
+    if (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch")) {
+      createTestCapsWithFirstMatch(new HashMap<>(capabilityMap));
+    } else {
       createTestCapsWithDesiredCaps(capabilityMap);
+    }
+
     TEST_CAPS.set(capabilities);
-    ltLogger.info("Test caps set in LocalThread: {}", TEST_CAPS.get().toString());
+    ltLogger.info("Test caps set in LocalThread: {}", TEST_CAPS.get());
   }
 }

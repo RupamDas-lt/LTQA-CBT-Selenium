@@ -33,7 +33,8 @@ public class EnvSetup {
   public static final ThreadLocal<WebDriver> testDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<WebDriver> clientDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<MutableCapabilities> TEST_CAPS = new ThreadLocal<>();
-  public static final ThreadLocal<HashMap<String, Object>> GIVEN_TEST_CAPS_MAP = new ThreadLocal<HashMap<String, Object>>();
+  public static final ThreadLocal<HashMap<String, Object>> CUSTOM_TEST_CAPS_MAP_FROM_ENV = new ThreadLocal<HashMap<String, Object>>();
+  public static final ThreadLocal<HashMap<String, Object>> TEST_CAPS_MAP = new ThreadLocal<HashMap<String, Object>>();
 
   // Test utilities
   public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();
