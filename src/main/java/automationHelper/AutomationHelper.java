@@ -184,44 +184,102 @@ public class AutomationHelper extends BaseClass {
   }
 
   private String[] getBrowserDetailsFromJS() {
-    Map<String, String> browserDetails = (Map<String, String>) driverManager.executeScriptAndFetchValue(
-      jsForFetchBrowserDetails);
-    assert browserDetails != null;
-    return new String[] { browserDetails.get("name"), browserDetails.get("version") };
+    String javaScript = "return navigator.userAgent;";
+    String userAgent = (String) driverManager.executeScriptAndFetchValue(javaScript);
+    String browserName = getBrowserName(userAgent);
+    String browserVersion = getBrowserVersion(userAgent, browserName);
+    return new String[] { browserName, browserVersion };
+  }
+
+  private String getBrowserName(String userAgent) {
+    if (userAgent.contains("OPR")) {
+      return "Opera";
+    } else if (userAgent.contains("Edg")) {
+      return "MicrosoftEdge";
+    } else if (userAgent.contains("Firefox")) {
+      return "Firefox";
+    } else if (userAgent.contains("Chrome")) {
+      return "Chrome";
+    } else if (userAgent.contains("Safari")) {
+      return "Safari";
+    } else {
+      return "Internet Explorer";
+    }
+  }
+
+  private String getBrowserVersion(String userAgent, String browserName) {
+    String[] dataArray = userAgent.split(" ");
+    String browserVersion = "";
+    switch (browserName) {
+    case "Opera":
+    case "MicrosoftEdge":
+    case "Firefox":
+      browserVersion = dataArray[dataArray.length - 1].split("/")[1];
+      break;
+    case "Chrome":
+    case "Safari":
+      browserVersion = dataArray[dataArray.length - 2].split("/")[1];
+      break;
+    case "Internet Explorer":
+      if (dataArray[dataArray.length - 3].contains(":")) {
+        browserVersion = dataArray[dataArray.length - 3].split(":")[1].replace(")", "");
+      } else if (dataArray[dataArray.length - 3].contains("/")) {
+        double num = Double.parseDouble(dataArray[dataArray.length - 3].split("/")[1].replace(";", ""));
+        num = num + 4;
+        browserVersion = Double.toString(num);
+      }
+      break;
+    default:
+      browserVersion = "Unknown";
+    }
+
+    return browserVersion.trim();
   }
 
   private void browserOSDetails() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String actualBrowserName = EnvSetup.TEST_CAPS_MAP.get().getOrDefault("browserName", "").toString().toLowerCase();
-    String actualBrowserVersion = EnvSetup.TEST_CAPS_MAP.get().getOrDefault("version", "").toString().trim();
-    if (actualBrowserVersion.contains("dev") || actualBrowserVersion.contains("beta") || actualBrowserVersion.contains(
-      "latest")) {
+    Map<String, Object> testCapsMap = EnvSetup.TEST_CAPS_MAP.get();
+
+    String actualBrowserName = testCapsMap.getOrDefault("browserName", "").toString().toLowerCase();
+    String actualBrowserVersion = testCapsMap.getOrDefault("version", "").toString().trim();
+
+    // Handle beta/dev/latest versions
+    if (actualBrowserVersion.matches(".*(dev|beta|latest).*")) {
       actualBrowserVersion = apiHelper.getBrowserVersionBasedOnKeyword(actualBrowserName, actualBrowserVersion,
-        TEST_CAPS_MAP.get().get("platform").toString()).split("\\.")[0];
+        testCapsMap.get("platform").toString()).split("\\.")[0];
       ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
-    try {
-      String[] browserDetails = getBrowserDetailsFromWeb();
-      assert browserDetails != null;
-      ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-      if (!browserDetails[0].trim().contains(actualBrowserName) && !browserDetails[1].contains(actualBrowserVersion))
-        throw new Exception("Browser details not correct");
-    } catch (Exception e) {
-      ltLogger.info("Unable to fetch browser details from website. Exception: {}", e.getMessage());
-      ltLogger.info("Trying to fetch browser details using JS");
-      String[] browserDetails = getBrowserDetailsFromJS();
-      String browserName = browserDetails[0];
-      String browserVersion = browserDetails[1];
-      ltLogger.info("Browser name: {}", browserName);
-      ltLogger.info("Browser version: {}", browserVersion);
 
-      softAssert.assertEquals(browserName, actualBrowserName,
-        String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
-
-      softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
-        String.format("Browser version doesn't match. Expected: %s, Actual: %s", actualBrowserVersion, browserVersion));
+    // Try fetching browser details from the web
+    String[] browserDetails = getBrowserDetailsFromWeb();
+    ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
+    if (browserDetails != null && validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion)) {
+      return;
     }
+
+    // Fallback to fetching browser details using JavaScript
+    ltLogger.warn("Unable to fetch browser details from website. Trying to fetch browser details using JS");
+    browserDetails = getBrowserDetailsFromJS();
+    String browserName = browserDetails[0].toLowerCase().trim();
+    String browserVersion = browserDetails[1].trim();
+    ltLogger.info("Browser name: {}", browserName);
+    ltLogger.info("Browser version: {}", browserVersion);
+
+    softAssert.assertEquals(browserName, actualBrowserName,
+      String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
+
+    softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
+      String.format("Browser version doesn't match. Expected: %s, Actual: %s", actualBrowserVersion, browserVersion));
+
     EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private boolean validateBrowserDetails(String[] browserDetails, String expectedBrowserName,
+    String expectedBrowserVersion) {
+    ltLogger.info("Actual details: {}, Expected name: {}, Expected version: {}", Arrays.asList(browserDetails),
+      expectedBrowserName, expectedBrowserVersion);
+    return browserDetails[0].trim().equalsIgnoreCase(expectedBrowserName) && browserDetails[1].trim()
+      .equals(expectedBrowserVersion);
   }
 
   private void verifyExtension() {

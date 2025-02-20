@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static utility.FrameworkConstants.*;
 
@@ -82,46 +84,47 @@ public class AutomationAPIHelper extends ApiManager {
   public String getBrowserVersionBasedOnKeyword(String browserName, String keyword, String template) {
     String filePath = BROWSER_VERSIONS_DATA_PATH.replace("<BROWSER_NAME>", browserName).replace("<TEMPLATE>", template);
     ltLogger.info("Browser versions data path: {}", filePath);
+
     String browserVersionFetchUrl = constructAPIUrl(EnvSetup.API_URL_BASE, BROWSER_VERSIONS_API_ENDPOINT).replace(
       "<BROWSER_NAME>", browserName).replace("<TEMPLATE>", osTemplateNameToKeywordMap.get(template));
     ltLogger.info("API for browser version fetch: {}", browserVersionFetchUrl);
+
     fetchDataAndWriteResponseToFile(browserVersionFetchUrl, filePath);
-    ObjectMapper objectMapper = new ObjectMapper();
+
     try {
-      ArrayList<String> stableVersions = new ArrayList<>();
-      String devVersion = "";
-      String betaVersion = "";
+      ObjectMapper objectMapper = new ObjectMapper();
       JsonNode rootNode = objectMapper.readTree(readFileContent(filePath));
       JsonNode versionsData = rootNode.path("versions");
+
+      Map<String, String> versionMap = new HashMap<>();
+      List<String> stableVersions = new ArrayList<>();
+
       for (JsonNode version : versionsData) {
-        if (version.path("channel_type").asText().equalsIgnoreCase("dev"))
-          devVersion = version.path("version").asText();
-        else if (version.path("channel_type").asText().equalsIgnoreCase("beta"))
-          betaVersion = version.path("version").asText();
-        else
-          stableVersions.add(version.path("version").asText());
-      }
-      ltLogger.info("{} versions on template {} is: Dev: {}, Beta: {}, Stable: {}", browserName, template, devVersion,
-        betaVersion, stableVersions);
-      switch (keyword) {
-      case "dev" -> {
-        return devVersion;
-      }
-      case "beta" -> {
-        return betaVersion;
-      }
-      case "latest" -> {
-        return stableVersions.getFirst();
-      }
-      default -> {
-        String[] versionParams = keyword.split("-");
-        int index = Integer.parseInt(versionParams[versionParams.length - 1]);
-        return stableVersions.get(index - 1);
-      }
+        String channelType = version.path("channel_type").asText().toLowerCase();
+        String versionNumber = version.path("version").asText();
+
+        switch (channelType) {
+        case "dev" -> versionMap.put("dev", versionNumber);
+        case "beta" -> versionMap.put("beta", versionNumber);
+        default -> stableVersions.add(versionNumber);
+        }
       }
 
+      ltLogger.info("{} versions on template {}: Dev: {}, Beta: {}, Stable: {}", browserName, template,
+        versionMap.get("dev"), versionMap.get("beta"), stableVersions);
+
+      return switch (keyword.toLowerCase()) {
+        case "dev" -> versionMap.get("dev");
+        case "beta" -> versionMap.get("beta");
+        case "latest" -> stableVersions.getFirst();
+        default -> {
+          String[] versionParams = keyword.split("-");
+          int index = Integer.parseInt(versionParams[versionParams.length - 1]);
+          yield stableVersions.get(index - 1);
+        }
+      };
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Failed to fetch or parse browser versions data", e);
     }
   }
 }
