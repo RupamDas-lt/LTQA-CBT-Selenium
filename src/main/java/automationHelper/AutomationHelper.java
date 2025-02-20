@@ -196,14 +196,15 @@ public class AutomationHelper extends BaseClass {
     String actualBrowserVersion = EnvSetup.TEST_CAPS_MAP.get().getOrDefault("version", "").toString().trim();
     if (actualBrowserVersion.contains("dev") || actualBrowserVersion.contains("beta") || actualBrowserVersion.contains(
       "latest")) {
-      //      actualBrowserVersion = apiHelper.getBrowserVersionBasedOnKeyword(actualBrowserName, actualBrowserVersion,
-      //        TEST_CAPS_MAP.get().get("platform").toString());
+      actualBrowserVersion = apiHelper.getBrowserVersionBasedOnKeyword(actualBrowserName, actualBrowserVersion,
+        TEST_CAPS_MAP.get().get("platform").toString()).split("\\.")[0];
+      ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
     try {
       String[] browserDetails = getBrowserDetailsFromWeb();
       assert browserDetails != null;
       ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-      if (!browserDetails[0].contains(actualBrowserName) && !browserDetails[1].contains(actualBrowserVersion))
+      if (!browserDetails[0].trim().contains(actualBrowserName) && !browserDetails[1].contains(actualBrowserVersion))
         throw new Exception("Browser details not correct");
     } catch (Exception e) {
       ltLogger.info("Unable to fetch browser details from website. Exception: {}", e.getMessage());

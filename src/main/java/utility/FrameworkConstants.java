@@ -3,10 +3,8 @@ package utility;
 import factory.Locator;
 import factory.LocatorTypes;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FrameworkConstants extends BaseClass {
   public static final String LT_OPTIONS = getRandomLowerUpperCaseOfSpecificString("LT:OPTIONS");
@@ -40,6 +38,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_GRID_URL = "CUSTOM_GRID_URL";
   public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
   public static final String TEST_PREREQUISITES = "TEST_PREREQUISITES";
+  public static final String CUSTOM_TEST_CAPS = "CUSTOM_TEST_CAPS";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
@@ -88,7 +87,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
 
   // File paths
-  public static final String GEOLOCATION_DATA_PATH = "TestData/geoLocations.json";
+  public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
+  public static final String RESOLUTION_DATA_PATH = "src/test/resources/TestData/resolutions.json";
+  public static final String BROWSER_VERSIONS_DATA_PATH = "src/test/resources/TestData/browser_versions/<BROWSER_NAME>_<TEMPLATE>.json";
 
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{
@@ -107,7 +108,18 @@ public class FrameworkConstants extends BaseClass {
     add(new Locator(LocatorTypes.CSS, "#invalid_css_selector"));
     add(new Locator(LocatorTypes.XPATH, "//div[class='invalid_XPATH_selector']"));
   }};
+  public static final Map<String, String> osKeywordToTemplateNameMap = Map.ofEntries(Map.entry("win10", "Windows 10"),
+    Map.entry("win11", "Windows 11"), Map.entry("win8.1", "Windows 8.1"), Map.entry("win8", "Windows 8"),
+    Map.entry("win7", "Windows 7"), Map.entry("sequoia", "MacOS Sequoia"), Map.entry("sonoma", "MacOS Sonoma"),
+    Map.entry("ventura", "MacOS Ventura"), Map.entry("monterey", "MacOS Monterey"),
+    Map.entry("bigsur", "MacOS Big Sur"), Map.entry("catalina", "MacOS Catalina"), Map.entry("mojave", "macOS Mojave"),
+    Map.entry("sierra", "macOS Sierra"), Map.entry("high_sierra", "macOS High Sierra"),
+    Map.entry("elcapitan", "OS X El Capitan"), Map.entry("yosemite", "OS X El Yosemite"),
+    Map.entry("mavericks", "OS X El Mavericks"), Map.entry("ubuntu", "ubuntu 20"));
+  public static final Map<String, String> osTemplateNameToKeywordMap = osKeywordToTemplateNameMap.entrySet().stream()
+    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
+
 }

@@ -15,7 +15,6 @@ import org.openqa.selenium.safari.SafariOptions;
 import utility.BaseClass;
 import utility.EnvSetup;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -97,7 +96,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomGeoLocation() {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(new File(GEOLOCATION_DATA_PATH));
+      JsonNode rootNode = objectMapper.readTree(readFileContent(GEOLOCATION_DATA_PATH));
       JsonNode geoDataArray = rootNode.path("geoData");
       if (geoDataArray.isArray() && !geoDataArray.isEmpty()) {
         Random random = new Random();
@@ -116,7 +115,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomResolution(String platform) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(new File(RESOLUTION_DATA_PATH));
+      JsonNode rootNode = objectMapper.readTree(readFileContent(RESOLUTION_DATA_PATH));
       JsonNode resDataArray;
       if (platform.toLowerCase().contains("win"))
         resDataArray = rootNode.path("win");

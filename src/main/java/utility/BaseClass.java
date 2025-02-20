@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.ServerSocket;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -17,10 +21,10 @@ import java.util.function.Function;
 
 public class BaseClass {
 
-  // Map of supported types and their corresponding conversion functions
   private static final Map<Class<?>, Function<String, Object>> typeConverters = Map.of(String.class, v -> v,
     String[].class, v -> new String[] { v }, Integer.class, v -> v.length(), Boolean.class,
     v -> new Random().nextBoolean());
+
   private final Logger ltLogger = LogManager.getLogger(BaseClass.class);
   private final StringBuilder commandErrOutput = new StringBuilder();
   private StringBuilder commandStdOutput = new StringBuilder();
@@ -142,20 +146,40 @@ public class BaseClass {
   }
 
   public void writeStringToFile(String filePath, String content) {
-    File file = new File(filePath);
-    File parentDir = file.getParentFile();
-    if (parentDir != null && !parentDir.exists()) {
-      boolean directoriesCreated = parentDir.mkdirs();
-      if (!directoriesCreated) {
-        ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
+    FileLockUtility.fileLock.lock();
+    try (FileChannel channel = FileChannel.open(Paths.get(filePath), StandardOpenOption.WRITE,
+      StandardOpenOption.CREATE); FileLock lock = channel.lock(); FileWriter fileWriter = new FileWriter(filePath)) {
+      File file = new File(filePath);
+      File parentDir = file.getParentFile();
+      if (parentDir != null && !parentDir.exists()) {
+        boolean directoriesCreated = parentDir.mkdirs();
+        if (!directoriesCreated) {
+          ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
+        }
       }
-    }
-    try (FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.write(content);
       ltLogger.info("Response data written to file: {}", filePath);
       ltLogger.info("Response data: {}", content);
     } catch (IOException e) {
       ltLogger.error("Error writing to file: {}", e.getMessage());
+    } finally {
+      FileLockUtility.fileLock.unlock();
+    }
+  }
+
+  public File readFileContent(String filePath) {
+    FileLockUtility.fileLock.lock();
+    try (FileChannel channel = FileChannel.open(Paths.get(filePath), StandardOpenOption.READ);
+      FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+      File file = new File(filePath);
+      ltLogger.info("Reading file: {}", filePath);
+      ltLogger.info("File status: {}", file.exists());
+      return file;
+    } catch (IOException e) {
+      ltLogger.error("Error reading file: {}", e.getMessage());
+      throw new RuntimeException(e);
+    } finally {
+      FileLockUtility.fileLock.unlock();
     }
   }
 

@@ -39,4 +39,5 @@ logs
 
 LT_Tunnel_Binary/**
 
-TestData
+src/test/resources/TestData/geoLocations.json
+src/test/resources/TestData/browser_versions
