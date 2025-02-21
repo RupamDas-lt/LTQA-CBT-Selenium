@@ -41,4 +41,10 @@ public class UrlsAndLocators {
   public static final String BROWSER_DETAILS_URL = "https://www.whatismybrowser.com/";
   public static final Locator browserDetailsText = new Locator(LocatorTypes.CSS,
     "#primary-browser-detection-backend .string-major a");
+
+  public static final String FILE_UPLOAD_URL = "https://the-internet.herokuapp.com/upload";
+  public static final Locator chooseFileButton = new Locator(LocatorTypes.ID, "file-upload");
+  public static final Locator uploadFileButton = new Locator(LocatorTypes.ID, "file-submit");
+  public static final Locator uploadedFileHeading = new Locator(LocatorTypes.XPATH,
+    "//h3[contains(text(),'File Uploaded!')]");
 }

@@ -90,6 +90,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
   public static final String RESOLUTION_DATA_PATH = "src/test/resources/TestData/resolutions.json";
   public static final String BROWSER_VERSIONS_DATA_PATH = "src/test/resources/TestData/browser_versions/<BROWSER_NAME>_<TEMPLATE>.json";
+  public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
 
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{

@@ -72,6 +72,9 @@ public class AutomationHelper extends BaseClass {
       case "verifyExtension":
         verifyExtension();
         break;
+      case "uploadFile":
+        uploadFile();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -302,6 +305,16 @@ public class AutomationHelper extends BaseClass {
     String actualText = driverManager.getText(todoNewEnteredText, 5);
     softAssert.assertTrue(actualText.contains(sampleText),
       "Entered text doesn't match. Expected: " + sampleText + " Actual: " + actualText);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void uploadFile() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.setLocalFileDetector();
+    driverManager.getURL(FILE_UPLOAD_URL);
+    driverManager.sendKeys(chooseFileButton, SAMPLE_TXT_FILE_PATH);
+    driverManager.click(uploadFileButton);
+    softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5), "Unable to upload file");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
