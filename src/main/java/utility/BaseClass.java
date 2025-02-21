@@ -146,9 +146,9 @@ public class BaseClass {
   }
 
   public void writeStringToFile(String filePath, String content) {
+    // Acquire lock only once here
     FileLockUtility.fileLock.lock();
-    try (FileChannel channel = FileChannel.open(Paths.get(filePath), StandardOpenOption.WRITE,
-      StandardOpenOption.CREATE); FileLock lock = channel.lock(); FileWriter fileWriter = new FileWriter(filePath)) {
+    try {
       File file = new File(filePath);
       File parentDir = file.getParentFile();
       if (parentDir != null && !parentDir.exists()) {
@@ -157,11 +157,15 @@ public class BaseClass {
           ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
         }
       }
-      fileWriter.write(content);
-      ltLogger.info("Response data written to file: {}", filePath);
-      ltLogger.info("Response data: {}", content);
-    } catch (IOException e) {
-      ltLogger.error("Error writing to file: {}", e.getMessage());
+
+      // Use FileWriter directly without locking via FileChannel
+      try (FileWriter fileWriter = new FileWriter(filePath)) {
+        fileWriter.write(content);
+        ltLogger.info("Response data written to file: {}", filePath);
+        ltLogger.info("Response data: {}", content);
+      } catch (IOException e) {
+        ltLogger.error("Error writing to file: {}", e.getMessage());
+      }
     } finally {
       FileLockUtility.fileLock.unlock();
     }

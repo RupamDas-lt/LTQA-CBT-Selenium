@@ -114,13 +114,13 @@ public class AutomationAPIHelper extends ApiManager {
         versionMap.get("dev"), versionMap.get("beta"), stableVersions);
 
       return switch (keyword.toLowerCase()) {
-        case "dev" -> versionMap.get("dev");
-        case "beta" -> versionMap.get("beta");
-        case "latest" -> stableVersions.getFirst();
+        case "dev" -> versionMap.get("dev").split("\\.")[0];
+        case "beta" -> versionMap.get("beta").split("\\.")[0];
+        case "latest" -> stableVersions.getFirst().split("\\.")[0];
         default -> {
           String[] versionParams = keyword.split("-");
           int index = Integer.parseInt(versionParams[versionParams.length - 1]);
-          yield stableVersions.get(index - 1);
+          yield stableVersions.get(index).split("\\.")[0];
         }
       };
     } catch (IOException e) {
