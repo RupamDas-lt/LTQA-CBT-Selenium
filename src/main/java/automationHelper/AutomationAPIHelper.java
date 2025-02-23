@@ -2,14 +2,20 @@ package automationHelper;
 
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
 import TestManagers.ApiManager;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.EnvSetup;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static utility.FrameworkConstants.*;
 
@@ -18,6 +24,7 @@ public class AutomationAPIHelper extends ApiManager {
   // API end-points
   private static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   private static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
+  private static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
 
   private final Logger ltLogger = LogManager.getLogger(AutomationAPIHelper.class);
 
@@ -72,5 +79,52 @@ public class AutomationAPIHelper extends ApiManager {
     String geoLocationFetchAPI = constructAPIUrl(EnvSetup.API_URL_BASE, GEOLOCATIONS_API_ENDPOINT);
     ltLogger.info("API for GEO location fetch: {}", geoLocationFetchAPI);
     fetchDataAndWriteResponseToFile(geoLocationFetchAPI, GEOLOCATION_DATA_PATH);
+  }
+
+  public String getBrowserVersionBasedOnKeyword(String browserName, String keyword, String template) {
+    String filePath = BROWSER_VERSIONS_DATA_PATH.replace("<BROWSER_NAME>", browserName).replace("<TEMPLATE>", template);
+    ltLogger.info("Browser versions data path: {}", filePath);
+
+    String browserVersionFetchUrl = constructAPIUrl(EnvSetup.API_URL_BASE, BROWSER_VERSIONS_API_ENDPOINT).replace(
+      "<BROWSER_NAME>", browserName).replace("<TEMPLATE>", osTemplateNameToKeywordMap.get(template));
+    ltLogger.info("API for browser version fetch: {}", browserVersionFetchUrl);
+
+    fetchDataAndWriteResponseToFile(browserVersionFetchUrl, filePath);
+
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(readFileContent(filePath));
+      JsonNode versionsData = rootNode.path("versions");
+
+      Map<String, String> versionMap = new HashMap<>();
+      List<String> stableVersions = new ArrayList<>();
+
+      for (JsonNode version : versionsData) {
+        String channelType = version.path("channel_type").asText().toLowerCase();
+        String versionNumber = version.path("version").asText();
+
+        switch (channelType) {
+        case "dev" -> versionMap.put("dev", versionNumber);
+        case "beta" -> versionMap.put("beta", versionNumber);
+        default -> stableVersions.add(versionNumber);
+        }
+      }
+
+      ltLogger.info("{} versions on template {}: Dev: {}, Beta: {}, Stable: {}", browserName, template,
+        versionMap.get("dev"), versionMap.get("beta"), stableVersions);
+
+      return switch (keyword.toLowerCase()) {
+        case "dev" -> versionMap.get("dev").split("\\.")[0];
+        case "beta" -> versionMap.get("beta").split("\\.")[0];
+        case "latest" -> stableVersions.getFirst().split("\\.")[0];
+        default -> {
+          String[] versionParams = keyword.split("-");
+          int index = Integer.parseInt(versionParams[versionParams.length - 1]);
+          yield stableVersions.get(index).split("\\.")[0];
+        }
+      };
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to fetch or parse browser versions data", e);
+    }
   }
 }

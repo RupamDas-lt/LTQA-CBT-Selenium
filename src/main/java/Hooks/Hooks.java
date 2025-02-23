@@ -40,6 +40,8 @@ public class Hooks {
 
   @Before(order = 1)
   public void beforeScenario() {
+    if (System.getProperty("ENV") == null)
+      throw new RuntimeException("ENV not set");
     resetEnvironment();
   }
 
@@ -98,6 +100,15 @@ public class Hooks {
     TEST_REPORT.get().put("hub", EnvSetup.testGridUrl.get());
   }
 
+  private void printTestDashboardAndRetinaLinks(Scenario scenario) {
+    String testDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, "/test?testID=",
+      EnvSetup.TEST_SESSION_ID.get());
+    String testRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=",
+      EnvSetup.TEST_SESSION_ID.get());
+    ltLogger.info("Test dashboard URL: {},\nTest Retina url: {}", testDashboardUrl, testRetinaUrl);
+    scenario.log("Dashboard URL: " + testDashboardUrl + "\nTest Retina URL: " + testRetinaUrl);
+  }
+
   @After(order = 1)
   public void afterScenario(Scenario scenario) {
     try {
@@ -118,6 +129,8 @@ public class Hooks {
     }
 
     updateTestReport();
+    printTestDashboardAndRetinaLinks(scenario);
+
     apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
   }
 

@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.ServerSocket;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -17,10 +21,10 @@ import java.util.function.Function;
 
 public class BaseClass {
 
-  // Map of supported types and their corresponding conversion functions
   private static final Map<Class<?>, Function<String, Object>> typeConverters = Map.of(String.class, v -> v,
     String[].class, v -> new String[] { v }, Integer.class, v -> v.length(), Boolean.class,
     v -> new Random().nextBoolean());
+
   private final Logger ltLogger = LogManager.getLogger(BaseClass.class);
   private final StringBuilder commandErrOutput = new StringBuilder();
   private StringBuilder commandStdOutput = new StringBuilder();
@@ -85,20 +89,25 @@ public class BaseClass {
       return hashmapList;
     }
 
-    String actualSeparator = separators.length > 0 ? separators[0] : ",";
-    String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
-    String[] list = string.split(actualSeparator);
-    for (String s : list) {
-      String[] keyValue = s.split(keyValueSeparator);
-      if (keyValue.length == 2) {
-        hashmapList.put(keyValue[0].trim(), keyValue[1].trim());
+    try {
+      String actualSeparator = separators.length > 0 ? separators[0] : ",";
+      String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
+      String[] list = string.split(actualSeparator);
+      for (String s : list) {
+        String[] keyValue = s.split(keyValueSeparator);
+        if (keyValue.length == 2) {
+          hashmapList.put(keyValue[0].trim(), keyValue[1].trim());
+        }
+        if (keyValue.length == 1) {
+          hashmapList.put(keyValue[0].trim(), null);
+        }
       }
-      if (keyValue.length == 1) {
-        hashmapList.put(keyValue[0].trim(), null);
-      }
+      ltLogger.info("Retrieved hashmap from string: {} is: {}", string, hashmapList);
+      return hashmapList;
+    } catch (Exception e) {
+      throw new RuntimeException(
+        "Exception occurred while parsing string: " + string + " to hashmap with separator: " + string, e);
     }
-    ltLogger.info("Retrieved hashmap from string: {} is: {}", string, hashmapList);
-    return hashmapList;
   }
 
   @SneakyThrows
@@ -137,20 +146,44 @@ public class BaseClass {
   }
 
   public void writeStringToFile(String filePath, String content) {
-    File file = new File(filePath);
-    File parentDir = file.getParentFile();
-    if (parentDir != null && !parentDir.exists()) {
-      boolean directoriesCreated = parentDir.mkdirs();
-      if (!directoriesCreated) {
-        ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
+    // Acquire lock only once here
+    FileLockUtility.fileLock.lock();
+    try {
+      File file = new File(filePath);
+      File parentDir = file.getParentFile();
+      if (parentDir != null && !parentDir.exists()) {
+        boolean directoriesCreated = parentDir.mkdirs();
+        if (!directoriesCreated) {
+          ltLogger.error("Failed to create the parent directory: {}", parentDir.getAbsolutePath());
+        }
       }
+
+      // Use FileWriter directly without locking via FileChannel
+      try (FileWriter fileWriter = new FileWriter(filePath)) {
+        fileWriter.write(content);
+        ltLogger.info("Response data written to file: {}", filePath);
+        ltLogger.info("Response data: {}", content);
+      } catch (IOException e) {
+        ltLogger.error("Error writing to file: {}", e.getMessage());
+      }
+    } finally {
+      FileLockUtility.fileLock.unlock();
     }
-    try (FileWriter fileWriter = new FileWriter(file)) {
-      fileWriter.write(content);
-      ltLogger.info("Response data written to file: {}", filePath);
-      ltLogger.info("Response data: {}", content);
+  }
+
+  public File readFileContent(String filePath) {
+    FileLockUtility.fileLock.lock();
+    try (FileChannel channel = FileChannel.open(Paths.get(filePath), StandardOpenOption.READ);
+      FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+      File file = new File(filePath);
+      ltLogger.info("Reading file: {}", filePath);
+      ltLogger.info("File status: {}", file.exists());
+      return file;
     } catch (IOException e) {
-      ltLogger.error("Error writing to file: {}", e.getMessage());
+      ltLogger.error("Error reading file: {}", e.getMessage());
+      throw new RuntimeException(e);
+    } finally {
+      FileLockUtility.fileLock.unlock();
     }
   }
 

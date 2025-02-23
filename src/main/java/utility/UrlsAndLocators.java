@@ -27,4 +27,24 @@ public class UrlsAndLocators {
   public static final Locator herokuLoginPageLoginButton = new Locator(LocatorTypes.CSS, "button[type='submit']");
   public static final Locator herokuAfterLoginPageHeading = new Locator(LocatorTypes.ID, "flash");
 
+  public static final String TODO_APP_URL = "https://lambdatest.github.io/sample-todo-app";
+  public static final Locator todoListItem1 = new Locator(LocatorTypes.NAME, "li1");
+  public static final Locator todoListItem2 = new Locator(LocatorTypes.NAME, "li2");
+  public static final Locator todoListItem3 = new Locator(LocatorTypes.NAME, "li3");
+  public static final Locator todoListItem4 = new Locator(LocatorTypes.NAME, "li4");
+  public static final Locator todoListItem5 = new Locator(LocatorTypes.NAME, "li5");
+  public static final Locator todoInput = new Locator(LocatorTypes.XPATH, "//*[@id='sampletodotext']");
+  public static final Locator todoAddButton = new Locator(LocatorTypes.ID, "addbutton");
+  public static final Locator todoNewEnteredText = new Locator(LocatorTypes.XPATH,
+    "/html/body/div/div/div/ul/li[6]/span");
+
+  public static final String BROWSER_DETAILS_URL = "https://www.whatismybrowser.com/";
+  public static final Locator browserDetailsText = new Locator(LocatorTypes.CSS,
+    "#primary-browser-detection-backend .string-major a");
+
+  public static final String FILE_UPLOAD_URL = "https://the-internet.herokuapp.com/upload";
+  public static final Locator chooseFileButton = new Locator(LocatorTypes.ID, "file-upload");
+  public static final Locator uploadFileButton = new Locator(LocatorTypes.ID, "file-submit");
+  public static final Locator uploadedFileHeading = new Locator(LocatorTypes.XPATH,
+    "//h3[contains(text(),'File Uploaded!')]");
 }

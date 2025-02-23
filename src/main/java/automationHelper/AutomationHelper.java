@@ -13,7 +13,10 @@ import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -69,6 +72,10 @@ public class AutomationHelper extends BaseClass {
       case "verifyExtension":
         verifyExtension();
         break;
+      case "uploadFile":
+        uploadFile();
+        break;
+      case "networkLog":
       default:
         baseTest();
         break;
@@ -140,7 +147,7 @@ public class AutomationHelper extends BaseClass {
     String browserTimeOffSet = driverManager.executeScriptAndFetchValue("return new Date().getTimezoneOffset();")
       .toString();
     String testTimeZone = apiHelper.constructTimeZoneFromTimeOffset(browserTimeOffSet);
-    String expectedTimeZone = EnvSetup.GIVEN_TEST_CAPS_MAP.get().getOrDefault("timezone", "").toString();
+    String expectedTimeZone = EnvSetup.TEST_CAPS_MAP.get().getOrDefault("timezone", "").toString();
     if (!expectedTimeZone.isEmpty())
       softAssert.assertTrue(testTimeZone.equals(expectedTimeZone),
         "Timezone is not set correctly. Current timezone is: " + testTimeZone + " expected: " + expectedTimeZone);
@@ -167,43 +174,148 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  private String[] getBrowserDetailsFromWeb() {
+    driverManager.getURL(BROWSER_DETAILS_URL);
+    String text = driverManager.getText(browserDetailsText, 5);
+    String regex = "(\\w+)\\s(\\d+)";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(text);
+    if (matcher.find()) {
+      return new String[] { matcher.group(1), matcher.group(2) };
+    }
+    return null;
+  }
+
+  private String[] getBrowserDetailsFromJS() {
+    String javaScript = "return navigator.userAgent;";
+    String userAgent = (String) driverManager.executeScriptAndFetchValue(javaScript);
+    String browserName = getBrowserName(userAgent);
+    String browserVersion = getBrowserVersion(userAgent, browserName);
+    return new String[] { browserName, browserVersion };
+  }
+
+  private String getBrowserName(String userAgent) {
+    if (userAgent.contains("OPR")) {
+      return "Opera";
+    } else if (userAgent.contains("Edg")) {
+      return "MicrosoftEdge";
+    } else if (userAgent.contains("Firefox")) {
+      return "Firefox";
+    } else if (userAgent.contains("Chrome")) {
+      return "Chrome";
+    } else if (userAgent.contains("Safari")) {
+      return "Safari";
+    } else {
+      return "Internet Explorer";
+    }
+  }
+
+  private String getBrowserVersion(String userAgent, String browserName) {
+    String[] dataArray = userAgent.split(" ");
+    String browserVersion = "";
+    switch (browserName) {
+    case "Opera":
+    case "MicrosoftEdge":
+    case "Firefox":
+      browserVersion = dataArray[dataArray.length - 1].split("/")[1];
+      break;
+    case "Chrome":
+    case "Safari":
+      browserVersion = dataArray[dataArray.length - 2].split("/")[1];
+      break;
+    case "Internet Explorer":
+      if (dataArray[dataArray.length - 3].contains(":")) {
+        browserVersion = dataArray[dataArray.length - 3].split(":")[1].replace(")", "");
+      } else if (dataArray[dataArray.length - 3].contains("/")) {
+        double num = Double.parseDouble(dataArray[dataArray.length - 3].split("/")[1].replace(";", ""));
+        num = num + 4;
+        browserVersion = Double.toString(num);
+      }
+      break;
+    default:
+      browserVersion = "Unknown";
+    }
+
+    return browserVersion.trim();
+  }
+
   private void browserOSDetails() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String actualBrowserName = EnvSetup.GIVEN_TEST_CAPS_MAP.get().getOrDefault("browserName", "").toString()
-      .toLowerCase();
-    String actualBrowserVersion = EnvSetup.GIVEN_TEST_CAPS_MAP.get().getOrDefault("version", "").toString().trim();
+    Map<String, Object> testCapsMap = EnvSetup.TEST_CAPS_MAP.get();
 
-    Map<String, String> browserDetails = (Map<String, String>) driverManager.executeScriptAndFetchValue(
-      jsForFetchBrowserDetails);
+    String actualBrowserName = testCapsMap.getOrDefault("browserName", "").toString().toLowerCase();
+    String actualBrowserVersion = testCapsMap.getOrDefault("version", "").toString().trim();
 
-    if (browserDetails != null && !browserDetails.isEmpty()) {
-      String browserName = browserDetails.get("name");
-      String browserVersion = browserDetails.get("version");
-
-      ltLogger.info("Browser name: {}", browserName);
-      ltLogger.info("Browser version: {}", browserVersion);
-
-      softAssert.assertEquals(browserName, actualBrowserName,
-        String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
-
-      softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
-        String.format("Browser version doesn't match. Expected: %s, Actual: %s", actualBrowserVersion, browserVersion));
-    } else {
-      ltLogger.error("Failed to fetch browser details.");
+    // Handle beta/dev/latest versions
+    if (actualBrowserVersion.matches(".*(dev|beta|latest).*")) {
+      actualBrowserVersion = apiHelper.getBrowserVersionBasedOnKeyword(actualBrowserName, actualBrowserVersion,
+        testCapsMap.get("platform").toString()).split("\\.")[0];
+      ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
+
+    // Try fetching browser details from the web
+    String[] browserDetails = getBrowserDetailsFromWeb();
+    ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
+    if (browserDetails != null && validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion)) {
+      return;
+    }
+
+    // Fallback to fetching browser details using JavaScript
+    ltLogger.warn("Unable to fetch browser details from website. Trying to fetch browser details using JS");
+    browserDetails = getBrowserDetailsFromJS();
+    String browserName = browserDetails[0].toLowerCase().trim();
+    String browserVersion = browserDetails[1].trim();
+    ltLogger.info("Browser name: {}", browserName);
+    ltLogger.info("Browser version: {}", browserVersion);
+
+    softAssert.assertEquals(browserName, actualBrowserName,
+      String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
+
+    softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
+      String.format("Browser version doesn't match. Expected: %s, Actual: %s", actualBrowserVersion, browserVersion));
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  private boolean validateBrowserDetails(String[] browserDetails, String expectedBrowserName,
+    String expectedBrowserVersion) {
+    ltLogger.info("Actual details: {}, Expected name: {}, Expected version: {}", Arrays.asList(browserDetails),
+      expectedBrowserName, expectedBrowserVersion);
+    return browserDetails[0].trim().equalsIgnoreCase(expectedBrowserName) && browserDetails[1].trim()
+      .equals(expectedBrowserVersion);
+  }
+
   private void verifyExtension() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    driverManager.switchToTab(0, 1);
+    driverManager.switchToTab(1);
     softAssert.assertTrue(driverManager.getCurrentURL().contains("chrome-extension"),
       "Extension not working, or might be tab not switched");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   private void baseTest() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sampleText = "Let's add it to list";
+    driverManager.getURL(TODO_APP_URL);
+    driverManager.click(todoListItem1);
+    driverManager.click(todoListItem2);
+    driverManager.sendKeys(todoInput, sampleText);
+    driverManager.click(todoAddButton);
+    driverManager.executeScript("document.getElementById(\"" + todoAddButton.value() + "\").click();");
+    String actualText = driverManager.getText(todoNewEnteredText, 5);
+    softAssert.assertTrue(actualText.contains(sampleText),
+      "Entered text doesn't match. Expected: " + sampleText + " Actual: " + actualText);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void uploadFile() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.setLocalFileDetector();
+    driverManager.getURL(FILE_UPLOAD_URL);
+    driverManager.sendKeys(chooseFileButton, SAMPLE_TXT_FILE_PATH);
+    driverManager.click(uploadFileButton);
+    softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5), "Unable to upload file");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   private void testLocalUrlWithTunnel() {
@@ -224,7 +336,7 @@ public class AutomationHelper extends BaseClass {
     String[] testActionsArray = testActions.split(",");
     if (IS_EXTENSION_TEST.get()) {
       waitForTime(20);
-      driverManager.switchToTab(1, 0);
+      driverManager.switchToTab(0);
     }
     for (String testAction : testActionsArray) {
       runTestActions(testAction);

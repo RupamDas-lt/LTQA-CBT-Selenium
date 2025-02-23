@@ -21,6 +21,8 @@ public class EnvSetup {
   public static final String USER_PASS = config.get("test_env_pass");
   public static final String GRID_URL = config.get("test_env_hub_url");
   public static final String API_URL_BASE = config.get("test_env_api_url");
+  public static final String TEST_DASHBOARD_URL_BASE = config.get("test_dashboard_url");
+  public static final String TEST_RETINA_URL_BASE = config.get("test_retina_url");
 
   // Test user configs
   public static final ThreadLocal<String> testUserName = new ThreadLocal<>();
@@ -33,7 +35,8 @@ public class EnvSetup {
   public static final ThreadLocal<WebDriver> testDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<WebDriver> clientDriver = new ThreadLocal<WebDriver>();
   public static final ThreadLocal<MutableCapabilities> TEST_CAPS = new ThreadLocal<>();
-  public static final ThreadLocal<HashMap<String, Object>> GIVEN_TEST_CAPS_MAP = new ThreadLocal<HashMap<String, Object>>();
+  public static final ThreadLocal<HashMap<String, Object>> CUSTOM_TEST_CAPS_MAP_FROM_ENV = new ThreadLocal<HashMap<String, Object>>();
+  public static final ThreadLocal<Map<String, Object>> TEST_CAPS_MAP = new ThreadLocal<Map<String, Object>>();
 
   // Test utilities
   public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();

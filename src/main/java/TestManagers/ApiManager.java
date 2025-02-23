@@ -7,7 +7,9 @@ import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.BaseClass;
+import utility.FileLockUtility;
 
+import java.io.File;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,7 +112,19 @@ public abstract class ApiManager extends BaseClass {
   }
 
   public void fetchDataAndWriteResponseToFile(String uri, String filePath) {
-    String responseString = getRequestAsString(uri);
-    writeStringToFile(filePath, responseString);
+    FileLockUtility.fileLock.lock();
+    try {
+      File file = new File(filePath);
+      if (file.exists()) {
+        ltLogger.info("File already exists: {}", filePath);
+        return;
+      }
+      String responseString = getRequestAsString(uri);
+      writeStringToFile(filePath, responseString);
+    } catch (Exception e) {
+      throw new RuntimeException("Error occurred while writing to file", e);
+    } finally {
+      FileLockUtility.fileLock.unlock();
+    }
   }
 }
