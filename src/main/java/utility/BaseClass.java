@@ -146,7 +146,6 @@ public class BaseClass {
   }
 
   public void writeStringToFile(String filePath, String content) {
-    // Acquire lock only once here
     FileLockUtility.fileLock.lock();
     try {
       File file = new File(filePath);
@@ -158,7 +157,6 @@ public class BaseClass {
         }
       }
 
-      // Use FileWriter directly without locking via FileChannel
       try (FileWriter fileWriter = new FileWriter(filePath)) {
         fileWriter.write(content);
         ltLogger.info("Response data written to file: {}", filePath);
