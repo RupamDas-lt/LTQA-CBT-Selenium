@@ -1,7 +1,9 @@
 package stepDefinitions;
 
 import automationHelper.AutomationHelper;
+import automationHelper.ClientAutomationHelper;
 import com.mysql.cj.util.StringUtils;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 
@@ -10,6 +12,7 @@ import static utility.FrameworkConstants.*;
 
 public class AutomationSetupDefinitions {
   AutomationHelper automationHelper = new AutomationHelper();
+  ClientAutomationHelper clientAutomationHelper = new ClientAutomationHelper();
 
   @Then("^I start session to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
   public void startSessionAndPerformActivity(String testActions, String capability) {
@@ -36,5 +39,19 @@ public class AutomationSetupDefinitions {
     } else if (startOrStop.equals("stop")) {
       automationHelper.stopTunnel();
     }
+  }
+
+  @Then("^I ([a-zA-Z0-9_=,: ]+) client test session$")
+  public void iStartClientTestSession(String startOrStop) {
+    if (startOrStop.equals("start")) {
+      clientAutomationHelper.startClientSession();
+    } else {
+      clientAutomationHelper.stopClientSession();
+    }
+  }
+
+  @And("Login to LT dashboard")
+  public void loginToLTDashboard() {
+    clientAutomationHelper.loginToLTDashboard();
   }
 }

@@ -37,10 +37,15 @@ public class EnvSetup {
   public static final ThreadLocal<MutableCapabilities> TEST_CAPS = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> CUSTOM_TEST_CAPS_MAP_FROM_ENV = new ThreadLocal<HashMap<String, Object>>();
   public static final ThreadLocal<Map<String, Object>> TEST_CAPS_MAP = new ThreadLocal<Map<String, Object>>();
+  public static final ThreadLocal<MutableCapabilities> CLIENT_TEST_CAPS = new ThreadLocal<>();
+  public static final ThreadLocal<Map<String, Object>> CLIENT_TEST_CAPS_MAP = new ThreadLocal<Map<String, Object>>();
 
   // Test utilities
-  public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = new ThreadLocal<>();
-  public static final ThreadLocal<String> TEST_SESSION_ID = new ThreadLocal<>();
+  public static final ThreadLocal<CustomSoftAssert> SOFT_ASSERT = ThreadLocal.withInitial(CustomSoftAssert::new);
+  public static final ThreadLocal<CustomSoftAssert> CLIENT_SOFT_ASSERT = ThreadLocal.withInitial(CustomSoftAssert::new);
+  public static final ThreadLocal<Boolean> IS_UI_VERIFICATION_ENABLED = ThreadLocal.withInitial(() -> false);
+  public static final ThreadLocal<String> TEST_SESSION_ID = ThreadLocal.withInitial(() -> "");
+  public static final ThreadLocal<String> CLIENT_SESSION_ID = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = ThreadLocal.withInitial(HashMap::new);
   public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = ThreadLocal.withInitial(HashMap::new);
   public static final ThreadLocal<String> TEST_TUNNEL_NAME = new ThreadLocal<>();
@@ -48,6 +53,8 @@ public class EnvSetup {
   public static final ThreadLocal<HashMap<String, Object>> TEST_VERIFICATION_DATA = ThreadLocal.withInitial(
     HashMap::new);
   public static final ThreadLocal<Boolean> IS_EXTENSION_TEST = new ThreadLocal<>();
+  public static final ThreadLocal<Boolean> IS_EXTENSION_CLIENT_TEST = new ThreadLocal<>();
+  public static final ThreadLocal<String> TEST_SCENARIO_NAME = new ThreadLocal<>();
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {

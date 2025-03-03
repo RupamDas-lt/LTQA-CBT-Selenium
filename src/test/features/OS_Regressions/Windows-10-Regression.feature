@@ -5,8 +5,11 @@ Feature: Automation of windows10 machine with different browsers.
   Scenario Outline: User is able to run local test session and run session with tunnel for windows10 browser to test console,command log and video with network false
     Given Setup user details
     Then I start tunnel
-    Then I start session to test selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,verifyExtension,uploadFile with <capabilities>
+    Then I start session to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,verifyExtension,uploadFile with <capabilities>
     Then I stop tunnel
+    Then I start client test session
+    And Login to LT dashboard
+    Then I stop client test session
 
     Examples:
       | capabilities                                                                                                          |

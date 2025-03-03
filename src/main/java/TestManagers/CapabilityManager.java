@@ -131,13 +131,23 @@ public class CapabilityManager extends BaseClass {
     return null;
   }
 
-  public void buildTestCapability(String capabilityString, String... capsType) {
+  private void buildCapabilities(String capabilityString, String purpose, String... capsType) {
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
-    Map<String, Object> capabilityMap = buildCapabilityMap(capabilityString);
-    setFinalCapabilities(capabilityMap, expectedCapsType);
+    Map<String, Object> capabilityMap = purpose.equals("client") ?
+      buildCapabilityMap(capabilityString, CUSTOM_CLIENT_CAPS) :
+      buildCapabilityMap(capabilityString, CUSTOM_TEST_CAPS);
+    setFinalCapabilities(capabilityMap, expectedCapsType, purpose);
   }
 
-  private Map<String, Object> buildCapabilityMap(String capabilityString) {
+  public void buildTestCapability(String capabilityString, String... capsType) {
+    buildCapabilities(capabilityString, "test", capsType);
+  }
+
+  public void buildClientTestCapability(String capabilityString, String... capsType) {
+    buildCapabilities(capabilityString, "client", capsType);
+  }
+
+  private Map<String, Object> buildCapabilityMap(String capabilityString, String customCapsSource) {
     capsString = capabilityString;
     // Get hashmap from caps string and build caps hashmap
     Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getHashMapFromString(capabilityString));
@@ -148,14 +158,14 @@ public class CapabilityManager extends BaseClass {
       setRandomValue(capabilityMap);
     }
     // If user is passing any custom caps as env variable then set them to capabilityMap
-    mergeCustomTestCaps(capabilityMap);
+    mergeCustomTestCaps(capabilityMap, customCapsSource);
     // Before creating caps object finally get the platform name based on platform keyword
     updatePlatform(capabilityMap);
     return capabilityMap;
   }
 
-  private void mergeCustomTestCaps(Map<String, Object> capabilityMap) {
-    Optional.ofNullable(System.getProperty(CUSTOM_TEST_CAPS)).filter(caps -> !caps.isEmpty()).ifPresent(customCaps -> {
+  private void mergeCustomTestCaps(Map<String, Object> capabilityMap, String customCapsSource) {
+    Optional.ofNullable(System.getProperty(customCapsSource)).filter(caps -> !caps.isEmpty()).ifPresent(customCaps -> {
       ltLogger.info("Applying custom test capabilities: {}", customCaps);
       capabilityMap.putAll(getHashMapFromString(customCaps));
     });
@@ -167,20 +177,23 @@ public class CapabilityManager extends BaseClass {
     ltLogger.info("Updating platform: {}", platform);
   }
 
-  private void setFinalCapabilities(Map<String, Object> capabilityMap, String expectedCapsType) {
-    TEST_CAPS_MAP.set(capabilityMap);
-    ltLogger.info("Final Test caps: {}", TEST_CAPS_MAP.get());
+  private void setFinalCapabilities(Map<String, Object> capabilityMap, String expectedCapsType, String testEnv) {
+
+    ThreadLocal<Map<String, Object>> capsMap = (testEnv.equals("client")) ? CLIENT_TEST_CAPS_MAP : TEST_CAPS_MAP;
+    ThreadLocal<Boolean> isExtensionTest = (testEnv.equals("client")) ? IS_EXTENSION_CLIENT_TEST : IS_EXTENSION_TEST;
+    ThreadLocal<MutableCapabilities> finalCaps = (testEnv.equals("client")) ? CLIENT_TEST_CAPS : TEST_CAPS;
+    capsMap.set(capabilityMap);
+    ltLogger.info("Final {} caps: {}", testEnv, capsMap.get());
     boolean hasExtensions = capabilityMap.containsKey(LOAD_PUBLIC_EXTENSION) || capabilityMap.containsKey(
       LOAD_PRIVATE_EXTENSION);
-    IS_EXTENSION_TEST.set(hasExtensions);
-    ltLogger.info("Is test contains extensions: {}", IS_EXTENSION_TEST.get());
+    isExtensionTest.set(hasExtensions);
+    ltLogger.info("Is {} contains extensions: {}", testEnv, isExtensionTest.get());
     CapsType capsType = (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch")) ?
       CapsType.FIRST_MATCH :
       CapsType.DESIRED_CAPABILITIES;
     createTestCaps(new HashMap<>(capabilityMap), capsType);
-
-    TEST_CAPS.set(capabilities);
-    ltLogger.info("Test caps set in LocalThread: {}", TEST_CAPS.get());
+    finalCaps.set(capabilities);
+    ltLogger.info("{} caps set in LocalThread: {}", testEnv, CLIENT_TEST_CAPS.get());
   }
 
   private enum CapsType {
