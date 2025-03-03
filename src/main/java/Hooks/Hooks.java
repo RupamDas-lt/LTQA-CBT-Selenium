@@ -88,13 +88,6 @@ public class Hooks {
     return results;
   }
 
-  private List<TestStep> getTestSteps(TestCaseState testCaseState) throws NoSuchFieldException, IllegalAccessException {
-    Field testStepsField = testCaseState.getClass().getDeclaredField("testSteps");
-    testStepsField.setAccessible(true);
-    @SuppressWarnings("unchecked") List<TestStep> steps = (List<TestStep>) testStepsField.get(testCaseState);
-    return steps;
-  }
-
   private List<String> getStepNames(Scenario scenario) throws NoSuchFieldException, IllegalAccessException {
     List<String> stepNames = new ArrayList<>();
     try {
