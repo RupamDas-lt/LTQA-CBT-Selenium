@@ -51,13 +51,10 @@ public class Hooks {
   private void updateScenarioStatusIfNeeded(Scenario scenario) {
     try {
       List<String> stepNames = getStepNames(scenario);
-      // Access the TestCaseState using reflection
       TestCaseState testCaseState = getTestCaseState(scenario);
 
-      // Retrieve step results and test steps
       List<Result> results = getStepResults(testCaseState);
 
-      // Find the first failed step
       for (int i = 0; i < results.size(); i++) {
         Result result = results.get(i);
         if ("FAILED".equalsIgnoreCase(result.getStatus().name())) {
@@ -67,7 +64,7 @@ public class Hooks {
             "Unknown Step";
           ltLogger.info("Failed step: {}", failedStepName);
           handleFailedStep(result, failedStepName);
-          break; // Stop after the first failure
+          break;
         }
       }
     } catch (ReflectiveOperationException e) {
@@ -130,7 +127,6 @@ public class Hooks {
     String stepErrorMessage = failResult.getError().getMessage();
     String errorStackTrace = getStackTrace(failResult.getError());
 
-    // Build the error message
     StringBuilder errorMessageBuilder = new StringBuilder();
     if (clientTestErrorMessage.isEmpty()) {
       errorMessageBuilder.append("Failed Step: ").append(failedStepName).append("\nError: ").append(stepErrorMessage);
@@ -140,7 +136,6 @@ public class Hooks {
     }
     clientTestErrorMessage = errorMessageBuilder.toString();
 
-    // Log the failure details
     ltLogger.debug("Scenario failed at step: {}", failedStepName);
     ltLogger.debug("Scenario failed with error: {}", stepErrorMessage);
     ltLogger.debug("Scenario failed with stacktrace: {}", errorStackTrace);
@@ -200,11 +195,9 @@ public class Hooks {
       stringBuilder.append("Client test retina URL: ").append(clientTestRetinaUrl);
     }
     ltLogger.info("Test dashboard URL: {},\nTest Retina url: {}", testDashboardUrl, testRetinaUrl);
-    //    scenario.log("Dashboard URL: " + testDashboardUrl + "\nTest Retina URL: " + testRetinaUrl);
     scenario.log(stringBuilder.toString());
   }
 
-  // Common method to handle assertion errors
   private void handleAssertionError(AssertionError e, boolean isClient) {
     String errorType = isClient ? "Client Assertion Error" : "Test Assertion Error";
     String errorMsg = e.getLocalizedMessage();
@@ -219,7 +212,6 @@ public class Hooks {
       testStatus = "failed";
     }
 
-    // Append to combined error message
     if (!combinedAssertionErrorMessage.isEmpty()) {
       combinedAssertionErrorMessage.append("\n");
     }
@@ -228,7 +220,6 @@ public class Hooks {
     ltLogger.debug("{}: {}", errorType, errorMsg);
   }
 
-  // Capture test assertions
   private void assertAll() {
     try {
       EnvSetup.SOFT_ASSERT.get().assertAll();
@@ -237,7 +228,6 @@ public class Hooks {
     }
   }
 
-  // Capture client assertions
   private void assertAllClient() {
     try {
       EnvSetup.CLIENT_SOFT_ASSERT.get().assertAll();
@@ -246,7 +236,6 @@ public class Hooks {
     }
   }
 
-  // Throw all assertion errors together if any exist
   private void throwErrorBasedOnAssertions() {
     if (testAssertionError || clientAssertionError) {
       String finalErrorMessage = combinedAssertionErrorMessage.toString();
