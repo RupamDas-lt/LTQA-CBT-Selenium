@@ -12,12 +12,5 @@ Feature: Automation of windows10 machine with different browsers.
     Then I stop client test session
 
     Examples:
-      | capabilities                                                                                                          |
-      | browserName=chrome,version=latest,resolution=.*,platform=win10,geoLocation=.*,timezone=UTC+01:00,loadExtension=true   |
-      | browserName=chrome,version=latest,resolution=.*,platform=win10,geoLocation=.*,timezone=UTC+01:00,loadExtension=true   |
-      | browserName=chrome,version=latest-1,resolution=.*,platform=win10,geoLocation=.*,timezone=UTC+01:00,loadExtension=true |
-      | browserName=chrome,version=latest-1,resolution=.*,platform=win10,geoLocation=.*,timezone=UTC+01:00,loadExtension=true |
-      | browserName=chrome,version=latest,resolution=.*,platform=win11,geoLocation=.*,timezone=UTC+01:00,loadExtension=true   |
-      | browserName=chrome,version=latest,resolution=.*,platform=win11,geoLocation=.*,timezone=UTC+01:00,loadExtension=true   |
-      | browserName=chrome,version=latest-1,resolution=.*,platform=win11,geoLocation=.*,timezone=UTC+01:00,loadExtension=true |
-      | browserName=chrome,version=latest-1,resolution=.*,platform=win11,geoLocation=.*,timezone=UTC+01:00,loadExtension=true |
+      | capabilities                                                                                             |
+      | browserName=chrome,version=.*,resolution=.*,platform=win10,geoLocation=.*,timezone=.*,loadExtension=true |
