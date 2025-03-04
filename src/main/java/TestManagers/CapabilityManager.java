@@ -25,7 +25,7 @@ import static utility.FrameworkConstants.*;
 
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
-  private final String[] randomValueSupportedCaps = new String[] { "geoLocation", "resolution" };
+  private final String[] randomValueSupportedCaps = new String[] { "geoLocation", "resolution", "version", "timezone" };
   MutableCapabilities capabilities;
   String capsString;
 
@@ -77,8 +77,10 @@ public class CapabilityManager extends BaseClass {
     capabilityMap.entrySet().stream().filter(entry -> entry.getValue().toString().equals(".*")).forEach(entry -> {
       String key = entry.getKey();
       String randomValue = switch (key) {
+        case "timezone" -> getRandomTimeZone();
         case "geoLocation" -> getRandomGeoLocation();
         case "resolution" -> getRandomResolution(capabilityMap.get("platform").toString());
+        case "version" -> getRandomBrowserVersionFromTopSix((String) capabilityMap.getOrDefault("browserName", ""));
         default -> throw new RuntimeException(
           key + " this capability doesn't support random value. Supported values: " + Arrays.asList(
             randomValueSupportedCaps));
@@ -129,6 +131,28 @@ public class CapabilityManager extends BaseClass {
       throw new RuntimeException("Unable to read resolution data", e);
     }
     return null;
+  }
+
+  private String getRandomBrowserVersionFromTopSix(String browserName) {
+    if (browserName.equalsIgnoreCase("safari"))
+      return "latest";
+    String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4", "latest-5" };
+    return topFive[new Random().nextInt(topFive.length)];
+  }
+
+  private String getRandomTimeZone() {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode rootNode = objectMapper.readTree(readFileContent(TIMEZONE_DATA_PATH));
+      List<String> timezoneIds = new ArrayList<>();
+      rootNode.fields().forEachRemaining(entry -> timezoneIds.add(entry.getKey()));
+      Random random = new Random();
+      int randomIndex = random.nextInt(timezoneIds.size());
+      return timezoneIds.get(randomIndex);
+
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to read timezone data", e);
+    }
   }
 
   private void buildCapabilities(String capabilityString, String purpose, String... capsType) {
