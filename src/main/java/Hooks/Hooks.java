@@ -145,6 +145,9 @@ public class Hooks {
       testStatus = "failed";
       errorMessage = clientTestErrorMessage;
     }
+
+    TEST_REPORT.get().put("failed_step", failedStepName);
+    TEST_REPORT.get().put("failed_step_error", stepErrorMessage);
   }
 
   private void setTestStatus(String testId, String testStatus, String remarks) {
@@ -176,6 +179,8 @@ public class Hooks {
     TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());
     TEST_REPORT.get().put("accessKey", EnvSetup.testAccessKey.get());
     TEST_REPORT.get().put("hub", EnvSetup.testGridUrl.get());
+    TEST_REPORT.get().put("test_status", testStatus);
+    TEST_REPORT.get().put("client_test_status", EnvSetup.IS_UI_VERIFICATION_ENABLED.get() ? clientTestStatus : "NA");
   }
 
   private void printTestDashboardAndRetinaLinks(Scenario scenario) {
@@ -206,10 +211,12 @@ public class Hooks {
       clientAssertionError = true;
       clientTestErrorMessage = clientTestErrorMessage.isEmpty() ? errorMsg : clientTestErrorMessage + "\n" + errorMsg;
       clientTestStatus = "failed";
+      TEST_REPORT.get().put("client_test_assertion_errors", errorMsg);
     } else {
       testAssertionError = true;
       errorMessage = errorMessage.isEmpty() ? errorMsg : errorMessage + "\n" + errorMsg;
       testStatus = "failed";
+      TEST_REPORT.get().put("test_assertion_errors", errorMsg);
     }
 
     if (!combinedAssertionErrorMessage.isEmpty()) {

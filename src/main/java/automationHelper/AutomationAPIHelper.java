@@ -63,7 +63,7 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {
-    customData.put("message", "New_Framework_Testing");
+    customData.put("message", "New_Framework_Testing-2");
     ltLogger.info("Custom data to push to SumoLogic: {}", customData);
     try {
       putRequestWithURLEncoding(SUMO_LOGIC_URL, customData);
