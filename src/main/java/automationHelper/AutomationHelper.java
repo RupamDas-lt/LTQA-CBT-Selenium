@@ -3,7 +3,6 @@ package automationHelper;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +47,10 @@ public class AutomationHelper extends BaseClass {
       switch (actionName) {
       case "local":
         testLocalUrlWithTunnel();
+        break;
+      case "throwError":
+        throwNewError();
+        break;
       case "basicAuthentication":
         basicAuthentication();
         break;
@@ -82,9 +85,10 @@ public class AutomationHelper extends BaseClass {
       }
     } catch (Exception e) {
       TEST_ERR_REPORT.get().put(actionName, e.getMessage());
-      softAssert.fail(
-        actionName + " test action failed. \nError message: " + e.getMessage() + "\nStack trace: " + ExceptionUtils.getStackTrace(
-          e));
+      //      softAssert.fail(
+      //        actionName + " test action failed. \nError message: " + e.getMessage() + "\nStack trace: " + ExceptionUtils.getStackTrace(
+      //          e));
+      throw new RuntimeException("Test action " + actionName + " failed", e);
     }
     endTestContext(actionName);
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -316,6 +320,10 @@ public class AutomationHelper extends BaseClass {
     driverManager.click(uploadFileButton);
     softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5), "Unable to upload file");
     EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void throwNewError() {
+    throw new RuntimeException("Something went wrong! This is a trial error :)");
   }
 
   private void testLocalUrlWithTunnel() {

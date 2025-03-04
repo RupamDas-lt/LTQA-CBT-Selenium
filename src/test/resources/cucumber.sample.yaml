@@ -7,6 +7,8 @@ stage:
   test_env_api_url: "stage-api.lambdatestinternal.com"
   test_dashboard_url: "stage-automation.lambdatestinternal.com"
   test_retina_url: "stage-retina.lambdatestinternal.com"
+  client_env_username: "<USER_NAME>"
+  client_env_key: "<ACCESS_KEY>"
   org_id: "<ORG_ID>"
 
 prod:
@@ -18,4 +20,6 @@ prod:
   test_env_api_url: "api.lambdatest.com"
   test_dashboard_url: "automation.lambdatest.com"
   test_retina_url: "retina.lambdatest.com"
+  client_env_username: "<USER_NAME>"
+  client_env_key: "<ACCESS_KEY>"
   org_id: "<ORG_ID>"

@@ -31,8 +31,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static utility.EnvSetup.*;
-import static utility.FrameworkConstants.HTTPS;
-import static utility.FrameworkConstants.SESSION_ID;
+import static utility.FrameworkConstants.*;
 
 public class DriverManager extends BaseClass {
   private static final EnumMap<LocatorTypes, Function<String, By>> LOCATOR_MAP = new EnumMap<>(LocatorTypes.class);
@@ -90,8 +89,18 @@ public class DriverManager extends BaseClass {
     if (TEST_ENV.equals("local"))
       createLocalTestDriver();
     else
-      createRemoteTestDriver();
+      createRemoteTestDriver("test");
     testDriver.set(driver);
+  }
+
+  public void createClientDriver() {
+    capabilities = EnvSetup.CLIENT_TEST_CAPS.get();
+    ltLogger.info("Client caps used passed by user: {}", capabilities.asMap().toString());
+    if (TEST_ENV.equals("local"))
+      createLocalTestDriver();
+    else
+      createRemoteTestDriver("client");
+    clientDriver.set(driver);
   }
 
   private void createLocalTestDriver() {
@@ -120,14 +129,16 @@ public class DriverManager extends BaseClass {
     return HTTPS + testUserName.get() + ":" + testAccessKey.get() + "@" + testGridUrl.get() + "/wd/hub";
   }
 
-  private void createRemoteTestDriver() {
+  private void createRemoteTestDriver(String purpose) {
+    ThreadLocal<String> sessionId = purpose.equals("client") ? CLIENT_SESSION_ID : TEST_SESSION_ID;
+    String sessionIdKey = purpose.equals("client") ? SESSION_ID_CLIENT : SESSION_ID;
     gridUrl = getGridUrl();
     ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
     try {
       driver = new RemoteWebDriver(URI.create(gridUrl).toURL(), capabilities);
-      TEST_SESSION_ID.set(driver.getSessionId().toString());
-      EnvSetup.TEST_REPORT.get().put(SESSION_ID, TEST_SESSION_ID.get());
-      ltLogger.info("Remote driver created. Test session ID: {}", TEST_SESSION_ID.get());
+      sessionId.set(driver.getSessionId().toString());
+      EnvSetup.TEST_REPORT.get().put(sessionIdKey, sessionId.get());
+      ltLogger.info("Remote driver created. Test session ID: {}", sessionId.get());
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }

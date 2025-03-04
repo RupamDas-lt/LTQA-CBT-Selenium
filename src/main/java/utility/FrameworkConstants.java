@@ -39,12 +39,14 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
   public static final String TEST_PREREQUISITES = "TEST_PREREQUISITES";
   public static final String CUSTOM_TEST_CAPS = "CUSTOM_TEST_CAPS";
+  public static final String CUSTOM_CLIENT_CAPS = "CUSTOM_CLIENT_CAPS";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
   public static final String TEST_EXECUTION_TIME = "test_execution_time";
   public static final String TEST_STOP_TIME = "test_stop_time";
   public static final String SESSION_ID = "test_session_id";
+  public static final String SESSION_ID_CLIENT = "client_session_id";
 
   // Test Status
   public static final String COMPLETED = "completed";
