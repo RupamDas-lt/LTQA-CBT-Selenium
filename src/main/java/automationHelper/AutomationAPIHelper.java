@@ -1,9 +1,8 @@
 package automationHelper;
 
+import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
 import TestManagers.ApiManager;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +11,7 @@ import utility.EnvSetup;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,17 +92,16 @@ public class AutomationAPIHelper extends ApiManager {
     fetchDataAndWriteResponseToFile(browserVersionFetchUrl, filePath);
 
     try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(readFileContent(filePath));
-      JsonNode versionsData = rootNode.path("versions");
-
       Map<String, String> versionMap = new HashMap<>();
       List<String> stableVersions = new ArrayList<>();
 
-      for (JsonNode version : versionsData) {
-        String channelType = version.path("channel_type").asText().toLowerCase();
-        String versionNumber = version.path("version").asText();
-
+      BrowserVersionsFromCapsGenerator browserVersionsFromCapsGenerator = convertJsonStringToPojo(
+        Files.readString(readFileContent(filePath).toPath()), new TypeToken<BrowserVersionsFromCapsGenerator>() {
+        });
+      ArrayList<BrowserVersionsFromCapsGenerator.VersionDTO> versionDTOS = browserVersionsFromCapsGenerator.getVersions();
+      for (BrowserVersionsFromCapsGenerator.VersionDTO versionDTO : versionDTOS) {
+        String channelType = versionDTO.getChannel_type();
+        String versionNumber = versionDTO.getVersion();
         switch (channelType) {
         case "dev" -> versionMap.put("dev", versionNumber);
         case "beta" -> versionMap.put("beta", versionNumber);
