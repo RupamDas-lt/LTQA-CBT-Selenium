@@ -84,7 +84,7 @@ To rerun failed tests:
 ## Random caps
 
 - This framework has support of assigning random value of certain caps upon passing the caps value `.*`.
-- Supported caps for random value: `geoLocation`, `browserVersion`
+- Supported caps for random value: `geoLocation`, `browserVersion`, `version`, `timezone`
 
 ---
 
