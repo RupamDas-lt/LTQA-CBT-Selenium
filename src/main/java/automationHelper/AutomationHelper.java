@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static utility.EnvSetup.*;
+import static utility.EnvSetup.IS_EXTENSION_TEST;
+import static utility.EnvSetup.TEST_REPORT;
 import static utility.FrameworkConstants.*;
 import static utility.UrlsAndLocators.*;
 
@@ -84,7 +85,7 @@ public class AutomationHelper extends BaseClass {
         break;
       }
     } catch (Exception e) {
-      TEST_ERR_REPORT.get().put(actionName, e.getMessage());
+      EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       //      softAssert.fail(
       //        actionName + " test action failed. \nError message: " + e.getMessage() + "\nStack trace: " + ExceptionUtils.getStackTrace(
       //          e));
@@ -360,7 +361,6 @@ public class AutomationHelper extends BaseClass {
     }
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
-    EnvSetup.TEST_REPORT.get().put("test_actions_failures", TEST_ERR_REPORT.get());
   }
 
   public void startTunnel() {

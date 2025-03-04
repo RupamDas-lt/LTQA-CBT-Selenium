@@ -47,7 +47,6 @@ public class EnvSetup {
   public static final ThreadLocal<String> TEST_SESSION_ID = ThreadLocal.withInitial(() -> "");
   public static final ThreadLocal<String> CLIENT_SESSION_ID = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = ThreadLocal.withInitial(HashMap::new);
-  public static final ThreadLocal<HashMap<String, Object>> TEST_ERR_REPORT = ThreadLocal.withInitial(HashMap::new);
   public static final ThreadLocal<String> TEST_TUNNEL_NAME = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> TEST_VERIFICATION_DATA = ThreadLocal.withInitial(
