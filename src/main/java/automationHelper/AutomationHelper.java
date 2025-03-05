@@ -17,8 +17,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static utility.EnvSetup.IS_EXTENSION_TEST;
-import static utility.EnvSetup.TEST_REPORT;
+import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 import static utility.UrlsAndLocators.*;
 
@@ -79,6 +78,9 @@ public class AutomationHelper extends BaseClass {
       case "uploadFile":
         uploadFile();
         break;
+      case "geolocation":
+        geolocation();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -86,9 +88,6 @@ public class AutomationHelper extends BaseClass {
       }
     } catch (Exception e) {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
-      //      softAssert.fail(
-      //        actionName + " test action failed. \nError message: " + e.getMessage() + "\nStack trace: " + ExceptionUtils.getStackTrace(
-      //          e));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
     endTestContext(actionName);
@@ -320,6 +319,23 @@ public class AutomationHelper extends BaseClass {
     driverManager.sendKeys(chooseFileButton, SAMPLE_TXT_FILE_PATH);
     driverManager.click(uploadFileButton);
     softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5), "Unable to upload file");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void geolocation() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getURL(GEOLOCATION_VERIFICATION_URL);
+    int retryCount = 0;
+    while (retryCount < 5) {
+      if (driverManager.isDisplayed(countryName, 10))
+        break;
+      retryCount++;
+    }
+    String actualCountryName = driverManager.getText(countryName);
+    String expectedCountryName = TEST_VERIFICATION_DATA.get().get("geoLocation").toString();
+    softAssert.assertTrue(
+      expectedCountryName.contains(actualCountryName) || actualCountryName.contains(expectedCountryName),
+      "GeoLocation didn't match. Expected: " + expectedCountryName + " Actual: " + actualCountryName);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 

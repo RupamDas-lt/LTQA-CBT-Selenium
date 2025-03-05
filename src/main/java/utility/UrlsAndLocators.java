@@ -47,4 +47,8 @@ public class UrlsAndLocators {
   public static final Locator uploadFileButton = new Locator(LocatorTypes.ID, "file-submit");
   public static final Locator uploadedFileHeading = new Locator(LocatorTypes.XPATH,
     "//h3[contains(text(),'File Uploaded!')]");
+
+  public static final String GEOLOCATION_VERIFICATION_URL = "https://geotargetly.com/my-ip-geolocation";
+  public static final Locator countryCode = new Locator(LocatorTypes.ID, "geotargetly_country_code");
+  public static final Locator countryName = new Locator(LocatorTypes.ID, "geotargetly_country_name");
 }
