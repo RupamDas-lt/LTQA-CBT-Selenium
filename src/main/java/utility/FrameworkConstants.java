@@ -30,6 +30,31 @@ public class FrameworkConstants extends BaseClass {
   public static final String PATCH_WITHOUT_STATUS_CODE_VERIFICATION = "PATCH_WITHOUT_STATUS_CODE_VERIFICATION";
   public static final String DELETE_WITHOUT_STATUS_CODE_VERIFICATION = "DELETE_WITHOUT_STATUS_CODE_VERIFICATION";
 
+  public static HashMap<String, String> sessionApiEndpoints() {
+    HashMap<String, String> sessionApiUriPart2 = new HashMap<>();
+    sessionApiUriPart2.put("console", "/log/console");
+    sessionApiUriPart2.put("network", "/log/network");
+    sessionApiUriPart2.put("selenium", "/log/selenium");
+    sessionApiUriPart2.put("command", "/log/command");
+    sessionApiUriPart2.put("exception", "/log/command?isExceptionLog=true");
+    sessionApiUriPart2.put("terminal", "/terminal-logs");
+    sessionApiUriPart2.put("video", "/video");
+    sessionApiUriPart2.put("screenshots", "/screenshots");
+    sessionApiUriPart2.put("session_details", "");
+    sessionApiUriPart2.put("stop", "/stop");
+    sessionApiUriPart2.put("networkHar", "/log/network.har");
+    sessionApiUriPart2.put("fullHar", "/log/full-har");
+    return sessionApiUriPart2;
+  }
+
+  public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
+  public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
+  public static final String REQUEST_BODY_CONTENT_TYPE_URLENC = "application/x-www-form-urlencoded";
+  public static final String REQUEST_BODY_CONTENT_TYPE_HTML = "text/html";
+  public static final String REQUEST_BODY_CONTENT_TYPE_XML = "application/xml";
+  public static final String REQUEST_BODY_CONTENT_TYPE_JSON = "application/json";
+  public static final String REQUEST_BODY_CONTENT_TYPE_TEXT = "text/plain";
+
   // ENV variables
   public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";
   public static final String CUSTOM_USER_KEY = "CUSTOM_USER_KEY";
@@ -61,7 +86,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String TUNNEL = "tunnel";
   public static final String TUNNEL_NAME = "tunnelName";
   public static final String TEST_NAME = "name";
-
+  public static final String SELENIUM_VERSION = "selenium_version";
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
   public static final String LAMBDA_FILE_EXIST = "lambda-file-exists";
@@ -94,6 +119,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String TIMEZONE_DATA_PATH = "src/test/resources/TestData/timeZones.json";
   public static final String BROWSER_VERSIONS_DATA_PATH = "src/test/resources/TestData/browser_versions/<BROWSER_NAME>_<TEMPLATE>.json";
   public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
+  public static final String SAMPLE_TERMINAL_LOGS_FILE_PATH = "src/test/resources/TestFiles/sample_terminal_logs.txt";
 
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{
