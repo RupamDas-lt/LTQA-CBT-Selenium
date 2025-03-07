@@ -1,6 +1,7 @@
 package Hooks;
 
 import automationHelper.AutomationAPIHelper;
+import com.mysql.cj.util.StringUtils;
 import io.cucumber.core.backend.TestCaseState;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -271,13 +272,13 @@ public class Hooks {
 
     apiHelper.waitForTime(5);
 
-    if (TEST_SESSION_ID.get() != null && COMPLETED.equalsIgnoreCase(
+    if (!StringUtils.isNullOrEmpty(TEST_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
       apiHelper.getSpecificSessionDetailsViaAPI(TEST_SESSION_ID.get(), "status_ind"))) {
       ltLogger.warn("Test status: {}, Test Error message: {}", testStatus, errorMessage);
       setTestStatus(TEST_SESSION_ID.get(), testStatus, errorMessage);
     }
 
-    if (CLIENT_SESSION_ID.get() != null && COMPLETED.equalsIgnoreCase(
+    if (!StringUtils.isNullOrEmpty(CLIENT_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
       apiHelper.getSpecificSessionDetailsViaAPI(CLIENT_SESSION_ID.get(), "status_ind"))) {
       ltLogger.warn("Client test status: {}, Client Test Error message: {}", clientTestStatus, clientTestErrorMessage);
       setTestStatus(CLIENT_SESSION_ID.get(), clientTestStatus, clientTestErrorMessage);
