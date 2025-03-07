@@ -41,8 +41,15 @@ public abstract class ApiManager extends BaseClass {
     }
 
     RequestSpecification req = RestAssured.given().headers(headers != null ? headers : Map.of())
-      .queryParams(queryParam != null ? queryParam : Map.of()).body(body != null ? body : "")
+      .queryParams(queryParam != null ? queryParam : Map.of())
       .contentType(contentType != null ? contentType : ContentType.JSON);
+
+    // Handle multipart requests
+    if (contentType == ContentType.MULTIPART && body instanceof RequestSpecification) {
+      req = ((RequestSpecification) body).headers(headers != null ? headers : Map.of());
+    } else {
+      req.body(body != null ? body : "");
+    }
 
     boolean verifyStatusCode = !method.endsWith("_WITHOUT_STATUS_CODE_VERIFICATION");
 
@@ -83,6 +90,33 @@ public abstract class ApiManager extends BaseClass {
     RestAssured.urlEncodingEnabled = false;
     return RestAssured.given().body(body).contentType(ContentType.JSON).put(uri).then().statusCode(200).extract()
       .response();
+  }
+
+  public Response postRequestWithBasicAuth(String uri, HashMap<String, Object> body, String username, String password) {
+    ltLogger.info("POST Request body: {}", body);
+    ContentType contentType = ContentType.JSON; // Default content type
+    if (body.containsKey("contentType")) {
+      contentType = ContentType.fromContentType((String) body.get("contentType"));
+      body.remove("contentType");
+    }
+
+    // Prepare the request body based on content type
+    Object requestBody = body;
+    if (contentType == ContentType.MULTIPART) {
+      RequestSpecification multiPartRequest = RestAssured.given();
+      for (Map.Entry<String, Object> entry : body.entrySet()) {
+        String key = entry.getKey();
+        Object value = entry.getValue();
+        if (value instanceof File) {
+          multiPartRequest.multiPart(key, (File) value);
+        } else {
+          multiPartRequest.multiPart(key, value.toString());
+        }
+      }
+      requestBody = multiPartRequest;
+    }
+
+    return httpMethod(POST, uri, requestBody, contentType, null, null, 200, username, password);
   }
 
   public Response getRequest(String uri) {

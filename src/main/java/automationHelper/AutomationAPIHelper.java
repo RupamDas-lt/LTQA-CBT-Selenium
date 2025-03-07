@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.EnvSetup;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -28,8 +29,14 @@ public class AutomationAPIHelper extends ApiManager {
 
   private final Logger ltLogger = LogManager.getLogger(AutomationAPIHelper.class);
 
-  public String constructAPIUrl(String uriBase, String endpoint, String... sessionId) {
-    String url = sessionId.length > 0 ? HTTPS + uriBase + endpoint + sessionId[0] : HTTPS + uriBase + endpoint;
+  public String constructAPIUrl(String uriBase, String endpoint, String... sessionDetails) {
+    // In sessionDetails, first param should always be session id and then the session API end points
+    int sessionDetailsLength = sessionDetails.length;
+    String url = switch (sessionDetailsLength) {
+      case 1 -> HTTPS + uriBase + endpoint + sessionDetails[0];
+      case 2 -> HTTPS + uriBase + endpoint + sessionDetails[0] + sessionDetails[1];
+      default -> HTTPS + uriBase + endpoint;
+    };
     ltLogger.info("URL: {}", url);
     return url;
   }
@@ -125,5 +132,17 @@ public class AutomationAPIHelper extends ApiManager {
     } catch (IOException e) {
       throw new RuntimeException("Failed to fetch or parse browser versions data", e);
     }
+  }
+
+  public String uploadTerminalLogs(String session_id) {
+    String urlToUploadTerminalLogs = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id,
+      sessionApiEndpoints().get("terminal"));
+    ltLogger.info("Uploading terminal logs to: {}", urlToUploadTerminalLogs);
+    HashMap<String, Object> multipartBody = new HashMap<>();
+    multipartBody.put("contentType", REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM);
+    multipartBody.put("file", new File(SAMPLE_TERMINAL_LOGS_FILE_PATH));
+    Response response = postRequestWithBasicAuth(urlToUploadTerminalLogs, multipartBody, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get());
+    return response.getBody().path("status").toString();
   }
 }

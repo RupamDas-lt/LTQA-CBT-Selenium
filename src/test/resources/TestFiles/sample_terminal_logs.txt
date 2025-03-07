@@ -1,0 +1,28 @@
+Testing started at 10:48 ...
+Write event:
+TEST_ENV_TEST_URL: https://automation.lambdatest.com/test?testID=KNQQ8-GYQNX-S4VHA-CUPC8
+TEST_ENV_RETINA_TEST_URL: https://retina.lambdatest.com/search/?query=KNQQ8-GYQNX-S4VHA-CUPC8
+
+1 Scenarios (1 passed)
+7 Steps (7 passed)
+0m44.716s
+
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│ Share your Cucumber Report with your team at https://reports.cucumber.io          │
+│ Activate publishing with one of the following:                                    │
+│                                                                                   │
+│ src/test/resources/cucumber.properties:          cucumber.publish.enabled=true    │
+│ src/test/resources/junit-platform.properties:    cucumber.publish.enabled=true    │
+│ Environment variable:                            CUCUMBER_PUBLISH_ENABLED=true    │
+│ JUnit:                                           @CucumberOptions(publish = true) │
+│                                                                                   │
+│ More information at https://reports.cucumber.io/docs/cucumber-jvm                 │
+│                                                                                   │
+│ Disable this message with one of the following:                                   │
+│                                                                                   │
+│ src/test/resources/cucumber.properties:          cucumber.publish.quiet=true      │
+│ src/test/resources/junit-platform.properties:    cucumber.publish.quiet=true      │
+└───────────────────────────────────────────────────────────────────────────────────┘
+
+Process finished with exit code 0

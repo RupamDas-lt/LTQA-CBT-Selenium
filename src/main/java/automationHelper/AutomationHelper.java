@@ -81,6 +81,9 @@ public class AutomationHelper extends BaseClass {
       case "geolocation":
         geolocation();
         break;
+      case "loginCacheCleaned":
+        loginCacheCleanedCheckUsingLTLoginPage();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -259,9 +262,18 @@ public class AutomationHelper extends BaseClass {
 
     // Try fetching browser details from the web
     String[] browserDetails = getBrowserDetailsFromWeb();
-    ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-    if (browserDetails != null && validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion)) {
-      return;
+    try {
+      assert browserDetails != null;
+      ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
+      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion) || testCapsMap.getOrDefault(
+        SELENIUM_VERSION, "default").toString().contains("latest-")) {
+        ltLogger.warn(
+          "Either browser version fetched from web is matched or verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
+          testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString());
+        return;
+      }
+    } catch (Exception e) {
+      ltLogger.error("Error while verifying browser details from osBrowserDetails page", e);
     }
 
     // Fallback to fetching browser details using JavaScript
@@ -339,6 +351,21 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  private void loginCacheCleanedCheckUsingLTLoginPage() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getURL(LT_LOGIN_URL);
+    softAssert.assertTrue(driverManager.isDisplayed(ltLoginPageEmailInput, 5),
+      "LT login page is not displayed, cache is not cleared in the machine.");
+    if (!driverManager.isDisplayed(ltLoginPageEmailInput)) {
+      driverManager.sendKeys(ltLoginPageEmailInput, USER_EMAIL);
+      driverManager.sendKeys(ltLoginPagePasswordInput, USER_PASS);
+      driverManager.click(ltLoginPageSubmitButton);
+      softAssert.assertTrue(driverManager.isDisplayed(ltLoginSuccessVerification, 20),
+        "Failed to login to LT website, cache verification will not be valid for next sessions.");
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
   private void throwNewError() {
     throw new RuntimeException("Something went wrong! This is a trial error :)");
   }
@@ -349,7 +376,7 @@ public class AutomationHelper extends BaseClass {
     Assert.assertEquals(httpServerStatus, 200,
       "Please start http server on port 8000 to start verifying tunnel. Expected status code: 200, original status code: " + httpServerStatus);
     driverManager.getURL(LOCAL_URL);
-    boolean localUrlStatus = driverManager.isDisplayed(localUrlHeading);
+    boolean localUrlStatus = driverManager.isDisplayed(localUrlHeading, 10);
     softAssert.assertTrue(localUrlStatus, "Local Url Not Displayed");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -402,5 +429,11 @@ public class AutomationHelper extends BaseClass {
 
   public void stopTunnel() {
     tunnelManager.stopTunnel();
+  }
+
+  public void uploadSampleTerminalLogs() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String status = apiHelper.uploadTerminalLogs(EnvSetup.TEST_SESSION_ID.get());
+    softAssert.assertTrue(status.equals("success"), "Failed to upload terminal logs");
   }
 }

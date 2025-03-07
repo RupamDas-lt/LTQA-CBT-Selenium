@@ -135,7 +135,7 @@ public class CapabilityManager extends BaseClass {
   }
 
   private String getRandomBrowserVersionFromTopSix(String browserName) {
-    if (browserName.equalsIgnoreCase("safari"))
+    if (browserName.matches(".*(safari|opera|ie).*"))
       return "latest";
     String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4", "latest-5" };
     return topFive[new Random().nextInt(topFive.length)];
