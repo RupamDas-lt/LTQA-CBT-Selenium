@@ -65,6 +65,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_PREREQUISITES = "TEST_PREREQUISITES";
   public static final String CUSTOM_TEST_CAPS = "CUSTOM_TEST_CAPS";
   public static final String CUSTOM_CLIENT_CAPS = "CUSTOM_CLIENT_CAPS";
+  public static final String REMOVE_TEST_CAPS = "REMOVE_TEST_CAPS";
+  public static final String REMOVE_CLIENT_TEST_CAPS = "REMOVE_CLIENT_TEST_CAPS";
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
@@ -87,6 +89,13 @@ public class FrameworkConstants extends BaseClass {
   public static final String TUNNEL_NAME = "tunnelName";
   public static final String TEST_NAME = "name";
   public static final String SELENIUM_VERSION = "selenium_version";
+  public static final String GEO_LOCATION = "geoLocation";
+  public static final String TIMEZONE = "timezone";
+  public static final String NETWORK = "network";
+  public static final String NETWORK_HTTP_2 = "network.http2";
+  public static final String NETWORK_HAR = "network.har";
+  public static final String NETWORK_FULL_HAR = "network.full.har";
+
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
   public static final String LAMBDA_FILE_EXIST = "lambda-file-exists";
@@ -146,8 +155,12 @@ public class FrameworkConstants extends BaseClass {
     Map.entry("sierra", "macOS Sierra"), Map.entry("high_sierra", "macOS High Sierra"),
     Map.entry("elcapitan", "OS X El Capitan"), Map.entry("yosemite", "OS X El Yosemite"),
     Map.entry("mavericks", "OS X El Mavericks"), Map.entry("ubuntu", "ubuntu 20"));
+
   public static final Map<String, String> osTemplateNameToKeywordMap = osKeywordToTemplateNameMap.entrySet().stream()
     .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+  public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL, NETWORK),
+    "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
