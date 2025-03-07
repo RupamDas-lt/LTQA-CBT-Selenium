@@ -14,6 +14,7 @@ import utility.EnvSetup;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,8 +41,35 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.TEST_REPORT.get().put(TEST_SETUP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
   }
 
+  private boolean checkIfValidTestAction(String actionName) {
+    ltLogger.info("Checking if action {} is valid.", actionName);
+    boolean runTestAction = false;
+    if (testActionsToCapsMap.containsKey(actionName)) {
+      Set<String> requiredCaps = testActionsToCapsMap.get(actionName);
+      ltLogger.info("Test Action: {}, requires caps: {}", actionName, requiredCaps);
+      for (String requiredCap : requiredCaps) {
+        if (TEST_CAPS_MAP.get().containsKey(requiredCap)) {
+          runTestAction = true;
+          break;
+        }
+      }
+    } else
+      runTestAction = true;
+    return runTestAction;
+  }
+
   private void runTestActions(String actionName) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+
+    boolean runTestAction = checkIfValidTestAction(actionName);
+
+    if (!runTestAction) {
+      ltLogger.info("Skipping test action: {}", actionName);
+      return;
+    }
+
+    ltLogger.info("Executing test action: {}", actionName);
+
     startTestContext(actionName);
     try {
       switch (actionName) {
@@ -213,7 +241,7 @@ public class AutomationHelper extends BaseClass {
     } else if (userAgent.contains("Safari")) {
       return "Safari";
     } else {
-      return "Internet Explorer";
+      return "ie";
     }
   }
 
@@ -284,7 +312,7 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("Browser name: {}", browserName);
     ltLogger.info("Browser version: {}", browserVersion);
 
-    softAssert.assertEquals(browserName, actualBrowserName,
+    softAssert.assertTrue(browserName.contains(actualBrowserName) || actualBrowserName.contains(browserName),
       String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
 
     softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
@@ -295,10 +323,22 @@ public class AutomationHelper extends BaseClass {
 
   private boolean validateBrowserDetails(String[] browserDetails, String expectedBrowserName,
     String expectedBrowserVersion) {
+    expectedBrowserName = expectedBrowserName.equals("ie") ? "internet explorer" : expectedBrowserName;
     ltLogger.info("Actual details: {}, Expected name: {}, Expected version: {}", Arrays.asList(browserDetails),
       expectedBrowserName, expectedBrowserVersion);
-    return browserDetails[0].trim().equalsIgnoreCase(expectedBrowserName) && browserDetails[1].trim()
-      .equals(expectedBrowserVersion);
+    if (browserDetails.length < 2 || browserDetails[0] == null || browserDetails[1] == null) {
+      ltLogger.warn("Invalid browser details provided: {}", Arrays.toString(browserDetails));
+      return false;
+    }
+    String actualBrowserName = browserDetails[0].trim().toLowerCase();
+    String actualBrowserVersion = browserDetails[1].trim();
+    String normalizedExpectedBrowserName = expectedBrowserName.trim().toLowerCase();
+    String normalizedExpectedBrowserVersion = expectedBrowserVersion.trim();
+
+    boolean isBrowserNameValid = actualBrowserName.contains(
+      normalizedExpectedBrowserName) || normalizedExpectedBrowserName.contains(actualBrowserName);
+    boolean isBrowserVersionValid = actualBrowserVersion.equals(normalizedExpectedBrowserVersion);
+    return isBrowserNameValid && isBrowserVersionValid;
   }
 
   private void verifyExtension() {

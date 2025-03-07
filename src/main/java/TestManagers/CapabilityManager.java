@@ -73,6 +73,21 @@ public class CapabilityManager extends BaseClass {
         String[].class);
   }
 
+  private void removeSpecificCaps(Map<String, Object> capsMap, String envVariable) {
+    String capsToRemove = System.getProperty(envVariable, "NA");
+    ltLogger.info("Removing specific caps: {}", capsToRemove);
+    if (capsToRemove.equals("NA"))
+      return;
+    String[] capsToRemoveArray = capsToRemove.split(",");
+    for (String capToRemove : capsToRemoveArray) {
+      String regex = "(CAPABILITY_NAME=[^,]+(,|$))".replace("CAPABILITY_NAME", capToRemove);
+      capsMap.remove(capToRemove);
+      capsString = capsString.replaceAll(regex, "");
+    }
+    ltLogger.info("Updated caps map and string after removing {}, caps string: {}, caps map: {}", capsToRemove,
+      capsString, capsMap);
+  }
+
   private void setRandomValue(Map<String, Object> capabilityMap) {
     capabilityMap.entrySet().stream().filter(entry -> entry.getValue().toString().equals(".*")).forEach(entry -> {
       String key = entry.getKey();
@@ -166,8 +181,8 @@ public class CapabilityManager extends BaseClass {
   private void buildCapabilities(String capabilityString, String purpose, String... capsType) {
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
     Map<String, Object> capabilityMap = purpose.equals("client") ?
-      buildCapabilityMap(capabilityString, CUSTOM_CLIENT_CAPS) :
-      buildCapabilityMap(capabilityString, CUSTOM_TEST_CAPS);
+      buildCapabilityMap(capabilityString, CUSTOM_CLIENT_CAPS, REMOVE_CLIENT_TEST_CAPS) :
+      buildCapabilityMap(capabilityString, CUSTOM_TEST_CAPS, REMOVE_TEST_CAPS);
     setFinalCapabilities(capabilityMap, expectedCapsType, purpose);
   }
 
@@ -179,18 +194,28 @@ public class CapabilityManager extends BaseClass {
     buildCapabilities(capabilityString, "client", capsType);
   }
 
-  private Map<String, Object> buildCapabilityMap(String capabilityString, String customCapsSource) {
+  private Map<String, Object> buildCapabilityMap(String capabilityString, String customCapsSource,
+    String... removeCapsSource) {
     capsString = capabilityString;
     // Get hashmap from caps string and build caps hashmap
-    Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getHashMapFromString(capabilityString));
+    Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getHashMapFromString(capsString));
+
+    // Remove specific caps based on env value
+    if (removeCapsSource != null && removeCapsSource.length > 0) {
+      removeSpecificCaps(capabilityMap, removeCapsSource[0]);
+    }
+
     // Set default custom values to caps map
     setCustomValues(capabilityMap);
+
     // Set random values if applicable
-    if (capabilityString.contains(".*")) {
+    if (capsString.contains(".*")) {
       setRandomValue(capabilityMap);
     }
+
     // If user is passing any custom caps as env variable then set them to capabilityMap
     mergeCustomTestCaps(capabilityMap, customCapsSource);
+
     // Before creating caps object finally get the platform name based on platform keyword
     updatePlatform(capabilityMap);
     return capabilityMap;
