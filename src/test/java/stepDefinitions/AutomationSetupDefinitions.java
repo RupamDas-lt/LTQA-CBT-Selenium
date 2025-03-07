@@ -54,4 +54,9 @@ public class AutomationSetupDefinitions {
   public void loginToLTDashboard() {
     clientAutomationHelper.loginToLTDashboard();
   }
+
+  @Then("I upload sample terminal logs")
+  public void iUploadSampleTerminalLogs() {
+    automationHelper.uploadSampleTerminalLogs();
+  }
 }

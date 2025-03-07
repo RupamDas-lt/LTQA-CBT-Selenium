@@ -47,4 +47,17 @@ public class UrlsAndLocators {
   public static final Locator uploadFileButton = new Locator(LocatorTypes.ID, "file-submit");
   public static final Locator uploadedFileHeading = new Locator(LocatorTypes.XPATH,
     "//h3[contains(text(),'File Uploaded!')]");
+
+  public static final String GEOLOCATION_VERIFICATION_URL = "https://geotargetly.com/my-ip-geolocation";
+  public static final Locator countryCode = new Locator(LocatorTypes.ID, "geotargetly_country_code");
+  public static final Locator countryName = new Locator(LocatorTypes.ID, "geotargetly_country_name");
+
+  public static final String LT_LOGIN_URL = EnvSetup.TEST_ENV.contains("stage") ?
+    "https://stage-accounts.lambdatestinternal.com/login" :
+    "https://accounts.lambdatest.com/login";
+  public static final Locator ltLoginPageEmailInput = new Locator(LocatorTypes.ID, "email");
+  public static final Locator ltLoginPagePasswordInput = new Locator(LocatorTypes.ID, "password");
+  public static final Locator ltLoginPageSubmitButton = new Locator(LocatorTypes.ID, "login-button");
+  public static final Locator ltLoginSuccessVerification = new Locator(LocatorTypes.XPATH,
+    "//*[@id='profile__dropdown__parent']|//*[@id='profile__dropdown']|//div[@role='dialog' and .//*[text()='How would you like to use LambdaTest?' or text()='Check Your Email']]|//*[@name='authentication_code']|//button[text()='Setup MFA']");
 }
