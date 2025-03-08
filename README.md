@@ -61,6 +61,22 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DCUSTOM_USER_NAME=username -DCUSTOM_USER_KEY=key -DCUSTOM_GRID_URL=gridUrl
 ```
 
+- **`CUSTOM_TEST_CAPS`**: This flag can be used to add or modify any capability test capability. Like if we want to pass
+  custom build name NewRepoTesting, then we can use this flag like:
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DCUSTOM_TEST_CAPS=build=NewRepoTesting -DPARALLEL=10
+```
+
+- **`REMOVE_CLIENT_TEST_CAPS`**: This flag can be used to bypass any specific test capabilities. It will also skip any
+  test action which is dependent on that test action. Like if we want to
+  bypass
+  `geoLocation` and `resolution` caps then we can use this flag like:
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DREMOVE_TEST_CAPS=resolution,geoLocation
+```
+
 ---
 
 ## Tunnel
