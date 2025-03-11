@@ -7,6 +7,11 @@ Feature: Automation of windows10 machine with different browsers.
     Then I start tunnel
     Then I start session to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,verifyExtension,uploadFile with <capabilities>
     Then I stop tunnel
+    Then I verify console Log via API
+    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
+    Then I verify video via API
 
     Examples:
       | capabilities                                                                                                                                                                     |
@@ -18,6 +23,10 @@ Feature: Automation of windows10 machine with different browsers.
   Scenario Outline: User is able to verify network log, console log, selenium log, session video, timezone via api and driver start/stop time within its limit for windows10 browser with geolocation and network false
     Given Setup user details
     Then I start session to test uploadFile,consoleLog,basicAuthentication,geolocation,networkLog,exceptionLogTesting,timezone,browserOSDetails with <capabilities>
+#    Then I verify console Log via API
+#    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
     Examples:
       | capabilities                                                                                                                        |
       | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,geoLocation=.* |

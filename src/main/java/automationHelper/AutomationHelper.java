@@ -12,7 +12,9 @@ import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public class AutomationHelper extends BaseClass {
   DriverManager driverManager = new DriverManager();
   TunnelManager tunnelManager;
   AutomationAPIHelper apiHelper = new AutomationAPIHelper();
+  TestArtefactsVerificationHelper artefactsHelper = new TestArtefactsVerificationHelper();
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -422,6 +425,7 @@ public class AutomationHelper extends BaseClass {
   }
 
   public void startSessionWithSpecificCapabilities(String testCapability, String testActions) {
+    String startTime = getCurrentTimeIST();
     createTestSession(testCapability);
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -443,7 +447,10 @@ public class AutomationHelper extends BaseClass {
       e.printStackTrace();
     }
     stopWatch.stop();
+    String stopTime = getCurrentTimeIST();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+    EnvSetup.TEST_REPORT.get().put(TEST_START_TIMESTAMP, startTime);
+    EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
   }
 
   public void startTunnel() {
@@ -475,5 +482,65 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String status = apiHelper.uploadTerminalLogs(EnvSetup.TEST_SESSION_ID.get());
     softAssert.assertTrue(status.equals("success"), "Failed to upload terminal logs");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(int seconds) {
+    String currentTime = getCurrentTimeIST();
+    ltLogger.info("Time while checking for logs: {}", currentTime);
+    String testEndTime = EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString();
+    ltLogger.info("Time of test completion: {}", testEndTime);
+    Duration durationTillTestEnded = getTimeDifference(testEndTime, currentTime, IST_TimeZone);
+    if (durationTillTestEnded.getSeconds() <= seconds) {
+      int requiredTime = (int) (seconds - Math.floor(durationTillTestEnded.getSeconds()));
+      ltLogger.info("Waiting for {} before verifying the logs.", requiredTime);
+      waitForTime(requiredTime);
+    }
+  }
+
+  public void verifyLogs(String logs) {
+    waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(120);
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    Map<String, Object> testCaps = TEST_CAPS_MAP.get();
+    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
+    boolean validLogsToCheck = requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
+      Object value = testCaps.get(cap);
+      return value != null && !value.toString().equals("false"); // Key exists and value is not false
+    });
+    if (logs.equals("selenium") && !validLogsToCheck) {
+      // System logs are always expected to be present either selenium logs or webdriver
+      logs = "webDriver";
+      validLogsToCheck = true;
+    }
+    softAssert.assertTrue(validLogsToCheck,
+      logs + " logs verification is skipped as required caps are not used. Required caps: " + requiredCaps);
+    if (validLogsToCheck) {
+      String testId = EnvSetup.TEST_SESSION_ID.get();
+      switch (logs) {
+      case "webDriver":
+      case "selenium":
+        artefactsHelper.verifySystemLogs(logs, testId);
+        break;
+      case "command":
+        artefactsHelper.verifyCommandLogs(testId);
+        break;
+      case "console":
+        artefactsHelper.verifyConsoleLogs(testId);
+        break;
+      case "terminal":
+        artefactsHelper.verifyTerminalLogs(testId);
+        break;
+      case "network":
+        artefactsHelper.verifyNetworkLogs(testId);
+        break;
+      case "full.har":
+        artefactsHelper.verifyNetworkFullHarLogs(testId);
+        break;
+      case "default":
+        softAssert.fail("Unable to find any matching logs with name: " + logs);
+        break;
+      }
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }

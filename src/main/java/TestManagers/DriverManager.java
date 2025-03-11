@@ -59,8 +59,8 @@ public class DriverManager extends BaseClass {
 
   private static void putValueToVerificationData(String key, String value) {
     Map<String, Object> verificationData = TEST_VERIFICATION_DATA.get();
-    Set<String> set = (Set<String>) verificationData.computeIfAbsent(key, k -> new HashSet<String>());
-    set.add(value);
+    Queue<String> queue = (Queue<String>) verificationData.computeIfAbsent(key, k -> new LinkedList<>());
+    queue.add(value);
   }
 
   public WebElement waitForElementToBeVisible(Locator locator, int timeout) {

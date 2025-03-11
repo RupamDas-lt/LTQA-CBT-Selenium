@@ -1,6 +1,6 @@
 package utility;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
@@ -11,15 +11,26 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static utility.FrameworkConstants.DEFAULT_DATE_TIME_FORMAT;
+import static utility.FrameworkConstants.IST_TimeZone;
 
 public class BaseClass {
+
+  private static final Gson gson = new Gson();
+  private static final JsonParser parser = new JsonParser();
 
   private static final Map<Class<?>, Function<String, Object>> typeConverters = Map.of(String.class, v -> v,
     String[].class, v -> new String[] { v }, Integer.class, v -> v.length(), Boolean.class,
@@ -169,12 +180,12 @@ public class BaseClass {
     }
   }
 
-  public File readFileContent(String filePath) {
+  public File getFileWithFileLock(String filePath) {
     FileLockUtility.fileLock.lock();
     try (FileChannel channel = FileChannel.open(Paths.get(filePath), StandardOpenOption.READ);
       FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
       File file = new File(filePath);
-      ltLogger.info("Reading file: {}", filePath);
+      ltLogger.info("Implementing file lock on: {}", filePath);
       ltLogger.info("File status: {}", file.exists());
       return file;
     } catch (IOException e) {
@@ -205,6 +216,20 @@ public class BaseClass {
     return timeZone;
   }
 
+  public String getCurrentTimeIST(String... format) {
+    String tmeFormat = format.length > 0 ? format[0] : DEFAULT_DATE_TIME_FORMAT;
+    ZonedDateTime indianTime = ZonedDateTime.now(ZoneId.of(IST_TimeZone));
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(tmeFormat);
+    return indianTime.format(formatter);
+  }
+
+  public Duration getTimeDifference(String start, String end, String zone, String... format) {
+    String tmeFormat = format.length > 0 ? format[0] : DEFAULT_DATE_TIME_FORMAT;
+    ZonedDateTime startTime = ZonedDateTime.parse(start, DateTimeFormatter.ofPattern(tmeFormat));
+    ZonedDateTime endTime = ZonedDateTime.parse(end, DateTimeFormatter.ofPattern(tmeFormat));
+    return Duration.between(startTime, endTime);
+  }
+
   public void insertToMapWithRandom(Map<String, Object> map, String key, String value, Class<?>... returnTypes) {
     Random random = new Random();
     if (map == null || key == null || value == null || returnTypes == null || returnTypes.length == 0) {
@@ -216,5 +241,131 @@ public class BaseClass {
     }).apply(value);
 
     map.put(key, returnValue);
+  }
+
+  public boolean fileExists(String filePath, int retryCount, int interval) {
+    int count = 0;
+    while (count < retryCount) {
+      File file = new File(filePath);
+      boolean status = file.exists();
+      if (status) {
+        return true;
+      }
+      waitForTime(interval);
+      count++;
+    }
+    return false;
+  }
+
+  private static void deleteDirectory(File directory) {
+    if (directory.exists()) {
+      File[] files = directory.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          if (file.isDirectory()) {
+            deleteDirectory(file);
+          } else {
+            file.delete();
+          }
+        }
+      }
+      directory.delete();
+    }
+  }
+
+  public JsonObject processZipFile(String zipFilePath) throws IOException {
+    // Create a temporary directory
+    Path tempDir = Files.createTempDirectory("zipExtract");
+    JsonArray combinedJsonArray = new JsonArray();
+    StringBuilder otherFileContent = new StringBuilder();
+    Gson gson = new Gson();
+    JsonParser parser = new JsonParser();
+
+    try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+      ZipEntry entry;
+      while ((entry = zipInputStream.getNextEntry()) != null) {
+        Path filePath = tempDir.resolve(entry.getName());
+
+        // Ensure the file is not outside the temporary directory (security check)
+        if (!filePath.normalize().startsWith(tempDir)) {
+          throw new IOException("Invalid zip entry: " + entry.getName());
+        }
+
+        // Skip directories
+        if (entry.isDirectory()) {
+          Files.createDirectories(filePath);
+        } else {
+          // Extract the file
+          Files.copy(zipInputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+
+          // Read and parse the file content using the locked readFileContent method
+          File file = getFileWithFileLock(filePath.toString());
+          String fileContent = new String(Files.readAllBytes(file.toPath()));
+
+          // Check file extension
+          String fileName = entry.getName().toLowerCase();
+          if (fileName.endsWith(".json") || fileName.endsWith(".har")) {
+            // Parse JSON or HAR files
+            JsonElement jsonElement = parser.parse(fileContent);
+            if (jsonElement.isJsonArray()) {
+              combinedJsonArray.addAll(jsonElement.getAsJsonArray());
+            } else {
+              combinedJsonArray.add(jsonElement);
+            }
+          } else {
+            // Append content of other file types (e.g., .txt)
+            otherFileContent.append(fileContent).append("\n");
+          }
+        }
+      }
+    } finally {
+      // Delete the temporary directory and its contents
+      deleteDirectory(tempDir.toFile());
+    }
+
+    JsonObject result = new JsonObject();
+    result.add("jsonData", combinedJsonArray);
+    result.addProperty("otherFileContent", otherFileContent.toString());
+    return result;
+  }
+
+  public JsonElement processZipFileAndExtractDataAsJson(String zipFilePath) throws IOException {
+    return processZipFile(zipFilePath).get("jsonData");
+  }
+
+  public String processZipFileAndExtractDataAsString(String zipFilePath) throws IOException {
+    JsonObject jsonObject = processZipFile(zipFilePath);
+    JsonArray jsonArray = jsonObject.get("jsonData").getAsJsonArray();
+    String otherFilesContent = jsonObject.get("otherFileContent").getAsString();
+    return jsonArray.isEmpty() ? otherFilesContent : gson.toJson(jsonArray);
+  }
+
+  public String readDataFromDownloadedLogFile(String filePath) {
+    StringBuilder content = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        content.append(line);
+        content.append("\n");
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return content.toString();
+  }
+
+  public String readFileData(String filePath) throws IOException {
+    ltLogger.info("Reading file: {}", filePath);
+    String content;
+    if (filePath.contains(".zip"))
+      content = processZipFileAndExtractDataAsString(filePath);
+    else
+      content = readDataFromDownloadedLogFile(filePath);
+    ltLogger.info("File data: {}", content);
+    return content;
+  }
+
+  public static String handleUnicodeEscapes(String input) {
+    return input.replace("\\u002f", "/").replace("\\u002F", "/").replace("\\/", "/");
   }
 }

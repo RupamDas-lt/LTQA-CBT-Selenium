@@ -62,7 +62,8 @@ public class CapabilityManager extends BaseClass {
   }
 
   private void setCustomValues(@NonNull Map<String, Object> capabilityMap) {
-    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")))
+    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")) && StringUtils.isNullOrEmpty(
+      (String) capabilityMap.getOrDefault(TUNNEL_NAME, "")) && EnvSetup.TEST_TUNNEL_NAME.get() != null)
       capabilityMap.put(TUNNEL_NAME, EnvSetup.TEST_TUNNEL_NAME.get());
 
     if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TEST_NAME, "")))
@@ -109,7 +110,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomGeoLocation() {
     try {
       var objectMapper = new ObjectMapper();
-      var rootNode = objectMapper.readTree(readFileContent(GEOLOCATION_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(GEOLOCATION_DATA_PATH));
       var geoDataArray = rootNode.path("geoData");
       if (geoDataArray.isArray() && !geoDataArray.isEmpty()) {
         Random random = new Random();
@@ -128,7 +129,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomResolution(String platform) {
     try {
       var objectMapper = new ObjectMapper();
-      var rootNode = objectMapper.readTree(readFileContent(RESOLUTION_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(RESOLUTION_DATA_PATH));
       JsonNode resDataArray;
       if (platform.toLowerCase().contains("win"))
         resDataArray = rootNode.path("win");
@@ -161,7 +162,7 @@ public class CapabilityManager extends BaseClass {
     ltLogger.info("timezone index: {}", timeZoneIndex);
     try {
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(readFileContent(TIMEZONE_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(TIMEZONE_DATA_PATH));
       List<String> timezoneIds = new ArrayList<>();
       rootNode.path(timeZoneIndex).fields().forEachRemaining(entry -> timezoneIds.add(entry.getKey()));
       Random random = new Random();

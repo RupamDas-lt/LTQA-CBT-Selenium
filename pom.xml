@@ -29,6 +29,7 @@
         <rp.java.cucumber.version>5.3.2</rp.java.cucumber.version>
         <rp.epam.log4j.version>5.2.3</rp.epam.log4j.version>
         <!--        /Dependencies for reportPortal       -->
+        <appache.commons.io>2.18.0</appache.commons.io>
     </properties>
 
     <repositories>
@@ -147,6 +148,12 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${appache.commons.io}</version>
         </dependency>
     </dependencies>
 
