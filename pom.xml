@@ -30,6 +30,7 @@
         <rp.epam.log4j.version>5.2.3</rp.epam.log4j.version>
         <!--        /Dependencies for reportPortal       -->
         <appache.commons.io>2.18.0</appache.commons.io>
+        <json.schema.validator>1.5.6</json.schema.validator>
     </properties>
 
     <repositories>
@@ -155,6 +156,13 @@
             <artifactId>commons-io</artifactId>
             <version>${appache.commons.io}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.networknt/json-schema-validator -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${json.schema.validator}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

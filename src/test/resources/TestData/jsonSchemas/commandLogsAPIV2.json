@@ -1,0 +1,30 @@
+[
+  {
+    "logType": "requestLog",
+    "testID": "5HLCQ-HPCWH-UOE2O-2CUFA",
+    "status": 0,
+    "timestamp": 1551356385,
+    "annotation": "",
+    "annotationLevel": "",
+    "smartwaitRetry": 0,
+    "smartwaitRetryDelay": 0,
+    "Value": {
+      "requestId": "82e3b7cd-3b04-4bc8-9d2b-567aff450fe4",
+      "RequestStartTime": 1551356385,
+      "requestMethod": "POST",
+      "requestPath": "/wd/hub/session/2F42BCCC-BF43-426A-A72F-F58F58167496/element/node-DF5D363E-84A2-4CA4-9AC4-0F398C606082/click",
+      "duration": 8,
+      "requestBody": "{\"sessionId\": \"2F42BCCC-BF43-426A-A72F-F58F58167496\", \"id\": \"node-DF5D363E-84A2-4CA4-9AC4-0F398C606082\"}",
+      "responseBody": "{\"status\":0,\"sessionId\":\"2F42BCCC-BF43-426A-A72F-F58F58167496\",\"value\":{}}",
+      "responseStatus": "200 OK",
+      "screenshotId": "string"
+    },
+    "autoHeal": false,
+    "healedLocator": "",
+    "screenshotPath": "",
+    "pageDomPath": "",
+    "wasabiEnabled": false,
+    "windowBounds": null,
+    "elementBounds": null
+  }
+]

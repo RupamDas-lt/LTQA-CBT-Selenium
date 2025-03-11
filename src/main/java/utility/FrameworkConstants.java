@@ -48,6 +48,7 @@ public class FrameworkConstants extends BaseClass {
     return sessionApiUriPart2;
   }
 
+  public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
 
@@ -140,6 +141,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
   public static final String SAMPLE_TERMINAL_LOGS_FILE_PATH = "src/test/resources/TestFiles/sample_terminal_logs.txt";
   public static final String TEST_LOGS_DOWNLOAD_DIRECTORY = "logs/testLogsFromSwaggerV2/";
+  public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
+  public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
 
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{
@@ -184,6 +187,10 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String IST_TimeZone = "Asia/Kolkata";
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+
+  public enum testVerificationDataKeys {
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, GEO_LOCATION, RESOLUTION
+  }
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";

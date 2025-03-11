@@ -2,12 +2,23 @@ package automationHelper;
 
 import DTOs.SwaggerAPIs.ArtefactsApiV2ResponseDTO;
 import TestManagers.ApiManager;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
+import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 import static utility.FrameworkConstants.*;
 
 public class TestArtefactsVerificationHelper extends ApiManager {
@@ -22,10 +33,19 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     SUCCESS, FAIL
   }
 
+  @Getter private enum LogType {
+    COMMAND("command"), SELENIUM("selenium"), NETWORK("network"), CONSOLE("console"), TERMINAL("terminal");
+    private final String value;
+
+    LogType(String value) {
+      this.value = value;
+    }
+  }
+
   private static final String apiV2UrlGenerationSuccessMessage = "URL is succesfully generated";
 
   private static final String V2 = "/v2";
-  private final boolean apiV2logsDownloadStatusSuccess = true;
+  private final AutomationAPIHelper automationAPIHelper = new AutomationAPIHelper();
 
   private String getFileName(String sessionID, String sessionDetail) {
     String outFileName = sessionID;
@@ -103,11 +123,66 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     System.out.println("Selenium Logs from API v2: " + logsFromApiV2);
   }
 
+  @SneakyThrows
+  private Queue<String> extractUrlsAPIResponse(JsonArray response) {
+    Queue<String> urlsAPIResponse = new LinkedList<>();
+    for (JsonElement element : response) {
+      String requestPath = element.getAsJsonObject().get("Value").getAsJsonObject().get("requestPath").getAsString();
+      String method = element.getAsJsonObject().get("Value").getAsJsonObject().get("requestMethod").getAsString();
+      if (method.equals("POST") && requestPath.endsWith("/url")) {
+        String requestBody = element.getAsJsonObject().get("Value").getAsJsonObject().get("requestBody").getAsString();
+        ltLogger.info("Request body: {}", requestBody);
+        JsonNode jsonNode = new ObjectMapper().readTree(requestBody);
+        urlsAPIResponse.add(jsonNode.get("url").asText());
+      }
+    }
+    ltLogger.info("URLs API response: {}", urlsAPIResponse);
+    return urlsAPIResponse;
+  }
+
+  private void verifyExpectedUrlsArePresent(Queue<String> fetchedData, String logsSource, CustomSoftAssert softAssert) {
+    Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.URL);
+    assert expectedData != null;
+    Queue<String> expectedDataClone = new LinkedList<>(expectedData);
+    ltLogger.info("Verifying expected urls from {} to {} for log source {}", fetchedData, expectedDataClone,
+      logsSource);
+    softAssert.assertTrue(fetchedData.size() == expectedDataClone.size(),
+      "Number of urls present in the " + logsSource + " logs are not same. Expected: " + expectedDataClone.size() + ", Actual: " + fetchedData.size());
+    while (!expectedDataClone.isEmpty() && !fetchedData.isEmpty() && fetchedData.size() == expectedDataClone.size()) {
+      String actualUrl = fetchedData.remove();
+      String expectedUrl = expectedDataClone.remove();
+      softAssert.assertTrue(expectedUrl.equals(actualUrl),
+        "Mismatch found in " + logsSource + ". Expected URL: " + expectedUrl + " but got URL: " + actualUrl);
+    }
+  }
+
   public void verifyCommandLogs(String session_id) {
-    String logsFromApiV1 = fetchLogs("command", ArtefactAPIVersions.API_V1, session_id);
-    System.out.println("Command Logs from API v1: " + logsFromApiV1);
-    String logsFromApiV2 = fetchLogs("command", ArtefactAPIVersions.API_V2, session_id);
-    System.out.println("Command Logs from API v2: " + logsFromApiV2);
+    if (EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.get() == null) {
+      automationAPIHelper.getCommandCounts(session_id);
+    }
+    int expectedCommandLogsCount = EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.get();
+    this.verifyCommandLogs(session_id, ArtefactAPIVersions.API_V1, COMMAND_LOGS_API_V1_SCHEMA,
+      expectedCommandLogsCount);
+    this.verifyCommandLogs(session_id, ArtefactAPIVersions.API_V2, COMMAND_LOGS_API_V2_SCHEMA,
+      expectedCommandLogsCount);
+  }
+
+  private void verifyCommandLogs(String session_id, ArtefactAPIVersions apiVersion, String schemaFilePath,
+    int expectedCommandLogsCount) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String logsFromApi = fetchLogs(LogType.COMMAND.value, apiVersion, session_id);
+    Set<String> schemaValidationErrors = validateSchema(logsFromApi, schemaFilePath);
+    softAssert.assertTrue(schemaValidationErrors.isEmpty(),
+      "Schema validation failed for command logs from " + apiVersion.toString() + ". Errors: " + schemaValidationErrors);
+    JsonElement logsJson = constructJsonFromString(logsFromApi);
+    JsonArray commandsArray = apiVersion == ArtefactAPIVersions.API_V1 ?
+      logsJson.getAsJsonObject().get("data").getAsJsonArray() :
+      logsJson.getAsJsonArray();
+    softAssert.assertTrue(commandsArray.size() == expectedCommandLogsCount,
+      "Command logs count fetched from " + apiVersion + " doesn't match. Expected: " + expectedCommandLogsCount + ", Actual: " + commandsArray.size());
+    Queue<String> fetchedUrlsFromCommandLogs = extractUrlsAPIResponse(commandsArray);
+    verifyExpectedUrlsArePresent(fetchedUrlsFromCommandLogs, "command " + apiVersion, softAssert);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void verifyConsoleLogs(String session_id) {
@@ -119,9 +194,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   }
 
   public void verifyNetworkLogs(String session_id) {
-    String logsFromApiV1 = fetchLogs("network", ArtefactAPIVersions.API_V1, session_id);
+    String logsFromApiV1 = fetchLogs(LogType.NETWORK.value, ArtefactAPIVersions.API_V1, session_id);
     System.out.println("Network Logs from API v1: " + logsFromApiV1);
-    String logsFromApiV2 = fetchLogs("network", ArtefactAPIVersions.API_V2, session_id);
+    String logsFromApiV2 = fetchLogs(LogType.NETWORK.value, ArtefactAPIVersions.API_V2, session_id);
     System.out.println("Network Logs from API v2: " + logsFromApiV2);
   }
 

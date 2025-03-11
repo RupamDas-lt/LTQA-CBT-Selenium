@@ -116,7 +116,8 @@ public class CapabilityManager extends BaseClass {
         Random random = new Random();
         int randomIndex = random.nextInt(geoDataArray.size());
         JsonNode randomGeoObject = geoDataArray.get(randomIndex);
-        TEST_VERIFICATION_DATA.get().put("geoLocation", randomGeoObject.path("countryName").asText());
+        TEST_VERIFICATION_DATA.get()
+          .put(testVerificationDataKeys.GEO_LOCATION, randomGeoObject.path("countryName").asText());
         return randomGeoObject.path("countryCode").asText();
       }
     } catch (IOException e) {
@@ -141,7 +142,7 @@ public class CapabilityManager extends BaseClass {
         Random random = new Random();
         int randomIndex = random.nextInt(resDataArray.size());
         String res = resDataArray.get(randomIndex).asText();
-        TEST_VERIFICATION_DATA.get().put("resolution", res);
+        TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.RESOLUTION, res);
         return res;
       }
     } catch (IOException e) {

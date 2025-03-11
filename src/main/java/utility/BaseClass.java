@@ -1,8 +1,14 @@
 package utility;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+import com.networknt.schema.ValidationMessage;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,9 +22,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
@@ -28,9 +32,6 @@ import static utility.FrameworkConstants.DEFAULT_DATE_TIME_FORMAT;
 import static utility.FrameworkConstants.IST_TimeZone;
 
 public class BaseClass {
-
-  private static final Gson gson = new Gson();
-  private static final JsonParser parser = new JsonParser();
 
   private static final Map<Class<?>, Function<String, Object>> typeConverters = Map.of(String.class, v -> v,
     String[].class, v -> new String[] { v }, Integer.class, v -> v.length(), Boolean.class,
@@ -337,7 +338,13 @@ public class BaseClass {
     JsonObject jsonObject = processZipFile(zipFilePath);
     JsonArray jsonArray = jsonObject.get("jsonData").getAsJsonArray();
     String otherFilesContent = jsonObject.get("otherFileContent").getAsString();
-    return jsonArray.isEmpty() ? otherFilesContent : gson.toJson(jsonArray);
+    return jsonArray.isEmpty() ? otherFilesContent : new Gson().toJson(jsonArray);
+  }
+
+  public JsonElement constructJsonFromString(String jsonString) {
+    JsonElement jsonElement = JsonParser.parseString(jsonString);
+    ltLogger.info("Extracted Json Element: {}", jsonElement);
+    return jsonElement;
   }
 
   public String readDataFromDownloadedLogFile(String filePath) {
@@ -367,5 +374,37 @@ public class BaseClass {
 
   public static String handleUnicodeEscapes(String input) {
     return input.replace("\\u002f", "/").replace("\\u002F", "/").replace("\\/", "/");
+  }
+
+  public Set<String> validateSchema(String obtainedData, String expectedJsonFilePath) {
+    try {
+      // Load the expected schema from the file
+      File schemaFile = new File(expectedJsonFilePath);
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode schemaNode = objectMapper.readTree(schemaFile);
+
+      // Parse the API response JSON
+      JsonNode apiNode = objectMapper.readTree(obtainedData);
+
+      // Create the JsonSchema object from the schema file
+      JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
+      JsonSchema schema = schemaFactory.getSchema(schemaNode);
+
+      // Validate the JSON
+      Set<ValidationMessage> validationResult = schema.validate(apiNode);
+      Set<String> result = new HashSet<>();
+
+      // If there are any validation errors, return false
+      if (!validationResult.isEmpty()) {
+        for (ValidationMessage validationMessage : validationResult) {
+          result.add(validationMessage.getMessage());
+        }
+      }
+      ltLogger.info("Schema validation completed.");
+      return result;
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

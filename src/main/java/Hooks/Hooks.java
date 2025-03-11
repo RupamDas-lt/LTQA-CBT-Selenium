@@ -9,6 +9,7 @@ import io.cucumber.java.Scenario;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import java.io.PrintWriter;
@@ -289,6 +290,18 @@ public class Hooks {
     printTestDashboardAndRetinaLinks(scenario);
 
     apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
+
+    resetTestData();
+  }
+
+  private void resetTestData() {
+    SOFT_ASSERT.set(new CustomSoftAssert());
+    CLIENT_SOFT_ASSERT.set(new CustomSoftAssert());
+    IS_UI_VERIFICATION_ENABLED.set(false);
+    TEST_SESSION_ID.set("");
+    CLIENT_SESSION_ID.set("");
+    TEST_REPORT.set(new HashMap<>());
+    TEST_VERIFICATION_DATA.set(new HashMap<>());
   }
 
   @After(order = 2)

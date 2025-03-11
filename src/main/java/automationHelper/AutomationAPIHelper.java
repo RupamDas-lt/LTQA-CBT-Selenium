@@ -3,6 +3,8 @@ package automationHelper;
 import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
 import TestManagers.ApiManager;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
@@ -76,8 +78,8 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public String getBrowserVersionBasedOnKeyword(String browserName, String keyword, String template) {
-    String retrievedBrowserVersion = EnvSetup.TEST_VERIFICATION_DATA.get().getOrDefault("actualBrowserVersion", "")
-      .toString();
+    String retrievedBrowserVersion = EnvSetup.TEST_VERIFICATION_DATA.get()
+      .getOrDefault(testVerificationDataKeys.ACTUAL_BROWSER_VERSION, "").toString();
     if (!retrievedBrowserVersion.isEmpty())
       return retrievedBrowserVersion;
     String filePath = BROWSER_VERSIONS_DATA_PATH.replace("<BROWSER_NAME>", browserName).replace("<TEMPLATE>", template);
@@ -121,7 +123,8 @@ public class AutomationAPIHelper extends ApiManager {
         }
       };
       ltLogger.info("Retrieved browser version: {}", retrievedBrowserVersion);
-      EnvSetup.TEST_VERIFICATION_DATA.get().put("browserVersion", retrievedBrowserVersion);
+      EnvSetup.TEST_VERIFICATION_DATA.get()
+        .put(testVerificationDataKeys.ACTUAL_BROWSER_VERSION, retrievedBrowserVersion);
       return retrievedBrowserVersion;
     } catch (IOException e) {
       throw new RuntimeException("Failed to fetch or parse browser versions data", e);
@@ -138,5 +141,48 @@ public class AutomationAPIHelper extends ApiManager {
     Response response = postRequestWithBasicAuth(urlToUploadTerminalLogs, multipartBody, EnvSetup.testUserName.get(),
       EnvSetup.testAccessKey.get());
     return response.getBody().path("status").toString();
+  }
+
+  private JsonNode fetchTestDetails(String session_id) {
+    JsonNode node = EnvSetup.TEST_DETAIL_API_RESPONSE.get();
+    if (node == null) {
+      String uri = constructAPIUrl(EnvSetup.API_URL_BASE, TEST_API_ENDPOINT, session_id);
+      ltLogger.info("Fetching test details from: {}", uri);
+
+      int maxRetryCount = 5;
+      for (int retryCount = 1; retryCount <= maxRetryCount; retryCount++) {
+        try {
+          node = new ObjectMapper().readTree(
+            getRequestWithBasicAuthAsString(uri, EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get()));
+          EnvSetup.TEST_DETAIL_API_RESPONSE.set(node);
+          break;
+        } catch (Exception e) {
+          ltLogger.error("Trial: {} -> Failed to fetch test details from: {}. Error: {}", retryCount, uri,
+            e.getMessage());
+          if (retryCount == maxRetryCount) {
+            throw new RuntimeException("Failed to fetch test details from: " + uri, e);
+          }
+        }
+      }
+    }
+    return node;
+  }
+
+  public void getCommandCounts(String session_id) {
+    int commandCount;
+    int exceptionCount;
+    int visualCommandCount;
+    if (EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.get() == null || EnvSetup.SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.get() == null || EnvSetup.SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API.get() == null) {
+      JsonNode testDetails = fetchTestDetails(session_id);
+      commandCount = testDetails.get("commandCount").asInt(0);
+      exceptionCount = testDetails.get("exceptionCount").asInt(0);
+      visualCommandCount = testDetails.get("visualCommandCount").asInt(0);
+      ltLogger.info(
+        "Fetched command counts-> All commands count: {}, exception commands count: {}, visual commands count: {}",
+        commandCount, exceptionCount, visualCommandCount);
+      EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.set(commandCount);
+      EnvSetup.SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.set(exceptionCount);
+      EnvSetup.SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API.set(visualCommandCount);
+    }
   }
 }

@@ -387,7 +387,7 @@ public class AutomationHelper extends BaseClass {
       retryCount++;
     }
     String actualCountryName = driverManager.getText(countryName);
-    String expectedCountryName = TEST_VERIFICATION_DATA.get().get("geoLocation").toString();
+    String expectedCountryName = TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.GEO_LOCATION).toString();
     softAssert.assertTrue(
       expectedCountryName.contains(actualCountryName) || actualCountryName.contains(expectedCountryName),
       "GeoLocation didn't match. Expected: " + expectedCountryName + " Actual: " + actualCountryName);
@@ -451,6 +451,8 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
     EnvSetup.TEST_REPORT.get().put(TEST_START_TIMESTAMP, startTime);
     EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
+    EnvSetup.TEST_REPORT.get().put("test_verification_data", TEST_VERIFICATION_DATA.get());
+    ltLogger.info("Test verification data: {}", TEST_VERIFICATION_DATA.get());
   }
 
   public void startTunnel() {
