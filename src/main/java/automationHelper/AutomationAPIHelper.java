@@ -23,23 +23,10 @@ import static utility.FrameworkConstants.*;
 public class AutomationAPIHelper extends ApiManager {
 
   // API end-points
-  private static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   private static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
   private static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
 
   private final Logger ltLogger = LogManager.getLogger(AutomationAPIHelper.class);
-
-  public String constructAPIUrl(String uriBase, String endpoint, String... sessionDetails) {
-    // In sessionDetails, first param should always be session id and then the session API end points
-    int sessionDetailsLength = sessionDetails.length;
-    String url = switch (sessionDetailsLength) {
-      case 1 -> HTTPS + uriBase + endpoint + sessionDetails[0];
-      case 2 -> HTTPS + uriBase + endpoint + sessionDetails[0] + sessionDetails[1];
-      default -> HTTPS + uriBase + endpoint;
-    };
-    ltLogger.info("URL: {}", url);
-    return url;
-  }
 
   public void updateSessionDetailsViaAPI(String session_id, HashMap<String, String> sessionDetails) {
     String sessionAPIUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id);
@@ -89,6 +76,10 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public String getBrowserVersionBasedOnKeyword(String browserName, String keyword, String template) {
+    String retrievedBrowserVersion = EnvSetup.TEST_VERIFICATION_DATA.get().getOrDefault("actualBrowserVersion", "")
+      .toString();
+    if (!retrievedBrowserVersion.isEmpty())
+      return retrievedBrowserVersion;
     String filePath = BROWSER_VERSIONS_DATA_PATH.replace("<BROWSER_NAME>", browserName).replace("<TEMPLATE>", template);
     ltLogger.info("Browser versions data path: {}", filePath);
 
@@ -103,7 +94,7 @@ public class AutomationAPIHelper extends ApiManager {
       List<String> stableVersions = new ArrayList<>();
 
       BrowserVersionsFromCapsGenerator browserVersionsFromCapsGenerator = convertJsonStringToPojo(
-        Files.readString(readFileContent(filePath).toPath()), new TypeToken<BrowserVersionsFromCapsGenerator>() {
+        Files.readString(getFileWithFileLock(filePath).toPath()), new TypeToken<BrowserVersionsFromCapsGenerator>() {
         });
       ArrayList<BrowserVersionsFromCapsGenerator.VersionDTO> versionDTOS = browserVersionsFromCapsGenerator.getVersions();
       for (BrowserVersionsFromCapsGenerator.VersionDTO versionDTO : versionDTOS) {
@@ -119,7 +110,7 @@ public class AutomationAPIHelper extends ApiManager {
       ltLogger.info("{} versions on template {}: Dev: {}, Beta: {}, Stable: {}", browserName, template,
         versionMap.get("dev"), versionMap.get("beta"), stableVersions);
 
-      return switch (keyword.toLowerCase()) {
+      retrievedBrowserVersion = switch (keyword.toLowerCase()) {
         case "dev" -> versionMap.get("dev").split("\\.")[0];
         case "beta" -> versionMap.get("beta").split("\\.")[0];
         case "latest" -> stableVersions.getFirst().split("\\.")[0];
@@ -129,6 +120,9 @@ public class AutomationAPIHelper extends ApiManager {
           yield stableVersions.get(index).split("\\.")[0];
         }
       };
+      ltLogger.info("Retrieved browser version: {}", retrievedBrowserVersion);
+      EnvSetup.TEST_VERIFICATION_DATA.get().put("browserVersion", retrievedBrowserVersion);
+      return retrievedBrowserVersion;
     } catch (IOException e) {
       throw new RuntimeException("Failed to fetch or parse browser versions data", e);
     }
