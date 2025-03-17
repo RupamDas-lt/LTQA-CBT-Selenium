@@ -10,27 +10,26 @@ Feature: Automation of windows10 machine with different browsers.
     Then I verify console Log via API
     Then I verify selenium Log via API
     Then I verify command Log via API
-    Then I verify network Log via API
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                                                                                                     |
-      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true                              |
-      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true |
+      | capabilities                                                                                                                                                                                  |
+      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true                              |
+      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
 
   @win10_regression_2 @geoLocations_verification
   Scenario Outline: User is able to verify network log, console log, selenium log, session video, timezone via api and driver start/stop time within its limit for windows10 browser with geolocation and network false
     Given Setup user details
     Then I start session to test uploadFile,consoleLog,basicAuthentication,geolocation,networkLog,exceptionLogTesting,timezone,browserOSDetails with <capabilities>
-#    Then I verify console Log via API
-#    Then I verify selenium Log via API
+    Then I verify console Log via API
+    Then I verify selenium Log via API
     Then I verify command Log via API
-    Then I verify network Log via API
+
     Examples:
-      | capabilities                                                                                                                        |
-      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,geoLocation=.* |
-      | browserName=ie,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,geoLocation=.*                         |
+      | capabilities                                                                                                                                     |
+      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
+      | browserName=ie,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.*                         |
 
 
   @win10_regression_3 @tunnel_verification @martian_verification
@@ -39,19 +38,28 @@ Feature: Automation of windows10 machine with different browsers.
     Then I start tunnel
     Then I start session to test local,loginCacheCleaned,basicAuthentication,consoleLog,timezone,exceptionLogTesting,browserOSDetails with <capabilities>
     Then I stop tunnel
+    Then I verify console Log via API
+    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
 
     Examples:
-      | capabilities                                                                                                                                                        |
-      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true |
+      | capabilities                                                                                                                                                                     |
+      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
 
 
   @win10_regression_4 @martian_verification
   Scenario Outline: User is able to verify network log, console log, selenium log, session video, timezone via api for windows10 browser with geolocation and network true
     Given Setup user details
     Then I start session to test selfSigned,uploadFile,basicAuthentication,consoleLog,timezone,exceptionLogTesting,browserOSDetails,networkLog with <capabilities>
+    Then I verify console Log via API
+    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
+
     Examples:
-      | capabilities                                                                                                                                           |
-      | browserName=firefox,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.* |
+      | capabilities                                                                                                                                                       |
+      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
 
   @win10_regression_5 @ui_verification @tunnel_verification @martian_verification
   Scenario Outline: PT-13416871 network logs, console & selenium logs should be generated and visible on UI for windows10 browser with tunnel true
@@ -59,13 +67,17 @@ Feature: Automation of windows10 machine with different browsers.
     Then I start tunnel
     Then I start session to test local,consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I stop tunnel
-    Then I start client test session
-    And Login to LT dashboard
-    Then I stop client test session
+#    Then I start client test session
+#    And Login to LT dashboard
+#    Then I stop client test session
+    Then I verify console Log via API
+    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
 
     Examples:
-      | capabilities                                                                                                     |
-      | browserName=chrome,platform=win10,version=.*,performance=true,resolution=.*,network=true,visual=true,tunnel=true |
+      | capabilities                                                                                                                  |
+      | browserName=chrome,platform=win10,version=.*,performance=true,resolution=.*,network=true,visual=true,tunnel=true,console=true |
 
 
   @win10_regression_6 @ui_verification @martian_verification
@@ -73,13 +85,17 @@ Feature: Automation of windows10 machine with different browsers.
     Given Setup user details
     Then I start session to test consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I upload sample terminal logs
-    Then I start client test session
-    And Login to LT dashboard
-    Then I stop client test session
+#    Then I start client test session
+#    And Login to LT dashboard
+#    Then I stop client test session
+    Then I verify console Log via API
+    Then I verify selenium Log via API
+    Then I verify command Log via API
+    Then I verify network Log via API
 
     Examples:
-      | capabilities                                                                                                     |
-      | browserName=edge,platform=win10,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true |
+      | capabilities                                                                                                                  |
+      | browserName=edge,platform=win10,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
 
   @win10_regression_7
   Scenario Outline: User is able to run multiple sessions on for win10 machine with different browsers and latest and random versions
