@@ -287,7 +287,6 @@ public class BaseClass {
       while ((entry = zipInputStream.getNextEntry()) != null) {
         Path filePath = tempDir.resolve(entry.getName());
 
-        // Ensure the file is not outside the temporary directory (security check)
         if (!filePath.normalize().startsWith(tempDir)) {
           throw new IOException("Invalid zip entry: " + entry.getName());
         }
@@ -296,14 +295,12 @@ public class BaseClass {
         if (entry.isDirectory()) {
           Files.createDirectories(filePath);
         } else {
-          // Extract the file
           Files.copy(zipInputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 
           // Read and parse the file content using the locked readFileContent method
           File file = getFileWithFileLock(filePath.toString());
           String fileContent = new String(Files.readAllBytes(file.toPath()));
 
-          // Check file extension
           String fileName = entry.getName().toLowerCase();
           if (fileName.endsWith(".json") || fileName.endsWith(".har")) {
             // Parse JSON or HAR files
@@ -378,19 +375,15 @@ public class BaseClass {
 
   public Set<String> validateSchema(String obtainedData, String expectedJsonFilePath) {
     try {
-      // Load the expected schema from the file
       File schemaFile = new File(expectedJsonFilePath);
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode schemaNode = objectMapper.readTree(schemaFile);
 
-      // Parse the API response JSON
       JsonNode apiNode = objectMapper.readTree(obtainedData);
 
-      // Create the JsonSchema object from the schema file
       JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
       JsonSchema schema = schemaFactory.getSchema(schemaNode);
 
-      // Validate the JSON
       Set<ValidationMessage> validationResult = schema.validate(apiNode);
       Set<String> result = new HashSet<>();
 
@@ -407,4 +400,10 @@ public class BaseClass {
       throw new RuntimeException(e);
     }
   }
+
+  public String removeBasicAuthHeadersFromUrl(String url) {
+    url = url.replaceAll("https?://([^@]+@)", "https://");
+    return url;
+  }
+
 }
