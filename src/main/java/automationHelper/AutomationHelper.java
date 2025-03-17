@@ -145,6 +145,10 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(GOOGLE_URL);
     consoleLogs.forEach(consoleLog -> {
       driverManager.executeScript("console.error('" + consoleLog + "')");
+      ArrayList<String> consoleLogsList = (ArrayList<String>) TEST_VERIFICATION_DATA.get()
+        .getOrDefault(testVerificationDataKeys.CONSOLE_LOG, new ArrayList<>());
+      consoleLogsList.add(consoleLog);
+      TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.CONSOLE_LOG, consoleLogsList);
     });
   }
 
@@ -287,14 +291,15 @@ public class AutomationHelper extends BaseClass {
         testCapsMap.get("platform").toString()).split("\\.")[0];
       ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
+    String seleniumVersion = testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString();
 
     // Try fetching browser details from the web
     String[] browserDetails = getBrowserDetailsFromWeb();
     try {
       assert browserDetails != null;
       ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion) || testCapsMap.getOrDefault(
-        SELENIUM_VERSION, "default").toString().contains("latest-")) {
+      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion) || seleniumVersion.equals(
+        "latest") || seleniumVersion.equals("default")) {
         ltLogger.warn(
           "Either browser version fetched from web is matched or verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
           testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString());
