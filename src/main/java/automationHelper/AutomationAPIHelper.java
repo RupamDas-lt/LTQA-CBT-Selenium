@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 import static utility.FrameworkConstants.*;
 
 public class AutomationAPIHelper extends ApiManager {
@@ -198,6 +199,14 @@ public class AutomationAPIHelper extends ApiManager {
     multipartBody.put("file", new File(SAMPLE_TERMINAL_LOGS_FILE_PATH));
     Response response = postRequestWithBasicAuth(urlToUploadTerminalLogs, multipartBody, EnvSetup.testUserName.get(),
       EnvSetup.testAccessKey.get());
+    if (response.getStatusCode() == 200) {
+      try {
+        TEST_VERIFICATION_DATA.get()
+          .put(testVerificationDataKeys.TERMINAL_LOG, readFileData(SAMPLE_TERMINAL_LOGS_FILE_PATH));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
     return response.getBody().path("status").toString();
   }
 
