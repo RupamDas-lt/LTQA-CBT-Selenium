@@ -176,7 +176,7 @@ public class CapabilityManager extends BaseClass {
   }
 
   private String getRandomSelenium4Version() {
-    String[] topFive = { "latest", "latest-1", "latest-2", "4.13.0", "4.5.0", "4.0.0" };
+    String[] topFive = { "latest", "latest-1", "latest-2", "4.17.0", "4.13.0", "4.8.0", "4.0.0" };
     return topFive[new Random().nextInt(topFive.length)];
   }
 
