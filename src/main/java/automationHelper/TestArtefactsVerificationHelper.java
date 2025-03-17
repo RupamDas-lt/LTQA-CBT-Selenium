@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.mysql.cj.util.StringUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static utility.EnvSetup.TEST_CAPS_MAP;
 import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 import static utility.FrameworkConstants.*;
 
@@ -36,7 +38,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
   @Getter private enum LogType {
     COMMAND("command"), SELENIUM("selenium"), WEBDRIVER("webdriver"), NETWORK("network"), CONSOLE("console"), TERMINAL(
-      "terminal");
+      "terminal"), FULL_HAR("fullHar");
     private final String value;
 
     LogType(String value) {
@@ -85,9 +87,10 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     if (apiVersion.equals(ArtefactAPIVersions.API_V2)) {
       response = handleApiV2Response(response, sessionId, logType, softAssert);
+      ltLogger.info("Fetched {} artefacts API URL response via API V2: {}", logType, response);
     } else {
       response = handleUnicodeEscapes(response);
-      ltLogger.info("Fetched artefacts API URL response via API V1: {}", response);
+      ltLogger.info("Fetched {} artefacts API URL response via API V1: {}", logType, response);
     }
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -179,17 +182,20 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       testCaps.getOrDefault(VERBOSE_WEBDRIVER_LOGGING, "false").toString());
   }
 
-  private void checkForUrlsAndLocatorsPresentInSystemLogs(String logs) {
+  private void checkForSpecificTestVerificationDataPresentInLogs(String logs, String logsType,
+    testVerificationDataKeys[] expectedDataKeys) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    testVerificationDataKeys[] keysArray = { testVerificationDataKeys.LOCATORS, testVerificationDataKeys.URL };
-    Arrays.stream(keysArray).sequential().forEach(key -> {
+    Arrays.stream(expectedDataKeys).sequential().forEach(key -> {
       Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(key);
       String dataType = key.toString();
-      ltLogger.info("Checking for the following {} in system logs: {}", dataType, expectedData);
+      ltLogger.info("Checking for the following {} in {} logs: {}", dataType, logsType, expectedData);
       expectedData.forEach(expectedValue -> {
+        if (logsType.contains(NETWORK) && key.equals(testVerificationDataKeys.URL))
+          expectedValue = removeBasicAuthHeadersFromUrl(expectedValue);
         boolean isPresent = logs.contains(expectedValue);
-        softAssert.assertTrue(isPresent, expectedValue + " is not present in the system logs.");
-        ltLogger.info("{} '{}' {} present in the system logs.", dataType, expectedValue, isPresent ? "is" : "is not");
+        softAssert.assertTrue(isPresent, expectedValue + " is not present in the " + logsType + " logs.");
+        ltLogger.info("{} '{}' {} present in the {} logs.", dataType, expectedValue, isPresent ? "is" : "is not",
+          logsType);
       });
     });
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -198,7 +204,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void verifyWebDriverLogs(String session_id, String logs, Map<String, Object> testCaps) {
     boolean isWebDriverVerboseLoggingEnabled = isWebDriverVerboseLoggingEnabled(session_id, testCaps);
     if (isWebDriverVerboseLoggingEnabled) {
-      checkForUrlsAndLocatorsPresentInSystemLogs(logs);
+      checkForSpecificTestVerificationDataPresentInLogs(logs, "webdriver",
+        new testVerificationDataKeys[] { testVerificationDataKeys.LOCATORS, testVerificationDataKeys.URL });
     }
   }
 
@@ -220,7 +227,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     return retrievedVersionFromSeleniumLogs;
   }
 
-  private String verifySeleniumVersion(String session_id, String logs, Map<String, Object> testCaps) {
+  private String verifySeleniumVersion(String logs, Map<String, Object> testCaps) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     ComparableVersion defaultSeleniumVersion = new ComparableVersion("3.13.0");
     ComparableVersion expectedSeleniumVersion;
@@ -261,7 +268,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     ComparableVersion thresholdVersionForSeleniumFour = new ComparableVersion("4.0.0");
 
     if (seleniumVersion.compareTo(thresholdVersionForSeleniumFour) < 0) {
-      checkForUrlsAndLocatorsPresentInSystemLogs(logs);
+      checkForSpecificTestVerificationDataPresentInLogs(logs, "selenium 3",
+        new testVerificationDataKeys[] { testVerificationDataKeys.LOCATORS, testVerificationDataKeys.URL });
     } else if (seleniumVersion.compareTo(thresholdVersionForLegacySeleniumFourLogs) < 0) {
       verifyLogsForOlderVersions(logs, seleniumVersionString, session_id, softAssert);
     } else {
@@ -311,7 +319,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
   private void verifySeleniumLogs(String session_id, String logs, Map<String, Object> testCaps) {
     logs = logs.replace("\\\"", "\"");
-    String seleniumVersion = verifySeleniumVersion(session_id, logs, testCaps);
+    String seleniumVersion = verifySeleniumVersion(logs, testCaps);
     session_id = automationAPIHelper.getSessionIDFromTestId(session_id);
     verifyLogLevelOfSystemLogs(logs, seleniumVersion, session_id);
   }
@@ -350,7 +358,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     return urlsAPIResponse;
   }
 
-  private void verifyExpectedUrlsArePresent(Queue<String> fetchedData, String logsSource, CustomSoftAssert softAssert) {
+  private void verifyExpectedUrlsArePresentWithSpecificSequence(Queue<String> fetchedData, String logsSource,
+    CustomSoftAssert softAssert) {
     Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.URL);
     assert expectedData != null;
     Queue<String> expectedDataClone = new LinkedList<>(expectedData);
@@ -391,26 +400,71 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     softAssert.assertTrue(commandsArray.size() == expectedCommandLogsCount,
       "Command logs count fetched from " + apiVersion + " doesn't match. Expected: " + expectedCommandLogsCount + ", Actual: " + commandsArray.size());
     Queue<String> fetchedUrlsFromCommandLogs = extractUrlsAPIResponse(commandsArray);
-    verifyExpectedUrlsArePresent(fetchedUrlsFromCommandLogs, "command " + apiVersion, softAssert);
+    verifyExpectedUrlsArePresentWithSpecificSequence(fetchedUrlsFromCommandLogs, LogType.COMMAND.value + apiVersion,
+      softAssert);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void verifyConsoleLogs(String session_id) {
+    String browserName = TEST_CAPS_MAP.get().get(BROWSER_NAME).toString();
+    if (!"chrome".equals(browserName)) {
+      ltLogger.warn("Console logs verification is not valid for browser: {}", browserName);
+      return;
+    }
 
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    ArrayList<String> expectedConsoleLogs = (ArrayList<String>) TEST_VERIFICATION_DATA.get()
+      .get(testVerificationDataKeys.CONSOLE_LOG);
+    softAssert.assertFalse(expectedConsoleLogs == null || expectedConsoleLogs.isEmpty(),
+      "Expected logs to verify console logs are missing.");
+    if (expectedConsoleLogs == null || expectedConsoleLogs.isEmpty()) {
+      return;
+    }
+
+    for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
+      String version = artefactAPIVersion.equals(ArtefactAPIVersions.API_V1) ? "v1" : "v2";
+      String logs = fetchLogs(LogType.CONSOLE.value, artefactAPIVersion, session_id);
+
+      for (String expectedConsoleLog : expectedConsoleLogs) {
+        ltLogger.info("Checking console log {}", expectedConsoleLog);
+        softAssert.assertTrue(logs.contains(expectedConsoleLog),
+          "Expected log: " + expectedConsoleLog + " is missing from the console logs fetched from API version: " + version);
+      }
+    }
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void verifyTerminalLogs(String session_id) {
-
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String expectedData = TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.TERMINAL_LOG, "")
+      .toString();
+    softAssert.assertFalse(StringUtils.isNullOrEmpty(expectedData),
+      "Expected terminal logs data is empty, please upload terminal logs before verifying terminal logs");
+    if (!StringUtils.isNullOrEmpty(expectedData)) {
+      for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
+        String version = artefactAPIVersion.equals(ArtefactAPIVersions.API_V1) ? "v1" : "v2";
+        String logs = fetchLogs(LogType.TERMINAL.value, artefactAPIVersion, session_id);
+        softAssert.assertTrue(logs.contains(expectedData),
+          "Terminal logs data doesn't match for the logs data fetched from API version: " + version);
+      }
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void verifyNetworkLogs(String session_id) {
-    String logsFromApiV1 = fetchLogs(LogType.NETWORK.value, ArtefactAPIVersions.API_V1, session_id);
-    System.out.println("Network Logs from API v1: " + logsFromApiV1);
-    String logsFromApiV2 = fetchLogs(LogType.NETWORK.value, ArtefactAPIVersions.API_V2, session_id);
-    System.out.println("Network Logs from API v2: " + logsFromApiV2);
+    for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
+      String logs = fetchLogs(LogType.NETWORK.value, artefactAPIVersion, session_id);
+      checkForSpecificTestVerificationDataPresentInLogs(logs, "network",
+        new testVerificationDataKeys[] { testVerificationDataKeys.URL });
+    }
   }
 
   public void verifyNetworkFullHarLogs(String session_id) {
-
+    for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
+      String logs = fetchLogs(LogType.FULL_HAR.value, artefactAPIVersion, session_id);
+      checkForSpecificTestVerificationDataPresentInLogs(logs, "network full.har",
+        new testVerificationDataKeys[] { testVerificationDataKeys.URL });
+    }
   }
 }
