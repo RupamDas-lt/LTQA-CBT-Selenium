@@ -46,6 +46,7 @@ public class EnvSetup {
   public static final ThreadLocal<CustomSoftAssert> CLIENT_SOFT_ASSERT = ThreadLocal.withInitial(CustomSoftAssert::new);
   public static final ThreadLocal<Boolean> IS_UI_VERIFICATION_ENABLED = ThreadLocal.withInitial(() -> false);
   public static final ThreadLocal<String> TEST_SESSION_ID = ThreadLocal.withInitial(() -> "");
+  public static final ThreadLocal<String> TEST_TEST_ID = ThreadLocal.withInitial(() -> "");
   public static final ThreadLocal<String> CLIENT_SESSION_ID = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> TEST_REPORT = ThreadLocal.withInitial(HashMap::new);
   public static final ThreadLocal<String> TEST_TUNNEL_NAME = new ThreadLocal<>();
@@ -59,6 +60,7 @@ public class EnvSetup {
   public static final ThreadLocal<Integer> SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API = new ThreadLocal<>();
   public static final ThreadLocal<Integer> SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API = new ThreadLocal<>();
   public static final ThreadLocal<JsonNode> TEST_DETAIL_API_RESPONSE = new ThreadLocal<>();
+  public static final ThreadLocal<JsonNode> TEST_FEATURE_FLAG_DETAILS = new ThreadLocal<>();
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {

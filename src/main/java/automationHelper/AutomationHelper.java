@@ -13,10 +13,7 @@ import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -500,49 +497,70 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
+  private boolean isWebdriverModeEnabled(String session_id, Map<String, Object> testCaps) {
+    final String webDriverModeFlagKey = "ml_webdriver_mode";
+    boolean isWebdriverModeEnabled = true;
+    String isWebdriverModeFlagEnabled = apiHelper.getFeatureFlagValueOfSpecificSession(session_id,
+      webDriverModeFlagKey);
+    if (testCaps.getOrDefault(WEBDRIVER_MODE, isWebdriverModeFlagEnabled).toString()
+      .equalsIgnoreCase("false") || testCaps.getOrDefault(SELENIUM_CDP, "false").toString()
+      .equals("true") || testCaps.getOrDefault(SELENIUM_TELEMETRY_LOGS, "false").toString().equals("true"))
+      isWebdriverModeEnabled = false;
+    return isWebdriverModeEnabled;
+  }
+
   public void verifyLogs(String logs) {
+    // Wait for logs to be uploaded
     waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(120);
+
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     Map<String, Object> testCaps = TEST_CAPS_MAP.get();
-    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
-    boolean validLogsToCheck = requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
-      Object value = testCaps.get(cap);
-      return value != null && !value.toString().equals("false"); // Key exists and value is not false
-    });
-    if (logs.equals("selenium") && !validLogsToCheck) {
-      // System logs are always expected to be present either selenium logs or webdriver
-      logs = "webDriver";
-      validLogsToCheck = true;
+    String testId = EnvSetup.TEST_SESSION_ID.get();
+
+    // Check if logs verification is required based on capabilities
+    boolean validLogsToCheck = areLogsVerificationRequired(logs, testCaps);
+
+    // Handle special case for system logs
+    if (logs.equals("selenium")) {
+      boolean isWebDriverTest = isWebdriverModeEnabled(testId, testCaps);
+      logs = isWebDriverTest ? "webDriver" : "selenium";
+      validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
+
     softAssert.assertTrue(validLogsToCheck,
-      logs + " logs verification is skipped as required caps are not used. Required caps: " + requiredCaps);
+      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+        logs, Collections.emptySet()));
+
     if (validLogsToCheck) {
-      String testId = EnvSetup.TEST_SESSION_ID.get();
-      switch (logs) {
-      case "webDriver":
-      case "selenium":
-        artefactsHelper.verifySystemLogs(logs, testId);
-        break;
-      case "command":
-        artefactsHelper.verifyCommandLogs(testId);
-        break;
-      case "console":
-        artefactsHelper.verifyConsoleLogs(testId);
-        break;
-      case "terminal":
-        artefactsHelper.verifyTerminalLogs(testId);
-        break;
-      case "network":
-        artefactsHelper.verifyNetworkLogs(testId);
-        break;
-      case "full.har":
-        artefactsHelper.verifyNetworkFullHarLogs(testId);
-        break;
-      case "default":
-        softAssert.fail("Unable to find any matching logs with name: " + logs);
-        break;
-      }
+      verifyLogsByType(logs, testId, softAssert);
     }
+
     EnvSetup.SOFT_ASSERT.set(softAssert);
+
+  }
+
+  private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
+    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
+    return requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
+      Object value = testCaps.get(cap);
+      return value != null && !value.toString().equalsIgnoreCase("false");
+    });
+  }
+
+  private void verifyLogsByType(String logs, String testId, CustomSoftAssert softAssert) {
+
+    Map<String, Runnable> logVerificationMap = new HashMap<>();
+    logVerificationMap.put("webDriver", () -> artefactsHelper.verifySystemLogs(logs, testId));
+    logVerificationMap.put("selenium", () -> artefactsHelper.verifySystemLogs(logs, testId));
+    logVerificationMap.put("command", () -> artefactsHelper.verifyCommandLogs(testId));
+    logVerificationMap.put("console", () -> artefactsHelper.verifyConsoleLogs(testId));
+    logVerificationMap.put("terminal", () -> artefactsHelper.verifyTerminalLogs(testId));
+    logVerificationMap.put("network", () -> artefactsHelper.verifyNetworkLogs(testId));
+    logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
+
+    // Execute the verification method
+    Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
+      () -> softAssert.fail("Unable to find any matching logs with name: " + logs));
+    verificationMethod.run();
   }
 }

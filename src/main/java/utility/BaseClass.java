@@ -373,7 +373,7 @@ public class BaseClass {
   }
 
   public static String handleUnicodeEscapes(String input) {
-    return input.replace("\\u002f", "/").replace("\\u002F", "/").replace("\\/", "/");
+    return input.replace("\\u002f", "/").replace("\\u002F", "/").replace("\\/", "/").replace("\\\\", "");
   }
 
   public Set<String> validateSchema(String obtainedData, String expectedJsonFilePath) {

@@ -31,6 +31,7 @@
         <!--        /Dependencies for reportPortal       -->
         <appache.commons.io>2.18.0</appache.commons.io>
         <json.schema.validator>1.5.6</json.schema.validator>
+        <maven.artifact>3.9.9</maven.artifact>
     </properties>
 
     <repositories>
@@ -161,6 +162,17 @@
             <groupId>com.networknt</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>${json.schema.validator}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.artifact}</version> <!-- or the latest version -->
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.openjson/openjson -->
+        <dependency>
+            <groupId>com.github.openjson</groupId>
+            <artifactId>openjson</artifactId>
+            <version>1.0.13</version>
         </dependency>
 
     </dependencies>

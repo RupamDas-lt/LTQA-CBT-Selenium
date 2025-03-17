@@ -11,12 +11,13 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 import static utility.FrameworkConstants.*;
@@ -34,7 +35,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   }
 
   @Getter private enum LogType {
-    COMMAND("command"), SELENIUM("selenium"), NETWORK("network"), CONSOLE("console"), TERMINAL("terminal");
+    COMMAND("command"), SELENIUM("selenium"), WEBDRIVER("webdriver"), NETWORK("network"), CONSOLE("console"), TERMINAL(
+      "terminal");
     private final String value;
 
     LogType(String value) {
@@ -45,6 +47,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private static final String apiV2UrlGenerationSuccessMessage = "URL is succesfully generated";
 
   private static final String V2 = "/v2";
+  private static final String seleniumThreeExpectedLogLine = "Selenium build info: version: '";
+  private static final String seleniumFourExpectedLogLine = "Started Selenium Standalone ";
+
   private final AutomationAPIHelper automationAPIHelper = new AutomationAPIHelper();
 
   private String getFileName(String sessionID, String sessionDetail) {
@@ -81,6 +86,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     if (apiVersion.equals(ArtefactAPIVersions.API_V2)) {
       response = handleApiV2Response(response, sessionId, logType, softAssert);
     } else {
+      response = handleUnicodeEscapes(response);
       ltLogger.info("Fetched artefacts API URL response via API V1: {}", response);
     }
 
@@ -116,11 +122,215 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       apiV2UrlGenerationSuccessMessage);
   }
 
+  private void verifyPortNumber(String sessionId, String logs, boolean isWebDriverEnabled, String browserName) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    if (logs == null || logs.isEmpty()) {
+      softAssert.fail("Unable to verify port number. Received API response: " + logs);
+      return;
+    }
+
+    final String PORT_WEBDRIVER = "4445";
+    final String PORT_SELENIUM = "41000";
+
+    String expectedPortNumber = isWebDriverEnabled ? PORT_WEBDRIVER : PORT_SELENIUM;
+    ltLogger.info("Expected port number for webdriver mode status {} is: {}", isWebDriverEnabled, expectedPortNumber);
+    String regEx = getPortNumberRegex(browserName, isWebDriverEnabled);
+
+    // Extract port number using regex
+    String portNumber = extractPortNumberFromSystemLogs(logs, regEx);
+
+    if (portNumber != null) {
+      String expectedMessage = isWebDriverEnabled ?
+        "With webdriver mode, expected port number is " + PORT_WEBDRIVER :
+        "Expected port number is " + PORT_SELENIUM + " for Selenium Driver";
+
+      softAssert.assertEquals(portNumber, expectedPortNumber, expectedMessage + ". But used port is: " + portNumber);
+
+      ltLogger.info("Used Port: {} for session: {}", portNumber, sessionId);
+    } else {
+      softAssert.assertTrue(logs.contains(expectedPortNumber),
+        "Expected port number is not present in the Selenium logs. Expected port number is: " + expectedPortNumber);
+      ltLogger.error("Port number not found in the Selenium logs or Debug level logs are missing.");
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private String getPortNumberRegex(String browserName, boolean isWebDriverEnabled) {
+    if (isWebDriverEnabled) {
+      return browserName.equalsIgnoreCase("firefox") ? "Listening on 127\\.0\\.0\\.1:(\\d+)" : "on port (\\d+)";
+    } else {
+      return browserName.equalsIgnoreCase("firefox") ?
+        "Listening on 127\\.0\\.0\\.1:(\\d+)" :
+        "Host: 127\\.0\\.0\\.1:(\\d+)";
+    }
+  }
+
+  private String extractPortNumberFromSystemLogs(String text, String regex) {
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(text);
+    return matcher.find() ? matcher.group(1) : null;
+  }
+
+  private boolean isWebDriverVerboseLoggingEnabled(String session_id, Map<String, Object> testCaps) {
+    String webDriverVerboseLoggingEnabledFlag = "ml_verbose_webdriver_logging";
+    String flagValue = automationAPIHelper.getFeatureFlagValueOfSpecificSession(session_id,
+      webDriverVerboseLoggingEnabledFlag);
+    return Boolean.parseBoolean(flagValue) || Boolean.parseBoolean(
+      testCaps.getOrDefault(VERBOSE_WEBDRIVER_LOGGING, "false").toString());
+  }
+
+  private void checkForUrlsAndLocatorsPresentInSystemLogs(String logs) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    testVerificationDataKeys[] keysArray = { testVerificationDataKeys.LOCATORS, testVerificationDataKeys.URL };
+    Arrays.stream(keysArray).sequential().forEach(key -> {
+      Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(key);
+      String dataType = key.toString();
+      ltLogger.info("Checking for the following {} in system logs: {}", dataType, expectedData);
+      expectedData.forEach(expectedValue -> {
+        boolean isPresent = logs.contains(expectedValue);
+        softAssert.assertTrue(isPresent, expectedValue + " is not present in the system logs.");
+        ltLogger.info("{} '{}' {} present in the system logs.", dataType, expectedValue, isPresent ? "is" : "is not");
+      });
+    });
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void verifyWebDriverLogs(String session_id, String logs, Map<String, Object> testCaps) {
+    boolean isWebDriverVerboseLoggingEnabled = isWebDriverVerboseLoggingEnabled(session_id, testCaps);
+    if (isWebDriverVerboseLoggingEnabled) {
+      checkForUrlsAndLocatorsPresentInSystemLogs(logs);
+    }
+  }
+
+  private String extractSeleniumVersionFromSeleniumLogs(String logs, boolean isSeleniumFourUsed) {
+    String retrievedVersionFromSeleniumLogs = "";
+    String retrievedVersionContainingStringFromSeleniumLogs = "";
+    Pattern pattern = isSeleniumFourUsed ?
+      Pattern.compile(seleniumFourExpectedLogLine + "[\\d.]+") :
+      Pattern.compile(seleniumThreeExpectedLogLine + "([\\d\\.]+)'");
+    Matcher matcher = pattern.matcher(logs);
+    if (matcher.find()) {
+      retrievedVersionContainingStringFromSeleniumLogs = isSeleniumFourUsed ? matcher.group(0) : matcher.group(1);
+    }
+    Pattern versionPattern = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+    Matcher versionPatternMatcher = versionPattern.matcher(retrievedVersionContainingStringFromSeleniumLogs);
+    if (versionPatternMatcher.find()) {
+      retrievedVersionFromSeleniumLogs = versionPatternMatcher.group(0).trim();
+    }
+    return retrievedVersionFromSeleniumLogs;
+  }
+
+  private String verifySeleniumVersion(String session_id, String logs, Map<String, Object> testCaps) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    ComparableVersion defaultSeleniumVersion = new ComparableVersion("3.13.0");
+    ComparableVersion expectedSeleniumVersion;
+    String givenSeleniumVersionString = testCaps.getOrDefault(SELENIUM_VERSION, "default").toString();
+    ltLogger.info("Used Selenium Version in test caps: {}", givenSeleniumVersionString);
+    if (givenSeleniumVersionString.contains("latest")) {
+      String browserName = testCaps.get(BROWSER_NAME).toString();
+      String browserVersion = testCaps.get(BROWSER_VERSION).toString();
+      String templateName = testCaps.get(PLATFORM_NAME).toString();
+      givenSeleniumVersionString = automationAPIHelper.getSeleniumVersionBasedOnKeyWord(givenSeleniumVersionString,
+        browserName, browserVersion, templateName);
+      expectedSeleniumVersion = new ComparableVersion(givenSeleniumVersionString);
+    } else
+      expectedSeleniumVersion = defaultSeleniumVersion;
+    boolean isSeleniumFourUsed = expectedSeleniumVersion.compareTo(new ComparableVersion("4.0.0")) >= 0;
+    ltLogger.info("Using Selenium Version: {} and selenium four used status: {}", expectedSeleniumVersion,
+      isSeleniumFourUsed);
+    String actualSeleniumVersionFromSeleniumLogs = extractSeleniumVersionFromSeleniumLogs(logs, isSeleniumFourUsed);
+    if (!actualSeleniumVersionFromSeleniumLogs.isEmpty()) {
+      ComparableVersion actualSeleniumVersion = new ComparableVersion(actualSeleniumVersionFromSeleniumLogs);
+      softAssert.assertTrue(expectedSeleniumVersion.equals(actualSeleniumVersion),
+        "Expected Selenium version is " + expectedSeleniumVersion + " but found " + actualSeleniumVersion);
+    } else {
+      ltLogger.info("Unable to extract selenium version from Selenium Logs");
+      String expectedLogs = (isSeleniumFourUsed ?
+        seleniumFourExpectedLogLine :
+        seleniumThreeExpectedLogLine) + expectedSeleniumVersion;
+      softAssert.assertTrue(logs.contains(expectedLogs), "Selenium logs does not contain " + expectedLogs);
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+    return actualSeleniumVersionFromSeleniumLogs;
+  }
+
+  private void verifyLogLevelOfSystemLogs(String logs, String seleniumVersionString, String session_id) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    ComparableVersion seleniumVersion = new ComparableVersion(seleniumVersionString);
+    ComparableVersion thresholdVersionForLegacySeleniumFourLogs = new ComparableVersion("4.28.0");
+    ComparableVersion thresholdVersionForSeleniumFour = new ComparableVersion("4.0.0");
+
+    if (seleniumVersion.compareTo(thresholdVersionForSeleniumFour) < 0) {
+      checkForUrlsAndLocatorsPresentInSystemLogs(logs);
+    } else if (seleniumVersion.compareTo(thresholdVersionForLegacySeleniumFourLogs) < 0) {
+      verifyLogsForOlderVersions(logs, seleniumVersionString, session_id, softAssert);
+    } else {
+      verifyLogsForNewerVersions(logs, seleniumVersionString, session_id, softAssert);
+    }
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void verifyLogsForOlderVersions(String logs, String seleniumVersionString, String session_id,
+    CustomSoftAssert softAssert) {
+    final String LOG_LEVEL = "\"log-level\": \"";
+    final String INFO = LOG_LEVEL + "INFO\"";
+    final String DEBUG = LOG_LEVEL + "DEBUG\"";
+    softAssert.assertTrue(logs.contains(INFO),
+      "Info level logs are missing for Selenium version " + seleniumVersionString);
+    softAssert.assertTrue(logs.contains(DEBUG),
+      "Debug level logs are missing for Selenium version " + seleniumVersionString);
+    softAssert.assertTrue(logs.contains("DELETE /wd/hub/session/" + session_id),
+      "Selenium " + seleniumVersionString + " logs are incomplete.");
+    ltLogger.info("Debug level Selenium logs have been checked for selenium version: {}", seleniumVersionString);
+  }
+
+  private void verifyLogsForNewerVersions(String logs, String seleniumVersionString, String session_id,
+    CustomSoftAssert softAssert) {
+    final String STARTED_SELENIUM = "Started Selenium Standalone ";
+    final String SESSION_CREATED_NODE = "Session created by the Node. Id: ";
+    final String SESSION_CREATED_DISTRIBUTOR = "Session created by the Distributor. Id: ";
+    final String[] SESSION_DELETION_LOGS = { "Deleted session from local Session Map, Id: ",
+      "Releasing slot for session id ", "Stopping session " };
+    String expectedLogString = STARTED_SELENIUM + seleniumVersionString;
+    softAssert.assertTrue(logs.contains(expectedLogString),
+      "Expected log 'Started Selenium Standalone' missing for Selenium " + seleniumVersionString);
+    expectedLogString = SESSION_CREATED_NODE + session_id;
+    softAssert.assertTrue(logs.contains(expectedLogString),
+      "Session creation log with correct session ID missing. Expected logs: " + expectedLogString);
+    expectedLogString = SESSION_CREATED_DISTRIBUTOR + session_id;
+    softAssert.assertTrue(logs.contains(expectedLogString),
+      "Distributor session creation log with correct session ID missing. Expected logs: " + expectedLogString);
+
+    for (String expectedLog : SESSION_DELETION_LOGS) {
+      expectedLogString = expectedLog + session_id;
+      softAssert.assertTrue(logs.contains(expectedLogString),
+        "Expected session log missing or incorrect session ID: " + expectedLogString);
+    }
+  }
+
+  private void verifySeleniumLogs(String session_id, String logs, Map<String, Object> testCaps) {
+    logs = logs.replace("\\\"", "\"");
+    String seleniumVersion = verifySeleniumVersion(session_id, logs, testCaps);
+    session_id = automationAPIHelper.getSessionIDFromTestId(session_id);
+    verifyLogLevelOfSystemLogs(logs, seleniumVersion, session_id);
+  }
+
   public void verifySystemLogs(String logsType, String session_id) {
-    String logsFromApiV1 = fetchLogs(logsType, ArtefactAPIVersions.API_V1, session_id);
-    System.out.println("Selenium Logs from API v1: " + logsFromApiV1);
-    String logsFromApiV2 = fetchLogs(logsType, ArtefactAPIVersions.API_V2, session_id);
-    System.out.println("Selenium Logs from API v2: " + logsFromApiV2);
+    boolean isWebDriverEnabled = logsType.equalsIgnoreCase("webdriver");
+    Map<String, Object> testCaps = EnvSetup.TEST_CAPS_MAP.get();
+    String browserName = testCaps.get(BROWSER_NAME).toString();
+    for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
+      String version = artefactAPIVersion.equals(ArtefactAPIVersions.API_V1) ? "v1" : "v2";
+      String logs = fetchLogs(logsType, artefactAPIVersion, session_id);
+      ltLogger.info("Selenium Logs from API {}: {}", version, logs);
+      verifyPortNumber(session_id, logs, isWebDriverEnabled, browserName);
+      if (isWebDriverEnabled) {
+        verifyWebDriverLogs(session_id, logs, testCaps);
+      } else {
+        verifySeleniumLogs(session_id, logs, testCaps);
+      }
+    }
   }
 
   @SneakyThrows

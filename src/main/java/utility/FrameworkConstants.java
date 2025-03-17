@@ -51,6 +51,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
+  public static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
+  public static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
+  public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -90,6 +93,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String SKIPPED = "skipped";
 
   // Test caps
+  public static final String BROWSER_NAME = "browserName";
+  public static final String BROWSER_VERSION = "version";
+  public static final String PLATFORM_NAME = "platform";
   public static final String LOAD_PUBLIC_EXTENSION = "loadExtension";
   public static final String LOAD_PRIVATE_EXTENSION = "lambda:loadExtension";
   public static final String TUNNEL = "tunnel";
@@ -106,6 +112,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_CDP = "scCdp";
   public static final String VIDEO = "video";
   public static final String VISUAL = "visual";
+  public static final String WEBDRIVER_MODE = "webdriverMode";
+  public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
+  public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -189,7 +198,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, GEO_LOCATION, RESOLUTION
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION
   }
 
   // JavaScripts

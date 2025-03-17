@@ -299,9 +299,12 @@ public class Hooks {
     CLIENT_SOFT_ASSERT.set(new CustomSoftAssert());
     IS_UI_VERIFICATION_ENABLED.set(false);
     TEST_SESSION_ID.set("");
+    TEST_TEST_ID.set("");
     CLIENT_SESSION_ID.set("");
     TEST_REPORT.set(new HashMap<>());
     TEST_VERIFICATION_DATA.set(new HashMap<>());
+    TEST_DETAIL_API_RESPONSE.remove();
+    TEST_FEATURE_FLAG_DETAILS.remove();
   }
 
   @After(order = 2)
