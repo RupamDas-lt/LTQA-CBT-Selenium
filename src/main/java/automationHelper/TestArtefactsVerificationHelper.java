@@ -38,7 +38,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
   @Getter private enum LogType {
     COMMAND("command"), SELENIUM("selenium"), WEBDRIVER("webdriver"), NETWORK("network"), CONSOLE("console"), TERMINAL(
-      "terminal"), FULL_HAR("fullHar");
+      "terminal"), FULL_HAR("fullHar"), EXCEPTION("exception");
     private final String value;
 
     LogType(String value) {
@@ -241,7 +241,10 @@ public class TestArtefactsVerificationHelper extends ApiManager {
         browserName, browserVersion, templateName);
       expectedSeleniumVersion = new ComparableVersion(givenSeleniumVersionString);
     } else
-      expectedSeleniumVersion = defaultSeleniumVersion;
+      //      Either use the given numeric value of selenium_version in test caps or use the default version
+      expectedSeleniumVersion = givenSeleniumVersionString.equals("default") ?
+        defaultSeleniumVersion :
+        new ComparableVersion(givenSeleniumVersionString);
     boolean isSeleniumFourUsed = expectedSeleniumVersion.compareTo(new ComparableVersion("4.0.0")) >= 0;
     ltLogger.info("Using Selenium Version: {} and selenium four used status: {}", expectedSeleniumVersion,
       isSeleniumFourUsed);
@@ -380,28 +383,53 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       automationAPIHelper.getCommandCounts(session_id);
     }
     int expectedCommandLogsCount = EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.get();
-    this.verifyCommandLogs(session_id, ArtefactAPIVersions.API_V1, COMMAND_LOGS_API_V1_SCHEMA,
-      expectedCommandLogsCount);
-    this.verifyCommandLogs(session_id, ArtefactAPIVersions.API_V2, COMMAND_LOGS_API_V2_SCHEMA,
-      expectedCommandLogsCount);
+    this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V1, COMMAND_LOGS_API_V1_SCHEMA,
+      expectedCommandLogsCount, LogType.COMMAND);
+    this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V2, COMMAND_LOGS_API_V2_SCHEMA,
+      expectedCommandLogsCount, LogType.COMMAND);
   }
 
-  private void verifyCommandLogs(String session_id, ArtefactAPIVersions apiVersion, String schemaFilePath,
-    int expectedCommandLogsCount) {
+  public void exceptionCommandLogs(String session_id) {
+    if (EnvSetup.SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.get() == null) {
+      automationAPIHelper.getCommandCounts(session_id);
+    }
+    int expectedExceptionCommandLogsCount = EnvSetup.SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.get();
+    this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V1, COMMAND_LOGS_API_V1_SCHEMA,
+      expectedExceptionCommandLogsCount, LogType.EXCEPTION);
+    this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V2, COMMAND_LOGS_API_V2_SCHEMA,
+      expectedExceptionCommandLogsCount, LogType.EXCEPTION);
+  }
+
+  private void verifyDifferentCommandLogs(String session_id, ArtefactAPIVersions apiVersion, String schemaFilePath,
+    int expectedCommandLogsCount, LogType logType) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String logsFromApi = fetchLogs(LogType.COMMAND.value, apiVersion, session_id);
+    String logsFromApi = fetchLogs(logType.value, apiVersion, session_id);
+
+    // Validate schema
     Set<String> schemaValidationErrors = validateSchema(logsFromApi, schemaFilePath);
     softAssert.assertTrue(schemaValidationErrors.isEmpty(),
-      "Schema validation failed for command logs from " + apiVersion.toString() + ". Errors: " + schemaValidationErrors);
+      "Schema validation failed for " + logType.value + " logs from " + apiVersion.toString() + ". Errors: " + schemaValidationErrors);
+
+    // Parse logs JSON
     JsonElement logsJson = constructJsonFromString(logsFromApi);
     JsonArray commandsArray = apiVersion == ArtefactAPIVersions.API_V1 ?
       logsJson.getAsJsonObject().get("data").getAsJsonArray() :
       logsJson.getAsJsonArray();
+
+    // Verify logs count
     softAssert.assertTrue(commandsArray.size() == expectedCommandLogsCount,
-      "Command logs count fetched from " + apiVersion + " doesn't match. Expected: " + expectedCommandLogsCount + ", Actual: " + commandsArray.size());
-    Queue<String> fetchedUrlsFromCommandLogs = extractUrlsAPIResponse(commandsArray);
-    verifyExpectedUrlsArePresentWithSpecificSequence(fetchedUrlsFromCommandLogs, LogType.COMMAND.value + apiVersion,
-      softAssert);
+      logType.value + " logs count fetched from " + apiVersion + " doesn't match. Expected: " + expectedCommandLogsCount + ", Actual: " + commandsArray.size());
+
+    // Specific verifications based on log type
+    if (logType == LogType.EXCEPTION) {
+      checkForSpecificTestVerificationDataPresentInLogs(logsFromApi, "exception command",
+        new testVerificationDataKeys[] { testVerificationDataKeys.EXCEPTION_LOG });
+    } else if (logType == LogType.COMMAND) {
+      Queue<String> fetchedUrlsFromCommandLogs = extractUrlsAPIResponse(commandsArray);
+      verifyExpectedUrlsArePresentWithSpecificSequence(fetchedUrlsFromCommandLogs, logType.value + apiVersion,
+        softAssert);
+    }
+
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 

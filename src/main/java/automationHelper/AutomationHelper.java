@@ -153,13 +153,17 @@ public class AutomationHelper extends BaseClass {
   }
 
   private void addExceptionLogs() {
+    Queue<String> exceptionLogsLocators = new LinkedList<>();
     locatorsForExceptionLogs.forEach(invalidLocator -> {
       try {
         driverManager.waitForElementToBeVisible(invalidLocator, 5);
       } catch (Exception e) {
-        ltLogger.info("Locator {} added to the exception log", invalidLocator.value());
+        String exceptionLogsLocator = invalidLocator.value();
+        ltLogger.info("Locator {} added to the exception log", exceptionLogsLocators);
+        exceptionLogsLocators.add(exceptionLogsLocator);
       }
     });
+    TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.EXCEPTION_LOG, exceptionLogsLocators);
   }
 
   private void selfSignedCertificate() {
@@ -292,21 +296,24 @@ public class AutomationHelper extends BaseClass {
       ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
     String seleniumVersion = testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString();
+    ltLogger.info("Selenium version: {}", seleniumVersion);
 
     // Try fetching browser details from the web
     String[] browserDetails = getBrowserDetailsFromWeb();
     try {
       assert browserDetails != null;
       ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion) || seleniumVersion.equals(
-        "latest") || seleniumVersion.equals("default")) {
-        ltLogger.warn(
-          "Either browser version fetched from web is matched or verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
-          testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString());
+      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion)) {
         return;
       }
     } catch (Exception e) {
       ltLogger.error("Error while verifying browser details from osBrowserDetails page", e);
+    }
+
+    if (!seleniumVersion.equals("latest") && !seleniumVersion.equals("default")) {
+      ltLogger.warn("Verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
+        seleniumVersion);
+      return;
     }
 
     // Fallback to fetching browser details using JavaScript
@@ -562,6 +569,7 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("terminal", () -> artefactsHelper.verifyTerminalLogs(testId));
     logVerificationMap.put("network", () -> artefactsHelper.verifyNetworkLogs(testId));
     logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
+    logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
 
     // Execute the verification method
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
