@@ -53,14 +53,18 @@ public class DriverManager extends BaseClass {
   String gridUrl;
 
   private static By toBy(Locator locator) {
-    putValueToVerificationData("locators", locator.value());
+    putValueToVerificationData(testVerificationDataKeys.LOCATORS, locator.value());
     return LOCATOR_MAP.get(locator.type()).apply(locator.value());
   }
 
-  private static void putValueToVerificationData(String key, String value) {
-    Map<String, Object> verificationData = TEST_VERIFICATION_DATA.get();
-    Set<String> set = (Set<String>) verificationData.computeIfAbsent(key, k -> new HashSet<String>());
-    set.add(value);
+  private static void putValueToVerificationData(testVerificationDataKeys key, String value) {
+    Map<testVerificationDataKeys, Object> verificationData = TEST_VERIFICATION_DATA.get();
+    Queue<String> queue;
+    if (verificationData.get(key) == null) {
+      queue = new LinkedList<>();
+      verificationData.put(key, queue);
+    }
+    ((Queue<String>) verificationData.get(key)).add(value);
   }
 
   public WebElement waitForElementToBeVisible(Locator locator, int timeout) {
@@ -147,7 +151,7 @@ public class DriverManager extends BaseClass {
   public void getURL(String url) {
     ltLogger.info("Opening URL: {}", url);
     driver.get(url);
-    putValueToVerificationData("url", url);
+    putValueToVerificationData(testVerificationDataKeys.URL, url);
   }
 
   public void quit() {
@@ -211,7 +215,7 @@ public class DriverManager extends BaseClass {
   }
 
   public Object executeScriptAndFetchValue(String script) {
-    putValueToVerificationData("javaScripts", script);
+    putValueToVerificationData(testVerificationDataKeys.JAVA_SCRIPTS, script);
     try {
       Object response = driver.executeScript(script);
       ltLogger.info("JS Script executed successfully. Script: {}", script);

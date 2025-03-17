@@ -29,6 +29,9 @@
         <rp.java.cucumber.version>5.3.2</rp.java.cucumber.version>
         <rp.epam.log4j.version>5.2.3</rp.epam.log4j.version>
         <!--        /Dependencies for reportPortal       -->
+        <appache.commons.io>2.18.0</appache.commons.io>
+        <json.schema.validator>1.5.6</json.schema.validator>
+        <maven.artifact>3.9.9</maven.artifact>
     </properties>
 
     <repositories>
@@ -148,6 +151,30 @@
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${appache.commons.io}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.networknt/json-schema-validator -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${json.schema.validator}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.artifact}</version> <!-- or the latest version -->
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.openjson/openjson -->
+        <dependency>
+            <groupId>com.github.openjson</groupId>
+            <artifactId>openjson</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+
     </dependencies>
 
     <build>

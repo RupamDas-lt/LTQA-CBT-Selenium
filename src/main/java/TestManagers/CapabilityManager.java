@@ -62,7 +62,8 @@ public class CapabilityManager extends BaseClass {
   }
 
   private void setCustomValues(@NonNull Map<String, Object> capabilityMap) {
-    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")))
+    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")) && StringUtils.isNullOrEmpty(
+      (String) capabilityMap.getOrDefault(TUNNEL_NAME, "")) && EnvSetup.TEST_TUNNEL_NAME.get() != null)
       capabilityMap.put(TUNNEL_NAME, EnvSetup.TEST_TUNNEL_NAME.get());
 
     if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TEST_NAME, "")))
@@ -109,13 +110,14 @@ public class CapabilityManager extends BaseClass {
   private String getRandomGeoLocation() {
     try {
       var objectMapper = new ObjectMapper();
-      var rootNode = objectMapper.readTree(readFileContent(GEOLOCATION_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(GEOLOCATION_DATA_PATH));
       var geoDataArray = rootNode.path("geoData");
       if (geoDataArray.isArray() && !geoDataArray.isEmpty()) {
         Random random = new Random();
         int randomIndex = random.nextInt(geoDataArray.size());
         JsonNode randomGeoObject = geoDataArray.get(randomIndex);
-        TEST_VERIFICATION_DATA.get().put("geoLocation", randomGeoObject.path("countryName").asText());
+        TEST_VERIFICATION_DATA.get()
+          .put(testVerificationDataKeys.GEO_LOCATION, randomGeoObject.path("countryName").asText());
         return randomGeoObject.path("countryCode").asText();
       }
     } catch (IOException e) {
@@ -128,7 +130,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomResolution(String platform) {
     try {
       var objectMapper = new ObjectMapper();
-      var rootNode = objectMapper.readTree(readFileContent(RESOLUTION_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(RESOLUTION_DATA_PATH));
       JsonNode resDataArray;
       if (platform.toLowerCase().contains("win"))
         resDataArray = rootNode.path("win");
@@ -140,7 +142,7 @@ public class CapabilityManager extends BaseClass {
         Random random = new Random();
         int randomIndex = random.nextInt(resDataArray.size());
         String res = resDataArray.get(randomIndex).asText();
-        TEST_VERIFICATION_DATA.get().put("resolution", res);
+        TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.RESOLUTION, res);
         return res;
       }
     } catch (IOException e) {
@@ -161,7 +163,7 @@ public class CapabilityManager extends BaseClass {
     ltLogger.info("timezone index: {}", timeZoneIndex);
     try {
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode rootNode = objectMapper.readTree(readFileContent(TIMEZONE_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(TIMEZONE_DATA_PATH));
       List<String> timezoneIds = new ArrayList<>();
       rootNode.path(timeZoneIndex).fields().forEachRemaining(entry -> timezoneIds.add(entry.getKey()));
       Random random = new Random();
@@ -174,7 +176,7 @@ public class CapabilityManager extends BaseClass {
   }
 
   private String getRandomSelenium4Version() {
-    String[] topFive = { "latest", "latest-1", "latest-2", "4.13.0", "4.5.0", "4.0.0" };
+    String[] topFive = { "latest", "latest-1", "latest-2", "4.17.0", "4.13.0", "4.8.0", "4.0.0" };
     return topFive[new Random().nextInt(topFive.length)];
   }
 

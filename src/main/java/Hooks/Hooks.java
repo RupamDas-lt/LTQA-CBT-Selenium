@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.COMPLETED;
@@ -209,11 +210,13 @@ public class Hooks {
     String errorMsg = e.getLocalizedMessage();
 
     if (isClient) {
+      errorMsg = "The following assertions failed in client test for test session id: " + TEST_SESSION_ID.get() + "client session id: " + CLIENT_SESSION_ID.get() + "\n" + errorMsg;
       clientAssertionError = true;
       clientTestErrorMessage = clientTestErrorMessage.isEmpty() ? errorMsg : clientTestErrorMessage + "\n" + errorMsg;
       clientTestStatus = "failed";
       TEST_REPORT.get().put("client_test_assertion_errors", errorMsg);
     } else {
+      errorMsg = "The following assertions failed for test session id: " + TEST_SESSION_ID.get() + "\n" + errorMsg;
       testAssertionError = true;
       errorMessage = errorMessage.isEmpty() ? errorMsg : errorMessage + "\n" + errorMsg;
       testStatus = "failed";
@@ -289,6 +292,31 @@ public class Hooks {
     printTestDashboardAndRetinaLinks(scenario);
 
     apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
+
+    resetTestData();
+  }
+
+  private static final Map<String, ThreadLocal<?>> threadLocalMap = new HashMap<>() {{
+    put("TEST_CAPS_MAP", TEST_CAPS_MAP);
+    put("SOFT_ASSERT", SOFT_ASSERT);
+    put("CLIENT_SOFT_ASSERT", CLIENT_SOFT_ASSERT);
+    put("IS_UI_VERIFICATION_ENABLED", IS_UI_VERIFICATION_ENABLED);
+    put("TEST_SESSION_ID", TEST_SESSION_ID);
+    put("TEST_TEST_ID", TEST_TEST_ID);
+    put("CLIENT_SESSION_ID", CLIENT_SESSION_ID);
+    put("TEST_REPORT", TEST_REPORT);
+    put("TEST_VERIFICATION_DATA", TEST_VERIFICATION_DATA);
+    put("TEST_DETAIL_API_RESPONSE", TEST_DETAIL_API_RESPONSE);
+    put("TEST_FEATURE_FLAG_DETAILS", TEST_FEATURE_FLAG_DETAILS);
+    put("SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API", SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API);
+    put("SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API", SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API);
+    put("SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API", SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API);
+  }};
+
+  private void resetTestData() {
+    threadLocalMap.forEach((key, threadLocal) -> threadLocal.remove());
+    TEST_REPORT.set(new HashMap<>());
+    TEST_VERIFICATION_DATA.set(new HashMap<>());
   }
 
   @After(order = 2)
