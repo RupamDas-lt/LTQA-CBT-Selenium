@@ -112,6 +112,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_CDP = "scCdp";
   public static final String VIDEO = "video";
   public static final String VISUAL = "visual";
+  public static final String CONSOLE = "console";
   public static final String WEBDRIVER_MODE = "webdriverMode";
   public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
   public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
@@ -192,13 +193,14 @@ public class FrameworkConstants extends BaseClass {
     put("selenium", Set.of(SELENIUM_VERSION, SELENIUM_CDP));
     put("video", Set.of(VIDEO));
     put("screenshot", Set.of(VISUAL));
+    put("console", Set.of(CONSOLE));
   }};
 
   public static final String IST_TimeZone = "Asia/Kolkata";
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG
   }
 
   // JavaScripts
