@@ -305,6 +305,9 @@ public class Hooks {
     TEST_VERIFICATION_DATA.set(new HashMap<>());
     TEST_DETAIL_API_RESPONSE.remove();
     TEST_FEATURE_FLAG_DETAILS.remove();
+    SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.remove();
+    SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.remove();
+    SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API.remove();
   }
 
   @After(order = 2)
