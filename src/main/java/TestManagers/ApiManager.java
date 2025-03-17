@@ -222,7 +222,7 @@ public abstract class ApiManager extends BaseClass {
         throw new RuntimeException(e);
       }
       String logsFromDownloadedFile = handleUnicodeEscapes(logsData);
-      ltLogger.info("Session logs from downloaded file: {}", logsFromDownloadedFile);
+      ltLogger.info("Data downloaded file: {}", logsFromDownloadedFile);
       return logsFromDownloadedFile;
     }
     return null;
