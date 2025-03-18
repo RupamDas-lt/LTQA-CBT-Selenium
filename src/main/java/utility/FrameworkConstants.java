@@ -2,6 +2,7 @@ package utility;
 
 import factory.Locator;
 import factory.LocatorTypes;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class FrameworkConstants extends BaseClass {
     sessionApiUriPart2.put("console", "/log/console");
     sessionApiUriPart2.put("network", "/log/network");
     sessionApiUriPart2.put("selenium", "/log/selenium");
+    sessionApiUriPart2.put("webDriver", "/log/selenium");
     sessionApiUriPart2.put("command", "/log/command");
     sessionApiUriPart2.put("exception", "/log/command?isExceptionLog=true");
     sessionApiUriPart2.put("terminal", "/terminal-logs");
@@ -46,6 +48,13 @@ public class FrameworkConstants extends BaseClass {
     sessionApiUriPart2.put("fullHar", "/log/full-har");
     return sessionApiUriPart2;
   }
+
+  public static final String TEST_API_ENDPOINT = "/api/v1/test/";
+  public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
+  public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
+  public static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
+  public static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
+  public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -74,6 +83,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_STOP_TIME = "test_stop_time";
   public static final String SESSION_ID = "test_session_id";
   public static final String SESSION_ID_CLIENT = "client_session_id";
+  public static final String TEST_START_TIMESTAMP = "test_start_timestamp";
+  public static final String TEST_END_TIMESTAMP = "test_end_timestamp";
 
   // Test Status
   public static final String COMPLETED = "completed";
@@ -83,6 +94,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String SKIPPED = "skipped";
 
   // Test caps
+  public static final String BROWSER_NAME = "browserName";
+  public static final String BROWSER_VERSION = "version";
+  public static final String PLATFORM_NAME = "platform";
   public static final String LOAD_PUBLIC_EXTENSION = "loadExtension";
   public static final String LOAD_PRIVATE_EXTENSION = "lambda:loadExtension";
   public static final String TUNNEL = "tunnel";
@@ -92,9 +106,18 @@ public class FrameworkConstants extends BaseClass {
   public static final String GEO_LOCATION = "geoLocation";
   public static final String TIMEZONE = "timezone";
   public static final String NETWORK = "network";
+  public static final String RESOLUTION = "resolution";
   public static final String NETWORK_HTTP_2 = "network.http2";
   public static final String NETWORK_HAR = "network.har";
   public static final String NETWORK_FULL_HAR = "network.full.har";
+  public static final String TERMINAL = "terminal";
+  public static final String SELENIUM_CDP = "scCdp";
+  public static final String VIDEO = "video";
+  public static final String VISUAL = "visual";
+  public static final String CONSOLE = "console";
+  public static final String WEBDRIVER_MODE = "webdriverMode";
+  public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
+  public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -129,6 +152,25 @@ public class FrameworkConstants extends BaseClass {
   public static final String BROWSER_VERSIONS_DATA_PATH = "src/test/resources/TestData/browser_versions/<BROWSER_NAME>_<TEMPLATE>.json";
   public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
   public static final String SAMPLE_TERMINAL_LOGS_FILE_PATH = "src/test/resources/TestFiles/sample_terminal_logs.txt";
+  public static final String TEST_LOGS_DOWNLOAD_DIRECTORY = "logs/testLogsFromSwaggerV2/";
+  public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
+  public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
+
+  // ffprobe commands to extract video data
+  public static final String[] DURATION_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] RESOLUTION_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "stream=width,height",
+    "-of", "csv=p=0:s=x" };
+
+  public static final String[] CODEC_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "stream=codec_name", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] FRAME_RATE_COMMAND = { "ffprobe", "-v", "error", "-show_entries",
+    "stream=avg_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] BITRATE_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "format=bit_rate", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
 
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{
@@ -161,6 +203,34 @@ public class FrameworkConstants extends BaseClass {
 
   public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL, NETWORK),
     "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
+
+  public static final Map<String, Set<String>> testArtefactsToCapsMap = new HashMap<>() {{
+    put("network", Set.of(NETWORK));
+    put("full.har", Set.of(NETWORK_FULL_HAR));
+    put("terminal", Set.of(TERMINAL));
+    put("selenium", Set.of(SELENIUM_VERSION, SELENIUM_CDP));
+    put("screenshot", Set.of(VISUAL));
+    put("console", Set.of(CONSOLE));
+  }};
+
+  public static final String IST_TimeZone = "Asia/Kolkata";
+  public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+
+  public enum testVerificationDataKeys {
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG
+  }
+
+  @Getter public enum videoMetadataTypes {
+    WIDTH("width"), HEIGHT("height"), FRAMERATE("frameRate"), DURATION_IN_SECONDS("durationInSeconds"), RESOLUTION(
+      "resolution"), CODEC("codec"), BITRATE("bitrate"),
+    ;
+
+    private final String value;
+
+    videoMetadataTypes(String value) {
+      this.value = value;
+    }
+  }
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";

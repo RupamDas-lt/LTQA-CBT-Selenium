@@ -4,12 +4,17 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.BaseClass;
+import utility.CustomSoftAssert;
+import utility.EnvSetup;
 import utility.FileLockUtility;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +24,26 @@ import static utility.FrameworkConstants.*;
 
 public abstract class ApiManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(ApiManager.class);
+
+  public String constructAPIUrl(String uriBase, String endpoint, String... sessionDetails) {
+    // In sessionDetails, first param should always be session id and then the session API end points
+    int sessionDetailsLength = sessionDetails.length;
+    String url = switch (sessionDetailsLength) {
+      case 1 -> HTTPS + uriBase + endpoint + sessionDetails[0];
+      case 2 -> HTTPS + uriBase + endpoint + sessionDetails[0] + sessionDetails[1];
+      default -> HTTPS + uriBase + endpoint;
+    };
+    ltLogger.info("URL: {}", url);
+    return url;
+  }
+
+  public String constructAPIUrlWithBasicAuth(String uriBase, String endpoint, String username, String password,
+    String... sessionDetails) {
+    ltLogger.info("Constructing API with Base: {}, Endpoint: {}, Username: {}, Password: {}, Session details: {}",
+      uriBase, endpoint, username, password, sessionDetails);
+    String uriBaseWithBasicAuth = username + ":" + password + "@" + uriBase;
+    return constructAPIUrl(uriBaseWithBasicAuth, endpoint, sessionDetails);
+  }
 
   private Response httpMethod(String method, String uri, Object body, ContentType contentType,
     Map<String, Object> headers, Map<String, Object> queryParam, int expectedStatus, String... basicAuthHeaders) {
@@ -160,5 +185,46 @@ public abstract class ApiManager extends BaseClass {
     } finally {
       FileLockUtility.fileLock.unlock();
     }
+  }
+
+  public boolean downloadFile(String uri, String desiredFileName, String filePath, int... expectedRetryCount) {
+    int retryCount = expectedRetryCount.length == 0 ? 3 : expectedRetryCount[0];
+    String expectedLogFilePath = filePath + desiredFileName;
+    boolean success = false;
+    ltLogger.info("Downloading file to : {}", expectedLogFilePath);
+    for (int i = 1; i <= retryCount; i++) {
+      try {
+        ltLogger.info("Attempt number: {} > Downloading file from uri: {}", i, uri);
+        FileUtils.copyURLToFile(new URL(uri), new File(expectedLogFilePath));
+        success = fileExists(filePath, 3, 5);
+        ltLogger.info("Download status: {}", success);
+        if (success) {
+          break;
+        }
+      } catch (Exception e) {
+        ltLogger.error("Unable to copy file from uri: {}", uri, e);
+      }
+    }
+    return success;
+  }
+
+  public String downloadFileFromUrlAndExtractContentAsString(String uri, String desiredFileName, String directory) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    uri = uri.replace(" ", "%20");
+    ltLogger.info("Downloading file from URI: {} , with name: {} , in directory: {}", uri, desiredFileName, directory);
+    boolean fileDownloadStatus = downloadFile(uri, desiredFileName, directory);
+    softAssert.assertTrue(fileDownloadStatus, "File not downloaded");
+    if (fileDownloadStatus) {
+      String logsData;
+      try {
+        logsData = readFileData(directory + desiredFileName);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      String logsFromDownloadedFile = handleUnicodeEscapes(logsData);
+      ltLogger.info("Data downloaded file: {}", logsFromDownloadedFile);
+      return logsFromDownloadedFile;
+    }
+    return null;
   }
 }

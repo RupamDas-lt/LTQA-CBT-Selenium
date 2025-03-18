@@ -59,4 +59,14 @@ public class AutomationSetupDefinitions {
   public void iUploadSampleTerminalLogs() {
     automationHelper.uploadSampleTerminalLogs();
   }
+
+  @Then("^I verify ([a-zA-Z0-9_=,: ]+) Log via API$")
+  public void iVerifyTestLogsViaAPI(String logName) {
+    automationHelper.verifyLogs(logName);
+  }
+
+  @Then("^I verify video via API$")
+  public void iVerifyVideoViaAPI() {
+    automationHelper.verifyLogs("video");
+  }
 }

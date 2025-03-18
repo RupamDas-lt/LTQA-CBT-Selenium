@@ -12,9 +12,8 @@ import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +27,7 @@ public class AutomationHelper extends BaseClass {
   DriverManager driverManager = new DriverManager();
   TunnelManager tunnelManager;
   AutomationAPIHelper apiHelper = new AutomationAPIHelper();
+  TestArtefactsVerificationHelper artefactsHelper = new TestArtefactsVerificationHelper();
 
   private void createTestSession(String testCapability) {
     StopWatch stopWatch = new StopWatch();
@@ -145,17 +145,25 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(GOOGLE_URL);
     consoleLogs.forEach(consoleLog -> {
       driverManager.executeScript("console.error('" + consoleLog + "')");
+      ArrayList<String> consoleLogsList = (ArrayList<String>) TEST_VERIFICATION_DATA.get()
+        .getOrDefault(testVerificationDataKeys.CONSOLE_LOG, new ArrayList<>());
+      consoleLogsList.add(consoleLog);
+      TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.CONSOLE_LOG, consoleLogsList);
     });
   }
 
   private void addExceptionLogs() {
+    Queue<String> exceptionLogsLocators = new LinkedList<>();
     locatorsForExceptionLogs.forEach(invalidLocator -> {
       try {
         driverManager.waitForElementToBeVisible(invalidLocator, 5);
       } catch (Exception e) {
-        ltLogger.info("Locator {} added to the exception log", invalidLocator.value());
+        String exceptionLogsLocator = invalidLocator.value();
+        ltLogger.info("Locator {} added to the exception log", exceptionLogsLocators);
+        exceptionLogsLocators.add(exceptionLogsLocator);
       }
     });
+    TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.EXCEPTION_LOG, exceptionLogsLocators);
   }
 
   private void selfSignedCertificate() {
@@ -287,21 +295,25 @@ public class AutomationHelper extends BaseClass {
         testCapsMap.get("platform").toString()).split("\\.")[0];
       ltLogger.info("Actual browser version: {}", actualBrowserVersion);
     }
+    String seleniumVersion = testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString();
+    ltLogger.info("Selenium version: {}", seleniumVersion);
 
     // Try fetching browser details from the web
     String[] browserDetails = getBrowserDetailsFromWeb();
     try {
       assert browserDetails != null;
       ltLogger.info("Browser details fetched from osBrowserDetails page: {}", Arrays.asList(browserDetails));
-      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion) || testCapsMap.getOrDefault(
-        SELENIUM_VERSION, "default").toString().contains("latest-")) {
-        ltLogger.warn(
-          "Either browser version fetched from web is matched or verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
-          testCapsMap.getOrDefault(SELENIUM_VERSION, "default").toString());
+      if (validateBrowserDetails(browserDetails, actualBrowserName, actualBrowserVersion)) {
         return;
       }
     } catch (Exception e) {
       ltLogger.error("Error while verifying browser details from osBrowserDetails page", e);
+    }
+
+    if (!seleniumVersion.equals("latest") && !seleniumVersion.equals("default")) {
+      ltLogger.warn("Verification skipped as selenium version is not in {default, latest}. Selenium version: {}",
+        seleniumVersion);
+      return;
     }
 
     // Fallback to fetching browser details using JavaScript
@@ -384,7 +396,7 @@ public class AutomationHelper extends BaseClass {
       retryCount++;
     }
     String actualCountryName = driverManager.getText(countryName);
-    String expectedCountryName = TEST_VERIFICATION_DATA.get().get("geoLocation").toString();
+    String expectedCountryName = TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.GEO_LOCATION).toString();
     softAssert.assertTrue(
       expectedCountryName.contains(actualCountryName) || actualCountryName.contains(expectedCountryName),
       "GeoLocation didn't match. Expected: " + expectedCountryName + " Actual: " + actualCountryName);
@@ -422,6 +434,7 @@ public class AutomationHelper extends BaseClass {
   }
 
   public void startSessionWithSpecificCapabilities(String testCapability, String testActions) {
+    String startTime = getCurrentTimeIST();
     createTestSession(testCapability);
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -443,7 +456,12 @@ public class AutomationHelper extends BaseClass {
       e.printStackTrace();
     }
     stopWatch.stop();
+    String stopTime = getCurrentTimeIST();
     EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+    EnvSetup.TEST_REPORT.get().put(TEST_START_TIMESTAMP, startTime);
+    EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
+    EnvSetup.TEST_REPORT.get().put("test_verification_data", TEST_VERIFICATION_DATA.get());
+    ltLogger.info("Test verification data: {}", TEST_VERIFICATION_DATA.get());
   }
 
   public void startTunnel() {
@@ -475,5 +493,88 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String status = apiHelper.uploadTerminalLogs(EnvSetup.TEST_SESSION_ID.get());
     softAssert.assertTrue(status.equals("success"), "Failed to upload terminal logs");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(int seconds) {
+    String currentTime = getCurrentTimeIST();
+    ltLogger.info("Time while checking for logs: {}", currentTime);
+    String testEndTime = EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString();
+    ltLogger.info("Time of test completion: {}", testEndTime);
+    Duration durationTillTestEnded = getTimeDifference(testEndTime, currentTime, IST_TimeZone);
+    if (durationTillTestEnded.getSeconds() <= seconds) {
+      int requiredTime = (int) (seconds - Math.floor(durationTillTestEnded.getSeconds()));
+      ltLogger.info("Waiting for {} before verifying the logs.", requiredTime);
+      waitForTime(requiredTime);
+    }
+  }
+
+  private boolean isWebdriverModeEnabled(String session_id, Map<String, Object> testCaps) {
+    final String webDriverModeFlagKey = "ml_webdriver_mode";
+    boolean isWebdriverModeEnabled = true;
+    String isWebdriverModeFlagEnabled = apiHelper.getFeatureFlagValueOfSpecificSession(session_id,
+      webDriverModeFlagKey);
+    if (testCaps.getOrDefault(WEBDRIVER_MODE, isWebdriverModeFlagEnabled).toString()
+      .equalsIgnoreCase("false") || testCaps.getOrDefault(SELENIUM_CDP, "false").toString()
+      .equals("true") || testCaps.getOrDefault(SELENIUM_TELEMETRY_LOGS, "false").toString().equals("true"))
+      isWebdriverModeEnabled = false;
+    return isWebdriverModeEnabled;
+  }
+
+  public void verifyLogs(String logs) {
+    // Wait for logs to be uploaded
+    waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(120);
+
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    Map<String, Object> testCaps = TEST_CAPS_MAP.get();
+    String testId = EnvSetup.TEST_SESSION_ID.get();
+
+    // Check if logs verification is required based on capabilities
+    boolean validLogsToCheck = areLogsVerificationRequired(logs, testCaps);
+
+    // Handle special case for system logs
+    if (logs.equals("selenium")) {
+      boolean isWebDriverTest = isWebdriverModeEnabled(testId, testCaps);
+      logs = isWebDriverTest ? "webDriver" : "selenium";
+      validLogsToCheck = true; // Always verify selenium/webDriver logs
+    }
+
+    softAssert.assertTrue(validLogsToCheck,
+      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+        logs, Collections.emptySet()));
+
+    if (validLogsToCheck) {
+      verifyLogsByType(logs, testId, softAssert);
+    }
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+
+  }
+
+  private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
+    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
+    return requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
+      Object value = testCaps.get(cap);
+      return value != null && !value.toString().equalsIgnoreCase("false");
+    });
+  }
+
+  private void verifyLogsByType(String logs, String testId, CustomSoftAssert softAssert) {
+
+    Map<String, Runnable> logVerificationMap = new HashMap<>();
+    logVerificationMap.put("webDriver", () -> artefactsHelper.verifySystemLogs(logs, testId));
+    logVerificationMap.put("selenium", () -> artefactsHelper.verifySystemLogs(logs, testId));
+    logVerificationMap.put("command", () -> artefactsHelper.verifyCommandLogs(testId));
+    logVerificationMap.put("console", () -> artefactsHelper.verifyConsoleLogs(testId));
+    logVerificationMap.put("terminal", () -> artefactsHelper.verifyTerminalLogs(testId));
+    logVerificationMap.put("network", () -> artefactsHelper.verifyNetworkLogs(testId));
+    logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
+    logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
+    logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
+
+    // Execute the verification method
+    Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
+      () -> softAssert.fail("Unable to find any matching logs with name: " + logs));
+    verificationMethod.run();
   }
 }
