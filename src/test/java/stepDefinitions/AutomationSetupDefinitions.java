@@ -67,6 +67,6 @@ public class AutomationSetupDefinitions {
 
   @Then("^I verify video via API$")
   public void iVerifyVideoViaAPI() {
-
+    automationHelper.verifyLogs("video");
   }
 }

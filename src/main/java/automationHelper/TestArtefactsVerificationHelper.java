@@ -1,6 +1,7 @@
 package automationHelper;
 
 import DTOs.SwaggerAPIs.ArtefactsApiV2ResponseDTO;
+import DTOs.SwaggerAPIs.FetchVideoAPIResponseDTO;
 import TestManagers.ApiManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.testng.asserts.SoftAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
@@ -20,8 +22,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static utility.EnvSetup.TEST_CAPS_MAP;
-import static utility.EnvSetup.TEST_VERIFICATION_DATA;
+import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
 public class TestArtefactsVerificationHelper extends ApiManager {
@@ -494,5 +495,94 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       checkForSpecificTestVerificationDataPresentInLogs(logs, "network full.har",
         new testVerificationDataKeys[] { testVerificationDataKeys.URL });
     }
+  }
+
+  private String[] extractVideoUrlsFromAPIResponse(String session_id, SoftAssert softAssert) {
+    String videoAPIResponse = fetchLogs(VIDEO, ArtefactAPIVersions.API_V1, session_id);
+    FetchVideoAPIResponseDTO fetchVideoAPIResponseDTO = convertJsonStringToPojo(videoAPIResponse,
+      new TypeToken<FetchVideoAPIResponseDTO>() {
+      });
+    String status = fetchVideoAPIResponseDTO.getStatus();
+    String message = fetchVideoAPIResponseDTO.getMessage();
+    softAssert.assertTrue(status.equals("success"),
+      "Unable to extract video urls from API response. Status: " + status + " Message: " + message);
+    if (status.equals("success")) {
+      String shareableVideoUrl = fetchVideoAPIResponseDTO.getView_video_url();
+      String videoDownloadUrl = fetchVideoAPIResponseDTO.getUrl();
+      ltLogger.info("Video download url: {}, video share url: {}", videoDownloadUrl, shareableVideoUrl);
+      return new String[] { shareableVideoUrl, videoDownloadUrl };
+    }
+    return null;
+  }
+
+  private void verifyVideoMetaData(String completeFilePath, Map<String, Object> testCaps, CustomSoftAssert softAssert) {
+    // Extract video metadata
+    Map<String, Object> videoMetaData = extractMetaDataOfSpecificVideoFile(completeFilePath);
+    ltLogger.info("Extracted video metadata: {}", videoMetaData);
+
+    // Verify Resolution
+    verifyResolution(videoMetaData, testCaps, softAssert);
+
+    // Verify Duration
+    verifyDuration(videoMetaData, softAssert);
+  }
+
+  private void verifyResolution(Map<String, Object> videoMetaData, Map<String, Object> testCaps,
+    CustomSoftAssert softAssert) {
+    String actualResolution = videoMetaData.get(videoMetadataTypes.RESOLUTION.getValue()).toString();
+    String expectedResolution = testCaps.get(RESOLUTION).toString();
+
+    ltLogger.info("Actual video resolution: {}. Expected video resolution: {}", actualResolution, expectedResolution);
+
+    if (!actualResolution.equals(expectedResolution)) {
+      String[] expectedDimensions = expectedResolution.split("x");
+      String[] actualDimensions = actualResolution.split("x");
+
+      String expectedWidth = expectedDimensions[0];
+      String expectedHeight = expectedDimensions[1];
+      String actualWidth = actualDimensions[0];
+      String actualHeight = actualDimensions[1];
+
+      softAssert.assertTrue(Integer.parseInt(actualWidth) >= Integer.parseInt(expectedWidth),
+        "Actual video width is not greater than expected width. Expected: " + expectedWidth + ", Actual: " + actualWidth);
+      softAssert.assertTrue(Integer.parseInt(actualHeight) >= Integer.parseInt(expectedHeight),
+        "Actual video height is not greater than expected height. Expected: " + expectedHeight + ", Actual: " + actualHeight);
+    }
+  }
+
+  private void verifyDuration(Map<String, Object> videoMetaData, CustomSoftAssert softAssert) {
+    int bufferTime = 60; // Buffer time in seconds
+    double testExecutionTimeInSeconds = Double.parseDouble((String) TEST_REPORT.get().get(TEST_EXECUTION_TIME));
+    double expectedVideoDurationLimit = testExecutionTimeInSeconds + bufferTime;
+
+    double actualVideoDuration = Double.parseDouble(
+      videoMetaData.get(videoMetadataTypes.DURATION_IN_SECONDS.getValue()).toString());
+
+    ltLogger.info("Actual video duration: {}. Expected video duration limit: {}", actualVideoDuration,
+      expectedVideoDurationLimit);
+
+    softAssert.assertTrue(actualVideoDuration < expectedVideoDurationLimit,
+      "Test video duration is greater than the expected video duration [1min + test execution time]. Expected duration: " + expectedVideoDurationLimit + ", Actual: " + actualVideoDuration);
+  }
+
+  public void verifyTestVideo(String session_id) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String[] videoUrls = extractVideoUrlsFromAPIResponse(session_id, softAssert);
+    Map<String, Object> testCaps = EnvSetup.TEST_CAPS_MAP.get();
+    if (videoUrls != null) {
+      String videoDownloadUrl = videoUrls[1];
+      String videoShareUrl = videoUrls[0];
+      String videoFileName = TEST_SESSION_ID.get() + "_" + System.currentTimeMillis() + ".mp4";
+      boolean isVideoDownloadSuccess = downloadFile(videoDownloadUrl, videoFileName, TEST_LOGS_DOWNLOAD_DIRECTORY);
+      softAssert.assertTrue(isVideoDownloadSuccess,
+        "Unable to download video file for the session with name: " + videoFileName);
+      if (isVideoDownloadSuccess) {
+        String completeFilePath = TEST_LOGS_DOWNLOAD_DIRECTORY + videoFileName;
+        verifyVideoMetaData(completeFilePath, testCaps, softAssert);
+        int statusCodeOfShareVideoUrl = getRequest(videoShareUrl).statusCode();
+        softAssert.assertTrue(statusCodeOfShareVideoUrl == 200, "Video share url is not valid. Url: " + videoShareUrl);
+      }
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }
