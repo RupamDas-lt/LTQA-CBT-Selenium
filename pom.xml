@@ -36,6 +36,10 @@
 
     <repositories>
         <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
             <id>bintray-epam-reportportal</id>
             <name>bintray</name>
             <url>https://dl.bintray.com/epam/reportportal</url>
@@ -174,7 +178,6 @@
             <artifactId>openjson</artifactId>
             <version>1.0.13</version>
         </dependency>
-
     </dependencies>
 
     <build>

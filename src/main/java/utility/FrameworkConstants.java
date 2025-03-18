@@ -2,6 +2,7 @@ package utility;
 
 import factory.Locator;
 import factory.LocatorTypes;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -105,6 +106,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String GEO_LOCATION = "geoLocation";
   public static final String TIMEZONE = "timezone";
   public static final String NETWORK = "network";
+  public static final String RESOLUTION = "resolution";
   public static final String NETWORK_HTTP_2 = "network.http2";
   public static final String NETWORK_HAR = "network.har";
   public static final String NETWORK_FULL_HAR = "network.full.har";
@@ -154,6 +156,22 @@ public class FrameworkConstants extends BaseClass {
   public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
   public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
 
+  // ffprobe commands to extract video data
+  public static final String[] DURATION_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] RESOLUTION_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "stream=width,height",
+    "-of", "csv=p=0:s=x" };
+
+  public static final String[] CODEC_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "stream=codec_name", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] FRAME_RATE_COMMAND = { "ffprobe", "-v", "error", "-show_entries",
+    "stream=avg_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1" };
+
+  public static final String[] BITRATE_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "format=bit_rate", "-of",
+    "default=noprint_wrappers=1:nokey=1" };
+
   // Test execution data
   public static final Set<String> validSelfSignedValues = new HashSet<>() {{
     add("self-signed.\nbadssl.com");
@@ -191,7 +209,6 @@ public class FrameworkConstants extends BaseClass {
     put("full.har", Set.of(NETWORK_FULL_HAR));
     put("terminal", Set.of(TERMINAL));
     put("selenium", Set.of(SELENIUM_VERSION, SELENIUM_CDP));
-    put("video", Set.of(VIDEO));
     put("screenshot", Set.of(VISUAL));
     put("console", Set.of(CONSOLE));
   }};
@@ -201,6 +218,18 @@ public class FrameworkConstants extends BaseClass {
 
   public enum testVerificationDataKeys {
     URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG
+  }
+
+  @Getter public enum videoMetadataTypes {
+    WIDTH("width"), HEIGHT("height"), FRAMERATE("frameRate"), DURATION_IN_SECONDS("durationInSeconds"), RESOLUTION(
+      "resolution"), CODEC("codec"), BITRATE("bitrate"),
+    ;
+
+    private final String value;
+
+    videoMetadataTypes(String value) {
+      this.value = value;
+    }
   }
 
   // JavaScripts

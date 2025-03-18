@@ -28,8 +28,7 @@ import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static utility.FrameworkConstants.DEFAULT_DATE_TIME_FORMAT;
-import static utility.FrameworkConstants.IST_TimeZone;
+import static utility.FrameworkConstants.*;
 
 public class BaseClass {
 
@@ -404,6 +403,57 @@ public class BaseClass {
   public String removeBasicAuthHeadersFromUrl(String url) {
     url = url.replaceAll("https?://([^@]+@)", "https://");
     return url;
+  }
+
+  private String executeFFprobeCommand(String[] command, String videoFilePath) {
+    StringBuilder output = new StringBuilder();
+    try {
+      ProcessBuilder builder = new ProcessBuilder(command);
+      builder.command().add(videoFilePath); // Add video file path to the command
+      builder.redirectErrorStream(true);
+      ltLogger.info("Command: {}", String.join(" ", builder.command()));
+      Process process = builder.start();
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          output.append(line).append("\n");
+        }
+      }
+      process.waitFor();
+
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException("Error executing FFprobe command: ", e);
+    }
+    return output.toString().trim();
+  }
+
+  public Map<String, Object> extractMetaDataOfSpecificVideoFile(String videoFilePath) {
+    Map<String, Object> metadataMap = new HashMap<>();
+    // Extract duration
+    ltLogger.info("Extracting video duration...");
+    String duration = executeFFprobeCommand(DURATION_COMMAND, videoFilePath);
+    metadataMap.put(videoMetadataTypes.DURATION_IN_SECONDS.getValue(), duration);
+
+    // Extract resolution
+    ltLogger.info("Extracting video resolution...");
+    String resolution = executeFFprobeCommand(RESOLUTION_COMMAND, videoFilePath);
+    metadataMap.put(videoMetadataTypes.RESOLUTION.getValue(), resolution);
+
+    // Extract codec
+    ltLogger.info("Extracting video codec...");
+    String codec = executeFFprobeCommand(CODEC_COMMAND, videoFilePath);
+    metadataMap.put(videoMetadataTypes.CODEC.getValue(), codec);
+
+    // Extract frame rate
+    ltLogger.info("Extracting video framerate...");
+    String frameRate = executeFFprobeCommand(FRAME_RATE_COMMAND, videoFilePath);
+    metadataMap.put(videoMetadataTypes.FRAMERATE.getValue(), frameRate);
+
+    // Extract bitrate
+    ltLogger.info("Extracting video bitrate...");
+    String bitrate = executeFFprobeCommand(BITRATE_COMMAND, videoFilePath);
+    metadataMap.put(videoMetadataTypes.BITRATE.getValue(), bitrate);
+    return metadataMap;
   }
 
 }

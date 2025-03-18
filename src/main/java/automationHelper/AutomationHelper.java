@@ -570,6 +570,7 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("network", () -> artefactsHelper.verifyNetworkLogs(testId));
     logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
     logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
+    logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
 
     // Execute the verification method
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
