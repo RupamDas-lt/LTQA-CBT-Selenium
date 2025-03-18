@@ -37,7 +37,10 @@ rerun/
 
 logs
 
-LT_Tunnel_Binary/**
 
 src/test/resources/TestData/geoLocations.json
 src/test/resources/TestData/browser_versions
+
+LT_Linux
+LT_Mac
+LT_Win

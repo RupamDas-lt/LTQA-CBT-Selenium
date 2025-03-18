@@ -19,9 +19,8 @@ import static utility.FrameworkConstants.*;
 public class TunnelManager extends BaseClass implements Runnable {
 
   // Tunnel Constants
-  private static final String TUNNEL_BINARY_PARENT_DIR = "./LT_Tunnel_Binary";
-  private static final Map<String, String> TUNNEL_BINARY_PATHS = Map.of("win", "/Windows/LT.exe", "mac", "/Mac/LT",
-    "linux", "/Linux/LT");
+  private static final Map<String, String> TUNNEL_BINARY_PATHS = Map.of("win", "./LT_Win/LT.exe", "mac", "./LT_Mac/LT",
+    "linux", "./LT_Linux/LT");
   private static final String[] TUNNEL_MODES = { "tcp", "ssh" };
   private final Logger ltLogger = LogManager.getLogger(TunnelManager.class);
 
@@ -49,9 +48,8 @@ public class TunnelManager extends BaseClass implements Runnable {
 
   private static String getTunnelBinaryPath() {
     String osKey = System.getProperty(OS_NAME).toLowerCase();
-    return TUNNEL_BINARY_PARENT_DIR + TUNNEL_BINARY_PATHS.entrySet().stream()
-      .filter(entry -> osKey.contains(entry.getKey())).map(Map.Entry::getValue).findFirst()
-      .orElseThrow(() -> new IllegalStateException("Unsupported OS: " + osKey));
+    return TUNNEL_BINARY_PATHS.entrySet().stream().filter(entry -> osKey.contains(entry.getKey()))
+      .map(Map.Entry::getValue).findFirst().orElseThrow(() -> new IllegalStateException("Unsupported OS: " + osKey));
   }
 
   private String constructTunnelRunCommand(String params) {

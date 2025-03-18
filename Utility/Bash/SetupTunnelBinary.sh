@@ -3,14 +3,6 @@
 # Default environment is prod
 ENV="prod"
 
-# Check if LT_Tunnel_Binary directory exists, if not, create it
-if [[ ! -d "LT_Tunnel_Binary" ]]; then
-    mkdir -p "LT_Tunnel_Binary"
-    echo "Directory 'LT_Tunnel_Binary' created."
-else
-    echo "Directory 'LT_Tunnel_Binary' already exists."
-fi
-
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -33,18 +25,26 @@ fi
 # Check the OS type
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     OS="Linux"
+    PARENT_FOLDER_NAME="LT_Linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     OS="Mac"
+    PARENT_FOLDER_NAME="LT_Mac"
 elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* || "$OSTYPE" == "win32" ]]; then
     OS="Windows"
+    PARENT_FOLDER_NAME="LT_Win"
 else
     echo "Unsupported OS: $OSTYPE"
     exit 1
 fi
 
-# Create the directory based on OS
-FOLDER="LT_Tunnel_Binary/$OS"
-mkdir -p "$FOLDER"
+FOLDER="$PARENT_FOLDER_NAME"
+# Check if parent directory exists, if not, create it
+if [[ ! -d "$FOLDER" ]]; then
+    mkdir -p "$FOLDER"
+    echo "Directory '$FOLDER' created."
+else
+    echo "Directory '$FOLDER' already exists."
+fi
 
 # Define download URL and extraction folder based on OS
 if [[ "$OS" == "Linux" ]]; then
