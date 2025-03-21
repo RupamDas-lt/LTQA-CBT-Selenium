@@ -148,6 +148,11 @@ public abstract class ApiManager extends BaseClass {
     return httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
   }
 
+  public Response putRequest(String uri, Object... body) {
+    Object requestBody = body.length == 1 ? body[0] : null;
+    return httpMethod(PUT_WITHOUT_STATUS_CODE_VERIFICATION, uri, requestBody, ContentType.JSON, null, null, 0);
+  }
+
   public String getRequestAsString(String uri) {
     Response response = httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
     ltLogger.info("Response: {}", response.asString());

@@ -58,6 +58,13 @@ public class AutomationAPIHelper extends ApiManager {
     }
   }
 
+  public String getStatusOfSessionViaAPI(String session_id) {
+    final String keyForSessionStatus = "status_ind";
+    String status = getSpecificSessionDetailsViaAPI(session_id, keyForSessionStatus);
+    ltLogger.info("Status of session: {} is: {}", session_id, status);
+    return status;
+  }
+
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {
     customData.put("message", "New_Framework_Testing-2");
     ltLogger.info("Custom data to push to SumoLogic: {}", customData);
@@ -289,5 +296,15 @@ public class AutomationAPIHelper extends ApiManager {
       EnvSetup.SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API.set(exceptionCount);
       EnvSetup.SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API.set(visualCommandCount);
     }
+  }
+
+  public Response stopTestViaApi(String session_id) {
+    String uri = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get(), session_id, sessionApiEndpoints().get("stop"));
+    ltLogger.info("Stopping test Via API: {}", uri);
+    Response response = putRequest(uri);
+    ltLogger.info("Test stop API response: {}", response.body().asString());
+    waitForTime(5);
+    return response;
   }
 }

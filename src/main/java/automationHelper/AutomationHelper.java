@@ -3,6 +3,7 @@ package automationHelper;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
+import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,6 +112,8 @@ public class AutomationHelper extends BaseClass {
         break;
       case "loginCacheCleaned":
         loginCacheCleanedCheckUsingLTLoginPage();
+        break;
+      case "noAction":
         break;
       case "networkLog":
       default:
@@ -433,7 +436,7 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  public void startSessionWithSpecificCapabilities(String testCapability, String testActions) {
+  public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions) {
     String startTime = getCurrentTimeIST();
     createTestSession(testCapability);
     StopWatch stopWatch = new StopWatch();
@@ -449,17 +452,19 @@ public class AutomationHelper extends BaseClass {
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_EXECUTION_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
     stopWatch.reset();
-    stopWatch.start();
-    try {
-      driverManager.quit();
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (quitTestDriver) {
+      stopWatch.start();
+      try {
+        driverManager.quit();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      stopWatch.stop();
+      String stopTime = getCurrentTimeIST();
+      EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+      EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
     }
-    stopWatch.stop();
-    String stopTime = getCurrentTimeIST();
-    EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
     EnvSetup.TEST_REPORT.get().put(TEST_START_TIMESTAMP, startTime);
-    EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
     EnvSetup.TEST_REPORT.get().put("test_verification_data", TEST_VERIFICATION_DATA.get());
     ltLogger.info("Test verification data: {}", TEST_VERIFICATION_DATA.get());
   }
@@ -572,9 +577,32 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
     logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
 
-    // Execute the verification method
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
       () -> softAssert.fail("Unable to find any matching logs with name: " + logs));
     verificationMethod.run();
+  }
+
+  public void stopRunningTest() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    String statusBeforeStoppingTheTest = apiHelper.getStatusOfSessionViaAPI(sessionId);
+    assert RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest);
+    if (RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest)) {
+      Response response = apiHelper.stopTestViaApi(sessionId);
+      String status = response.jsonPath().get("status").toString();
+      String message = response.jsonPath().get("message").toString();
+      softAssert.assertTrue(status.equalsIgnoreCase("success"),
+        "Unable to stop session with test stop api. Status: " + status + " Message: " + message);
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyTestStatusViaAPI(String status_ind) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    String currentTestStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
+    softAssert.assertTrue(status_ind.equalsIgnoreCase(currentTestStatus),
+      "Test status doesn't match. Expected: " + status_ind + ", Actual: " + currentTestStatus);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }
