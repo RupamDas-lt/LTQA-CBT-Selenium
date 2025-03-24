@@ -51,10 +51,12 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
+  public static final String BUILDS_API_ENDPOINT = "/automation/api/v1/builds/";
   public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
   public static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
   public static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
   public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
+  public static final String BUILD_STOP_API_ENDPOINT = "/api/v1/test/stop/?buildId=";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";

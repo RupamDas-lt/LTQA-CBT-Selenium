@@ -79,4 +79,14 @@ public class AutomationSetupDefinitions {
   public void iConfirmTheTestStatus(String status) {
     automationHelper.verifyTestStatusViaAPI(status);
   }
+
+  @Then("I stop the running build via API")
+  public void iStopTheRunningBuildViaAPI() {
+    automationHelper.stopRunningBuild();
+  }
+
+  @Then("^I confirm the build status is ([a-zA-Z0-9_=,: ]+)")
+  public void iConfirmTheBuildStatusIsStopped(String status) {
+    automationHelper.verifyBuildStatusViaAPI(status);
+  }
 }

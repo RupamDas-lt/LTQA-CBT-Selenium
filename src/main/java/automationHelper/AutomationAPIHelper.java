@@ -2,6 +2,7 @@ package automationHelper;
 
 import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.Others.SeleniumVersionsDTO;
+import DTOs.SwaggerAPIs.GetBuildResponseDTO;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
 import TestManagers.ApiManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.google.gson.reflect.TypeToken;
+import com.mysql.cj.util.StringUtils;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,11 +52,31 @@ public class AutomationAPIHelper extends ApiManager {
     try {
       Field field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
       field.setAccessible(true);
+      return field.get(data).toString();
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      ltLogger.error("Unable to get the session details {} from the Sessions API response.", requiredDetail);
+      throw new RuntimeException("Unable to extract " + requiredDetail + " detail from Session details api response",
+        e);
+    }
+  }
+
+  public String getSpecificBuildDetailsViaAPI(String build_id, String requiredDetail) {
+    String buildAPIUrl = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, BUILDS_API_ENDPOINT,
+      EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get(), build_id);
+    ltLogger.info("Get Build Details via API: {}", buildAPIUrl);
+    String buildAPIResponse = getRequestAsString(buildAPIUrl);
+    GetBuildResponseDTO getBuildResponseDTO = convertJsonStringToPojo(buildAPIResponse,
+      new TypeToken<GetBuildResponseDTO>() {
+      });
+    GetBuildResponseDTO.Data data = getBuildResponseDTO.getData();
+    try {
+      Field field = GetBuildResponseDTO.Data.class.getDeclaredField(requiredDetail);
+      field.setAccessible(true);
       return (String) field.get(data);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
-      ltLogger.error("Unable to get the session details {} from the Sessions API response.", requiredDetail);
-      return null;
+      ltLogger.error("Unable to get the build details {} from the Sessions API response.", requiredDetail);
+      throw new RuntimeException("Unable to extract " + requiredDetail + " detail from Build details api response", e);
     }
   }
 
@@ -62,6 +84,27 @@ public class AutomationAPIHelper extends ApiManager {
     final String keyForSessionStatus = "status_ind";
     String status = getSpecificSessionDetailsViaAPI(session_id, keyForSessionStatus);
     ltLogger.info("Status of session: {} is: {}", session_id, status);
+    return status;
+  }
+
+  public String getBuildIdFromSessionId(String session_id) {
+    final String keyForBuildId = "build_id";
+    String buildId;
+    String cachedBuildId = EnvSetup.BUILD_ID.get();
+    if (StringUtils.isNullOrEmpty(cachedBuildId)) {
+      buildId = getSpecificSessionDetailsViaAPI(session_id, keyForBuildId);
+      ltLogger.info("Fetched Build ID from session details API response: {}", buildId);
+    } else {
+      buildId = cachedBuildId;
+      ltLogger.info("Using cached build id: {}", buildId);
+    }
+    return buildId;
+  }
+
+  public String getStatusOfBuildViaAPI(String build_id) {
+    final String keyForStatus = "status_ind";
+    String status = getSpecificBuildDetailsViaAPI(build_id, keyForStatus);
+    ltLogger.info("Status of build: {} is: {}", build_id, status);
     return status;
   }
 
@@ -304,6 +347,16 @@ public class AutomationAPIHelper extends ApiManager {
     ltLogger.info("Stopping test Via API: {}", uri);
     Response response = putRequest(uri);
     ltLogger.info("Test stop API response: {}", response.body().asString());
+    waitForTime(5);
+    return response;
+  }
+
+  public Response stopBuildViaApi(String build_id) {
+    String uri = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, BUILD_STOP_API_ENDPOINT,
+      EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get(), build_id);
+    ltLogger.info("Stopping build Via API: {}", uri);
+    Response response = putRequest(uri);
+    ltLogger.info("Build stop API response: {}", response.body().asString());
     waitForTime(5);
     return response;
   }

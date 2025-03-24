@@ -587,13 +587,11 @@ public class AutomationHelper extends BaseClass {
     String sessionId = EnvSetup.TEST_SESSION_ID.get();
     String statusBeforeStoppingTheTest = apiHelper.getStatusOfSessionViaAPI(sessionId);
     assert RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest);
-    if (RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest)) {
-      Response response = apiHelper.stopTestViaApi(sessionId);
-      String status = response.jsonPath().get("status").toString();
-      String message = response.jsonPath().get("message").toString();
-      softAssert.assertTrue(status.equalsIgnoreCase("success"),
-        "Unable to stop session with test stop api. Status: " + status + " Message: " + message);
-    }
+    Response response = apiHelper.stopTestViaApi(sessionId);
+    String status = response.jsonPath().get("status").toString();
+    String message = response.jsonPath().get("message").toString();
+    softAssert.assertTrue(status.equalsIgnoreCase("success"),
+      "Unable to stop session with test stop api. Status: " + status + " Message: " + message);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -603,6 +601,25 @@ public class AutomationHelper extends BaseClass {
     String currentTestStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
     softAssert.assertTrue(status_ind.equalsIgnoreCase(currentTestStatus),
       "Test status doesn't match. Expected: " + status_ind + ", Actual: " + currentTestStatus);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void stopRunningBuild() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    String buildId = apiHelper.getBuildIdFromSessionId(sessionId);
+    String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
+    assert RUNNING.equalsIgnoreCase(buildStatus);
+    Response response = apiHelper.stopBuildViaApi(buildId);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyBuildStatusViaAPI(String buildStatus_ind) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String buildId = apiHelper.getBuildIdFromSessionId(EnvSetup.TEST_SESSION_ID.get());
+    String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
+    softAssert.assertTrue(STOPPED.equalsIgnoreCase(buildStatus),
+      "Build status doesn't match. Expected: " + buildStatus + ", Actual: " + buildStatus_ind);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }
