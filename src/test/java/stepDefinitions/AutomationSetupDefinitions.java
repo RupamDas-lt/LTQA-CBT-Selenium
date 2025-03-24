@@ -89,4 +89,16 @@ public class AutomationSetupDefinitions {
   public void iConfirmTheBuildStatusIsStopped(String status) {
     automationHelper.verifyBuildStatusViaAPI(status);
   }
+
+  @Then("^I verify tunnel is ([a-zA-Z0-9_=,: ]+) via API$")
+  public void iVerifyTunnelIsStartedViaAPI(String status) {
+    String expectedTunnelName = TEST_TUNNEL_NAME.get();
+    automationHelper.verifyTunnelStatusViaAPI(expectedTunnelName, status);
+  }
+
+  @Then("I stop tunnel via api")
+  public void iStopTunnelViaApi() {
+    String tunnelID = TEST_TUNNEL_ID.get();
+    automationHelper.stopRunningTunnelViaAPI(tunnelID);
+  }
 }

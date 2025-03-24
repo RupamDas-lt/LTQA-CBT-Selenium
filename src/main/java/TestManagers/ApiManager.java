@@ -153,6 +153,10 @@ public abstract class ApiManager extends BaseClass {
     return httpMethod(PUT_WITHOUT_STATUS_CODE_VERIFICATION, uri, requestBody, ContentType.JSON, null, null, 0);
   }
 
+  public Response deleteRequest(String uri) {
+    return httpMethod(DELETE_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
+  }
+
   public String getRequestAsString(String uri) {
     Response response = httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
     ltLogger.info("Response: {}", response.asString());

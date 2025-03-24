@@ -2,6 +2,7 @@ package automationHelper;
 
 import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.Others.SeleniumVersionsDTO;
+import DTOs.Others.TunnelsAPIResponseDTO;
 import DTOs.SwaggerAPIs.GetBuildResponseDTO;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
 import TestManagers.ApiManager;
@@ -359,5 +360,37 @@ public class AutomationAPIHelper extends ApiManager {
     ltLogger.info("Build stop API response: {}", response.body().asString());
     waitForTime(5);
     return response;
+  }
+
+  public Map<String, String> getAllRunningTunnels() {
+    String uri = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, TUNNELS_API_ENDPOINT, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get());
+    ltLogger.info("Fetching Tunnel details via API: {}", uri);
+    String responseString = getRequestAsString(uri);
+    TunnelsAPIResponseDTO tunnelsAPIResponseDTO = convertJsonStringToPojo(responseString,
+      new TypeToken<TunnelsAPIResponseDTO>() {
+      });
+    assert tunnelsAPIResponseDTO != null && tunnelsAPIResponseDTO.getStatus().equals("success");
+    ArrayList<TunnelsAPIResponseDTO.TunnelData> data = tunnelsAPIResponseDTO.getData();
+    Map<String, String> tunnelNameToTunnelIDMap = new HashMap<>();
+    for (TunnelsAPIResponseDTO.TunnelData tunnelData : data) {
+      String name = tunnelData.getTunnel_name();
+      String id = Integer.toString(tunnelData.getTunnel_id());
+      String status = tunnelData.getStatus_ind();
+      if (status.equalsIgnoreCase(RUNNING)) {
+        tunnelNameToTunnelIDMap.put(name, id);
+      }
+    }
+    ltLogger.info("Retrieved Running Tunnel Details: {}", tunnelNameToTunnelIDMap);
+    return tunnelNameToTunnelIDMap;
+  }
+
+  public String stopTunnel(String tunnel_id) {
+    String uri = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, TUNNELS_API_ENDPOINT, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get(), "/" + tunnel_id);
+    ltLogger.info("Stopping Tunnel with API: {}", uri);
+    Response response = deleteRequest(uri);
+    ltLogger.info("Tunnel stop API response: {}", response.body().asString());
+    return response.getBody().jsonPath().get("status").toString();
   }
 }
