@@ -276,13 +276,13 @@ public class Hooks {
     apiHelper.waitForTime(5);
 
     if (!StringUtils.isNullOrEmpty(TEST_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
-      apiHelper.getSpecificSessionDetailsViaAPI(TEST_SESSION_ID.get(), "status_ind"))) {
+      apiHelper.getStatusOfSessionViaAPI(TEST_SESSION_ID.get()))) {
       ltLogger.warn("Test status: {}, Test Error message: {}", testStatus, errorMessage);
       setTestStatus(TEST_SESSION_ID.get(), testStatus, errorMessage);
     }
 
     if (!StringUtils.isNullOrEmpty(CLIENT_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
-      apiHelper.getSpecificSessionDetailsViaAPI(CLIENT_SESSION_ID.get(), "status_ind"))) {
+      apiHelper.getStatusOfSessionViaAPI(CLIENT_SESSION_ID.get()))) {
       ltLogger.warn("Client test status: {}, Client Test Error message: {}", clientTestStatus, clientTestErrorMessage);
       setTestStatus(CLIENT_SESSION_ID.get(), clientTestStatus, clientTestErrorMessage);
     }
@@ -311,6 +311,7 @@ public class Hooks {
     put("SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API", SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API);
     put("SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API", SESSION_EXCEPTION_LOGS_COUNT_FROM_TEST_API);
     put("SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API", SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API);
+    put("BUILD_ID", BUILD_ID);
   }};
 
   private void resetTestData() {

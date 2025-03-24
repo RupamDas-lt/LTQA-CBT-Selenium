@@ -14,9 +14,9 @@ public class AutomationSetupDefinitions {
   AutomationHelper automationHelper = new AutomationHelper();
   ClientAutomationHelper clientAutomationHelper = new ClientAutomationHelper();
 
-  @Then("^I start session to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
-  public void startSessionAndPerformActivity(String testActions, String capability) {
-    automationHelper.startSessionWithSpecificCapabilities(capability, testActions);
+  @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
+  public void startSessionAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
+    automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions);
   }
 
   @Given("Setup user details")
@@ -68,5 +68,25 @@ public class AutomationSetupDefinitions {
   @Then("^I verify video via API$")
   public void iVerifyVideoViaAPI() {
     automationHelper.verifyLogs("video");
+  }
+
+  @Then("I stop the running test via API")
+  public void iStopTheRunningTestViaAPI() {
+    automationHelper.stopRunningTest();
+  }
+
+  @Then("^I confirm the test status is ([a-zA-Z0-9_=,: ]+)$")
+  public void iConfirmTheTestStatus(String status) {
+    automationHelper.verifyTestStatusViaAPI(status);
+  }
+
+  @Then("I stop the running build via API")
+  public void iStopTheRunningBuildViaAPI() {
+    automationHelper.stopRunningBuild();
+  }
+
+  @Then("^I confirm the build status is ([a-zA-Z0-9_=,: ]+)")
+  public void iConfirmTheBuildStatusIsStopped(String status) {
+    automationHelper.verifyBuildStatusViaAPI(status);
   }
 }
