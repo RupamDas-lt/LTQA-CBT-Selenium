@@ -52,6 +52,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   public static final String BUILDS_API_ENDPOINT = "/automation/api/v1/builds/";
+  public static final String TUNNELS_API_ENDPOINT = "/automation/api/v1/tunnels";
   public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
   public static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
   public static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";

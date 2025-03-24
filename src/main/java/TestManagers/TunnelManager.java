@@ -30,6 +30,7 @@ public class TunnelManager extends BaseClass implements Runnable {
   private final Map<String, Object> defaultTunnelFlags;
   private final String availableOpenPort;
   private String tunnelName = getRandomAlphaNumericString(30);
+
   // Variables
   private String tunnelRunCommand;
   private Thread thread;

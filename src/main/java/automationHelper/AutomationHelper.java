@@ -622,4 +622,27 @@ public class AutomationHelper extends BaseClass {
       "Build status doesn't match. Expected: " + buildStatus + ", Actual: " + buildStatus_ind);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
+
+  public void verifyTunnelStatusViaAPI(String tunnelName, String expectedTunnelStatus) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    Map<String, String> runningTunnelNameToTunnelIDMap = apiHelper.getAllRunningTunnels();
+    switch (expectedTunnelStatus) {
+    case RUNNING -> softAssert.assertTrue(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
+      "There is no running tunnel with name: " + tunnelName);
+    case STOPPED -> softAssert.assertFalse(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
+      "The tunnel with name: " + tunnelName + " is in running state. But expected state is: " + expectedTunnelStatus);
+    default -> throw new IllegalStateException("Unexpected value: " + expectedTunnelStatus);
+    }
+    String currentTunnelId = runningTunnelNameToTunnelIDMap.get(tunnelName);
+    TEST_TUNNEL_ID.set(currentTunnelId);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void stopRunningTunnelViaAPI(String tunnelID) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String status = apiHelper.stopTunnel(tunnelID);
+    softAssert.assertTrue(status.equalsIgnoreCase("success"),
+      "Stop tunnel failed with tunnel id: " + tunnelID + ", Status: " + status);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
 }

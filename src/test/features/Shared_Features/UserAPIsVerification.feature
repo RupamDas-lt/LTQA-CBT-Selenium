@@ -22,3 +22,12 @@ Feature: Verify all the public APIs
     Examples:
       | capabilities                                                                                                                  |
       | browserName=chrome,platform=win11,version=latest,idleTimeout=900,name=Build_Stop_API_Verification_Test,build=Build_Stop_Tests |
+
+
+  @tunnelStopApiVerification
+  Scenario: User should be able to stop tunnel via API
+    Given Setup user details
+    Then I start tunnel
+    Then I verify tunnel is running via API
+    Then I stop tunnel via api
+    Then I verify tunnel is stopped via API
