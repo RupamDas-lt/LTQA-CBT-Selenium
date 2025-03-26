@@ -93,6 +93,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String COMPLETED = "completed";
   public static final String RUNNING = "running";
   public static final String STOPPED = "stopped";
+  public static final String IDLE_TIMEOUT_STATUS = "idle_timeout";
   public static final String IGNORED = "ignored";
   public static final String FAILED = "failed";
   public static final String PASSED = "passed";

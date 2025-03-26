@@ -12,5 +12,5 @@ Feature: Verify test timeouts
     Then I verify command Log via API
 
     Examples:
-      | capabilities                                                                                    |
-      | browserName=chrome,platform=win10,version=.*,idleTimeout=120,name=Test_IdleTimeout,network=true |
+      | capabilities                                                                                                 |
+      | browserName=chrome,platform=win10,version=.*,idleTimeout=120,name=Test_IdleTimeout,network=true,console=true |

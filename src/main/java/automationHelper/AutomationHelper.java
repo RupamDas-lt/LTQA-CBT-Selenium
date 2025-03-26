@@ -599,21 +599,37 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  public void verifyTestStatusViaAPI(String status_ind, int... customRetryCounts) {
-    String sessionId = EnvSetup.TEST_SESSION_ID.get();
-    int retryCount = customRetryCounts != null && customRetryCounts.length > 0 ? customRetryCounts[0] : 2;
-    String currentTestStatus = "";
-    for (int i = 1; i <= retryCount; i++) {
-      currentTestStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
-      if (currentTestStatus.equalsIgnoreCase(status_ind)) {
-        break;
+  public void verifyTestStatusViaAPI(String expectedStatus, int... customRetryCounts) {
+    final String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    final int maxRetries = customRetryCounts.length > 0 ? customRetryCounts[0] : 2;
+    String currentStatus = "";
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      currentStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
+
+      if (expectedStatus.equalsIgnoreCase(currentStatus)) {
+        handleSuccessfulSessionStatusMatch(expectedStatus, attempt);
+        return;
       }
-      ltLogger.info("Trial-{}: Trying to match test status with expected value {} and actual value {}", retryCount,
-        status_ind, currentTestStatus);
-      waitForTime(5);
+
+      ltLogger.info("Attempt {}/{}: Status mismatch. Expected: {}, Actual: {}", attempt, maxRetries, expectedStatus,
+        currentStatus);
+
+      if (attempt < maxRetries) {
+        waitForTime(5);
+      }
     }
-    Assert.assertTrue(status_ind.equalsIgnoreCase(currentTestStatus),
-      "Test status doesn't match. Expected: " + status_ind + ", Actual: " + currentTestStatus);
+
+    throw new AssertionError(
+      String.format("Test status verification failed after %d attempts. Expected: %s, Actual: %s", maxRetries,
+        expectedStatus, currentStatus));
+  }
+
+  private void handleSuccessfulSessionStatusMatch(String status, int attempt) {
+    if (status.equalsIgnoreCase(STOPPED) || status.equalsIgnoreCase(IDLE_TIMEOUT_STATUS)) {
+      EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, getCurrentTimeIST());
+    }
+    ltLogger.info("Status matched on attempt-{}: {}", attempt, status);
   }
 
   public void stopRunningBuild() {
