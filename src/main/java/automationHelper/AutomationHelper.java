@@ -113,6 +113,9 @@ public class AutomationHelper extends BaseClass {
       case "loginCacheCleaned":
         loginCacheCleanedCheckUsingLTLoginPage();
         break;
+      case "idleTimeout":
+        waitForTestToGetIdleTimeout();
+        break;
       case "noAction":
         break;
       case "networkLog":
@@ -586,7 +589,8 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String sessionId = EnvSetup.TEST_SESSION_ID.get();
     String statusBeforeStoppingTheTest = apiHelper.getStatusOfSessionViaAPI(sessionId);
-    assert RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest);
+    Assert.assertTrue(RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest),
+      "Unable to initiate stop build as the build is not in Running state. Current state: " + statusBeforeStoppingTheTest);
     Response response = apiHelper.stopTestViaApi(sessionId);
     String status = response.jsonPath().get("status").toString();
     String message = response.jsonPath().get("message").toString();
@@ -595,13 +599,21 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  public void verifyTestStatusViaAPI(String status_ind) {
-    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+  public void verifyTestStatusViaAPI(String status_ind, int... customRetryCounts) {
     String sessionId = EnvSetup.TEST_SESSION_ID.get();
-    String currentTestStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
-    softAssert.assertTrue(status_ind.equalsIgnoreCase(currentTestStatus),
+    int retryCount = customRetryCounts != null && customRetryCounts.length > 0 ? customRetryCounts[0] : 2;
+    String currentTestStatus = "";
+    for (int i = 1; i <= retryCount; i++) {
+      currentTestStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
+      if (currentTestStatus.equalsIgnoreCase(status_ind)) {
+        break;
+      }
+      ltLogger.info("Trial-{}: Trying to match test status with expected value {} and actual value {}", retryCount,
+        status_ind, currentTestStatus);
+      waitForTime(5);
+    }
+    Assert.assertTrue(status_ind.equalsIgnoreCase(currentTestStatus),
       "Test status doesn't match. Expected: " + status_ind + ", Actual: " + currentTestStatus);
-    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void stopRunningBuild() {
@@ -609,7 +621,8 @@ public class AutomationHelper extends BaseClass {
     String sessionId = EnvSetup.TEST_SESSION_ID.get();
     String buildId = apiHelper.getBuildIdFromSessionId(sessionId);
     String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
-    assert RUNNING.equalsIgnoreCase(buildStatus);
+    Assert.assertTrue(RUNNING.equalsIgnoreCase(buildStatus),
+      "Unable to initiate build stop as the build is not in Running state. Current state: " + buildStatus);
     Response response = apiHelper.stopBuildViaApi(buildId);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -644,5 +657,11 @@ public class AutomationHelper extends BaseClass {
     softAssert.assertTrue(status.equalsIgnoreCase("success"),
       "Stop tunnel failed with tunnel id: " + tunnelID + ", Status: " + status);
     EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void waitForTestToGetIdleTimeout() {
+    int timeForIdleTimeout = Integer.parseInt(TEST_CAPS_MAP.get().getOrDefault(IDLE_TIMEOUT, "120").toString());
+    waitForTime(timeForIdleTimeout);
+    ltLogger.info("Test should be idle timeout.");
   }
 }
