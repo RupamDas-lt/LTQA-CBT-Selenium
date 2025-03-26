@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
@@ -365,7 +366,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void verifyExpectedUrlsArePresentWithSpecificSequence(Queue<String> fetchedData, String logsSource,
     CustomSoftAssert softAssert) {
     Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.URL);
-    assert expectedData != null;
+    Assert.assertNotNull(expectedData, "Test data for verifying artefacts is null");
     Queue<String> expectedDataClone = new LinkedList<>(expectedData);
     ltLogger.info("Verifying expected urls from {} to {} for log source {}", fetchedData, expectedDataClone,
       logsSource);

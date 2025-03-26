@@ -93,6 +93,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String COMPLETED = "completed";
   public static final String RUNNING = "running";
   public static final String STOPPED = "stopped";
+  public static final String IDLE_TIMEOUT_STATUS = "idle_timeout";
   public static final String IGNORED = "ignored";
   public static final String FAILED = "failed";
   public static final String PASSED = "passed";
@@ -123,6 +124,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String WEBDRIVER_MODE = "webdriverMode";
   public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
   public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
+  public static final String IDLE_TIMEOUT = "idleTimeout";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
