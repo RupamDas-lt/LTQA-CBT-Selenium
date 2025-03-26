@@ -547,23 +547,50 @@ public class AutomationHelper extends BaseClass {
       validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
 
-    softAssert.assertTrue(validLogsToCheck,
-      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
-        logs, Collections.emptySet()));
+    //    softAssert.assertTrue(validLogsToCheck,
+    //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+    //        logs, Collections.emptyMap()));
 
-    if (validLogsToCheck) {
-      verifyLogsByType(logs, testId, softAssert);
-    }
+    if (!validLogsToCheck)
+      System.err.println(
+        logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+          logs, Collections.emptyMap()));
+
+    verifyLogsByType(logs, testId, softAssert);
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
 
   }
 
   private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
-    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
-    return requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
-      Object value = testCaps.get(cap);
-      return value != null && !value.toString().equalsIgnoreCase("false");
+    Map<String, Object> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptyMap());
+    if (requiredCaps.isEmpty()) {
+      return true;
+    }
+
+    return requiredCaps.entrySet().stream().allMatch(entry -> {
+      String cap = entry.getKey();
+      Object requiredValue = entry.getValue();
+      Object actualValue = testCaps.get(cap);
+
+      if (actualValue == null) {
+        return false;
+      }
+
+      if (requiredValue instanceof Boolean || requiredValue instanceof String) {
+        ltLogger.info("Checking if {} cap value is {} for logs {}", cap, requiredValue.toString(), logs);
+        return actualValue.toString().equalsIgnoreCase(requiredValue.toString());
+      } else if (requiredValue instanceof List) {
+        ltLogger.info("Checking if {} cap value is among {} for logs {}", cap, requiredValue, logs);
+        try {
+          List<String> allowedValues = (List<String>) requiredValue;
+          return allowedValues.contains(actualValue.toString().toLowerCase());
+        } catch (ClassCastException e) {
+          ltLogger.error("Invalid type in required values list for cap {}", cap);
+          return false;
+        }
+      }
+      return false;
     });
   }
 
@@ -579,6 +606,7 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
     logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
     logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
+    logVerificationMap.put("performance report", () -> artefactsHelper.verifyPerformanceReport(testId));
 
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
       () -> softAssert.fail("Unable to find any matching logs with name: " + logs));

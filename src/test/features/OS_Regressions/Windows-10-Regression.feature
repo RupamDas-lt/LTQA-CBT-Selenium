@@ -74,6 +74,7 @@ Feature: Automation of windows10 machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
     Then I verify network Log via API
+    Then I verify performance report Log via API
 
     Examples:
       | capabilities                                                                                                                  |
