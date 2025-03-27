@@ -71,7 +71,7 @@ public class AutomationHelper extends BaseClass {
 
     ltLogger.info("Executing test action: {}", actionName);
 
-    startTestContext(actionName);
+    LTHooks.startStepContext(driverManager, actionName);
     try {
       switch (actionName) {
       case "local":
@@ -127,23 +127,39 @@ public class AutomationHelper extends BaseClass {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
-    endTestContext(actionName);
+    LTHooks.endStepContext(driverManager, actionName);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void startTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_START + "=" + actionName);
-  }
-
-  private void endTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + actionName);
-  }
-
   private void basicAuthentication() {
+    String browserName = TEST_CAPS_MAP.get().getOrDefault(BROWSER_NAME, "chrome").toString();
+    if (browserName.equalsIgnoreCase("safari")) {
+      ltLogger.info("Basic auth test is not valid in Safari");
+      return;
+    }
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(BASIC_AUTH);
     String pageHeading = driverManager.getText(basicAuthHeading);
     softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+
+  }
+
+  private void basicAuthenticationUsingKeyboardEvents() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getUrlWithoutTimeoutException(BASIC_AUTH_URL_WITHOUT_AUTH_HEADERS);
+    waitForTime(5);
+    LTHooks.setClipboard(driverManager, "admin");
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_TAB);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_ENTER);
+    waitForTime(5);
+    String pageHeading = driverManager.getText(basicAuthHeading);
+    softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed using keyboard events.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -186,7 +202,7 @@ public class AutomationHelper extends BaseClass {
         10);
       ltLogger.info("SelfSigned fallback website text: {}", selfsignedText);
     }
-    softAssert.assertTrue(validSelfSignedValues.contains(selfsignedText),
+    softAssert.assertTrue(validSelfSignedValues.contains(Objects.requireNonNull(selfsignedText).trim()),
       "Self-signed site not open. There might be a certificate issue or website didn't open.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -547,23 +563,50 @@ public class AutomationHelper extends BaseClass {
       validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
 
-    softAssert.assertTrue(validLogsToCheck,
-      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
-        logs, Collections.emptySet()));
+    //    softAssert.assertTrue(validLogsToCheck,
+    //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+    //        logs, Collections.emptyMap()));
 
-    if (validLogsToCheck) {
-      verifyLogsByType(logs, testId, softAssert);
-    }
+    if (!validLogsToCheck)
+      System.err.println(
+        logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+          logs, Collections.emptyMap()));
+
+    verifyLogsByType(logs, testId, softAssert);
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
 
   }
 
   private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
-    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
-    return requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
-      Object value = testCaps.get(cap);
-      return value != null && !value.toString().equalsIgnoreCase("false");
+    Map<String, Object> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptyMap());
+    if (requiredCaps.isEmpty()) {
+      return true;
+    }
+
+    return requiredCaps.entrySet().stream().allMatch(entry -> {
+      String cap = entry.getKey();
+      Object requiredValue = entry.getValue();
+      Object actualValue = testCaps.get(cap);
+
+      if (actualValue == null) {
+        return false;
+      }
+
+      if (requiredValue instanceof Boolean || requiredValue instanceof String) {
+        ltLogger.info("Checking if {} cap value is {} for logs {}", cap, requiredValue.toString(), logs);
+        return actualValue.toString().equalsIgnoreCase(requiredValue.toString());
+      } else if (requiredValue instanceof List) {
+        ltLogger.info("Checking if {} cap value is among {} for logs {}", cap, requiredValue, logs);
+        try {
+          List<String> allowedValues = (List<String>) requiredValue;
+          return allowedValues.contains(actualValue.toString().toLowerCase());
+        } catch (ClassCastException e) {
+          ltLogger.error("Invalid type in required values list for cap {}", cap);
+          return false;
+        }
+      }
+      return false;
     });
   }
 
@@ -579,6 +622,7 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
     logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
     logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
+    logVerificationMap.put("performance report", () -> artefactsHelper.verifyPerformanceReport(testId));
 
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
       () -> softAssert.fail("Unable to find any matching logs with name: " + logs));
