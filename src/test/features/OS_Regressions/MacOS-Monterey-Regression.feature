@@ -13,8 +13,12 @@ Feature: Automation of monterey machine with different browsers.
     Then I verify video via API
 
     Examples:
+      | capabilities                                                                                                                                                        |
+      | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+    
+    @singapore_smoke
+    Examples:
       | capabilities                                                                                                                                                                                     |
-      | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true                              |
       | browserName=edge,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
 

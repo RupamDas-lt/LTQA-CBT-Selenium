@@ -14,8 +14,12 @@ Feature: Automation of sequoia machine with different browsers.
 
     Examples:
       | capabilities                                                                                                                                                                                    |
-      | browserName=chrome,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true                              |
       | browserName=edge,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+
+    @eu_central_smoke
+    Examples:
+      | capabilities                                                                                                                                                       |
+      | browserName=chrome,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
 
   @sequoia_regression_2 @geoLocations_verification

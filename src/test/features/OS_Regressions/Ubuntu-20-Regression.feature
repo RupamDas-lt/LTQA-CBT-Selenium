@@ -43,6 +43,7 @@ Feature: Automation of ubuntu-20 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
+    @gdpr_smoke
     Examples:
       | capabilities                                                                                                                                                                      |
       | browserName=edge,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
