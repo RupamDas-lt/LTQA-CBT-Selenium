@@ -13,8 +13,12 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify video via API
 
     Examples:
+      | capabilities                                                                                                                                                     |
+      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+
+    @oregon_smoke
+    Examples:
       | capabilities                                                                                                                                                                                  |
-      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true                              |
       | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
 
@@ -27,9 +31,13 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
 
     Examples:
-      | capabilities                                                                                                                                     |
-      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
-      | browserName=firefox,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.*                    |
+      | capabilities                                                                                                                 |
+      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.* |
+
+    @london_smoke
+    Examples:
+      | capabilities                                                                                                                                   |
+      | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
 
 
   @win11_regression_3 @tunnel_verification @martian_verification
@@ -43,9 +51,10 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
+    @paris_smoke
     Examples:
-      | capabilities                                                                                                                                                                     |
-      | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
+      | capabilities                                                                                                                                                                        |
+      | browserName=firefox,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
 
 
   @win11_regression_4 @martian_verification
@@ -57,6 +66,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
+    @singapore_smoke
     Examples:
       | capabilities                                                                                                                                                       |
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
@@ -76,6 +86,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify network Log via API
     Then I verify performance report Log via API
 
+    @virginia_smoke
     Examples:
       | capabilities                                                                                                                  |
       | browserName=chrome,platform=win11,version=.*,performance=true,resolution=.*,network=true,visual=true,tunnel=true,console=true |
@@ -94,6 +105,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
+    @ohio_smoke
     Examples:
       | capabilities                                                                                                                  |
       | browserName=edge,platform=win11,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
