@@ -2,6 +2,7 @@ package automationHelper;
 
 import DTOs.SwaggerAPIs.ArtefactsApiV2ResponseDTO;
 import DTOs.SwaggerAPIs.FetchVideoAPIResponseDTO;
+import DTOs.SwaggerAPIs.LighthouseReportDTO;
 import TestManagers.ApiManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
@@ -365,7 +367,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void verifyExpectedUrlsArePresentWithSpecificSequence(Queue<String> fetchedData, String logsSource,
     CustomSoftAssert softAssert) {
     Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.URL);
-    assert expectedData != null;
+    Assert.assertNotNull(expectedData, "Test data for verifying artefacts is null");
     Queue<String> expectedDataClone = new LinkedList<>(expectedData);
     ltLogger.info("Verifying expected urls from {} to {} for log source {}", fetchedData, expectedDataClone,
       logsSource);
@@ -582,6 +584,33 @@ public class TestArtefactsVerificationHelper extends ApiManager {
         int statusCodeOfShareVideoUrl = getRequest(videoShareUrl).statusCode();
         softAssert.assertTrue(statusCodeOfShareVideoUrl == 200, "Video share url is not valid. Url: " + videoShareUrl);
       }
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyPerformanceReport(String session_id) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String uri = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, SESSION_LIGHTHOUSE_REPORT_ENDPOINT,
+      EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get(), session_id);
+    ltLogger.info("URI to fetch lighthouse reports: {}", uri);
+    String response = getRequestAsString(uri);
+    LighthouseReportDTO lighthouseReportDTO = convertJsonStringToPojo(response, new TypeToken<LighthouseReportDTO>() {
+    });
+    String status = lighthouseReportDTO.getStatus();
+    String message = lighthouseReportDTO.getMessage();
+    softAssert.assertTrue(lighthouseReportDTO.getStatus().equalsIgnoreCase("success"),
+      "Unable to fetch lighthouse reports. Status: " + status + ", Message: " + message);
+    if (status.equalsIgnoreCase("success")) {
+      String jsonReport = lighthouseReportDTO.getData().getJson_report();
+      String htmlReport = lighthouseReportDTO.getData().getHtml_report();
+      int jsonReportFetchStatusCode = getRequest(jsonReport).statusCode();
+      int htmlReportFetchStatusCode = getRequest(htmlReport).statusCode();
+      ltLogger.info("JSON report status: {} and HTML report status: {}", jsonReportFetchStatusCode,
+        htmlReportFetchStatusCode);
+      softAssert.assertTrue(jsonReportFetchStatusCode == 200,
+        "Unable to download Lighthouse report (JSON). Status: " + jsonReportFetchStatusCode);
+      softAssert.assertTrue(htmlReportFetchStatusCode == 200,
+        "Unable to download Lighthouse report (HTML). Status: " + htmlReportFetchStatusCode);
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }

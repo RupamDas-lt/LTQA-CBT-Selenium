@@ -3,6 +3,7 @@ package automationHelper;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
+import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,7 +71,7 @@ public class AutomationHelper extends BaseClass {
 
     ltLogger.info("Executing test action: {}", actionName);
 
-    startTestContext(actionName);
+    LTHooks.startStepContext(driverManager, actionName);
     try {
       switch (actionName) {
       case "local":
@@ -112,6 +113,11 @@ public class AutomationHelper extends BaseClass {
       case "loginCacheCleaned":
         loginCacheCleanedCheckUsingLTLoginPage();
         break;
+      case "idleTimeout":
+        waitForTestToGetIdleTimeout();
+        break;
+      case "noAction":
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -121,23 +127,39 @@ public class AutomationHelper extends BaseClass {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
-    endTestContext(actionName);
+    LTHooks.endStepContext(driverManager, actionName);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void startTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_START + "=" + actionName);
-  }
-
-  private void endTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + actionName);
-  }
-
   private void basicAuthentication() {
+    String browserName = TEST_CAPS_MAP.get().getOrDefault(BROWSER_NAME, "chrome").toString();
+    if (browserName.equalsIgnoreCase("safari")) {
+      ltLogger.info("Basic auth test is not valid in Safari");
+      return;
+    }
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(BASIC_AUTH);
     String pageHeading = driverManager.getText(basicAuthHeading);
     softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+
+  }
+
+  private void basicAuthenticationUsingKeyboardEvents() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getUrlWithoutTimeoutException(BASIC_AUTH_URL_WITHOUT_AUTH_HEADERS);
+    waitForTime(5);
+    LTHooks.setClipboard(driverManager, "admin");
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_TAB);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_ENTER);
+    waitForTime(5);
+    String pageHeading = driverManager.getText(basicAuthHeading);
+    softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed using keyboard events.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -180,7 +202,7 @@ public class AutomationHelper extends BaseClass {
         10);
       ltLogger.info("SelfSigned fallback website text: {}", selfsignedText);
     }
-    softAssert.assertTrue(validSelfSignedValues.contains(selfsignedText),
+    softAssert.assertTrue(validSelfSignedValues.contains(Objects.requireNonNull(selfsignedText).trim()),
       "Self-signed site not open. There might be a certificate issue or website didn't open.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -433,7 +455,7 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  public void startSessionWithSpecificCapabilities(String testCapability, String testActions) {
+  public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions) {
     String startTime = getCurrentTimeIST();
     createTestSession(testCapability);
     StopWatch stopWatch = new StopWatch();
@@ -449,17 +471,19 @@ public class AutomationHelper extends BaseClass {
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_EXECUTION_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
     stopWatch.reset();
-    stopWatch.start();
-    try {
-      driverManager.quit();
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (quitTestDriver) {
+      stopWatch.start();
+      try {
+        driverManager.quit();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      stopWatch.stop();
+      String stopTime = getCurrentTimeIST();
+      EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
+      EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
     }
-    stopWatch.stop();
-    String stopTime = getCurrentTimeIST();
-    EnvSetup.TEST_REPORT.get().put(TEST_STOP_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
     EnvSetup.TEST_REPORT.get().put(TEST_START_TIMESTAMP, startTime);
-    EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, stopTime);
     EnvSetup.TEST_REPORT.get().put("test_verification_data", TEST_VERIFICATION_DATA.get());
     ltLogger.info("Test verification data: {}", TEST_VERIFICATION_DATA.get());
   }
@@ -539,23 +563,50 @@ public class AutomationHelper extends BaseClass {
       validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
 
-    softAssert.assertTrue(validLogsToCheck,
-      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
-        logs, Collections.emptySet()));
+    //    softAssert.assertTrue(validLogsToCheck,
+    //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+    //        logs, Collections.emptyMap()));
 
-    if (validLogsToCheck) {
-      verifyLogsByType(logs, testId, softAssert);
-    }
+    if (!validLogsToCheck)
+      System.err.println(
+        logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
+          logs, Collections.emptyMap()));
+
+    verifyLogsByType(logs, testId, softAssert);
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
 
   }
 
   private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
-    Set<String> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptySet());
-    return requiredCaps.isEmpty() || requiredCaps.stream().allMatch(cap -> {
-      Object value = testCaps.get(cap);
-      return value != null && !value.toString().equalsIgnoreCase("false");
+    Map<String, Object> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptyMap());
+    if (requiredCaps.isEmpty()) {
+      return true;
+    }
+
+    return requiredCaps.entrySet().stream().allMatch(entry -> {
+      String cap = entry.getKey();
+      Object requiredValue = entry.getValue();
+      Object actualValue = testCaps.get(cap);
+
+      if (actualValue == null) {
+        return false;
+      }
+
+      if (requiredValue instanceof Boolean || requiredValue instanceof String) {
+        ltLogger.info("Checking if {} cap value is {} for logs {}", cap, requiredValue.toString(), logs);
+        return actualValue.toString().equalsIgnoreCase(requiredValue.toString());
+      } else if (requiredValue instanceof List) {
+        ltLogger.info("Checking if {} cap value is among {} for logs {}", cap, requiredValue, logs);
+        try {
+          List<String> allowedValues = (List<String>) requiredValue;
+          return allowedValues.contains(actualValue.toString().toLowerCase());
+        } catch (ClassCastException e) {
+          ltLogger.error("Invalid type in required values list for cap {}", cap);
+          return false;
+        }
+      }
+      return false;
     });
   }
 
@@ -571,10 +622,106 @@ public class AutomationHelper extends BaseClass {
     logVerificationMap.put("full.har", () -> artefactsHelper.verifyNetworkFullHarLogs(testId));
     logVerificationMap.put("exception", () -> artefactsHelper.exceptionCommandLogs(testId));
     logVerificationMap.put("video", () -> artefactsHelper.verifyTestVideo(testId));
+    logVerificationMap.put("performance report", () -> artefactsHelper.verifyPerformanceReport(testId));
 
-    // Execute the verification method
     Runnable verificationMethod = logVerificationMap.getOrDefault(logs,
       () -> softAssert.fail("Unable to find any matching logs with name: " + logs));
     verificationMethod.run();
+  }
+
+  public void stopRunningTest() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    String statusBeforeStoppingTheTest = apiHelper.getStatusOfSessionViaAPI(sessionId);
+    Assert.assertTrue(RUNNING.equalsIgnoreCase(statusBeforeStoppingTheTest),
+      "Unable to initiate stop build as the build is not in Running state. Current state: " + statusBeforeStoppingTheTest);
+    Response response = apiHelper.stopTestViaApi(sessionId);
+    String status = response.jsonPath().get("status").toString();
+    String message = response.jsonPath().get("message").toString();
+    softAssert.assertTrue(status.equalsIgnoreCase("success"),
+      "Unable to stop session with test stop api. Status: " + status + " Message: " + message);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyTestStatusViaAPI(String expectedStatus, int... customRetryCounts) {
+    final String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    final int maxRetries = customRetryCounts.length > 0 ? customRetryCounts[0] : 2;
+    String currentStatus = "";
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      currentStatus = apiHelper.getStatusOfSessionViaAPI(sessionId);
+
+      if (expectedStatus.equalsIgnoreCase(currentStatus)) {
+        handleSuccessfulSessionStatusMatch(expectedStatus, attempt);
+        return;
+      }
+
+      ltLogger.info("Attempt {}/{}: Status mismatch. Expected: {}, Actual: {}", attempt, maxRetries, expectedStatus,
+        currentStatus);
+
+      if (attempt < maxRetries) {
+        waitForTime(5);
+      }
+    }
+
+    throw new AssertionError(
+      String.format("Test status verification failed after %d attempts. Expected: %s, Actual: %s", maxRetries,
+        expectedStatus, currentStatus));
+  }
+
+  private void handleSuccessfulSessionStatusMatch(String status, int attempt) {
+    if (status.equalsIgnoreCase(STOPPED) || status.equalsIgnoreCase(IDLE_TIMEOUT_STATUS)) {
+      EnvSetup.TEST_REPORT.get().put(TEST_END_TIMESTAMP, getCurrentTimeIST());
+    }
+    ltLogger.info("Status matched on attempt-{}: {}", attempt, status);
+  }
+
+  public void stopRunningBuild() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String sessionId = EnvSetup.TEST_SESSION_ID.get();
+    String buildId = apiHelper.getBuildIdFromSessionId(sessionId);
+    String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
+    Assert.assertTrue(RUNNING.equalsIgnoreCase(buildStatus),
+      "Unable to initiate build stop as the build is not in Running state. Current state: " + buildStatus);
+    Response response = apiHelper.stopBuildViaApi(buildId);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyBuildStatusViaAPI(String buildStatus_ind) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String buildId = apiHelper.getBuildIdFromSessionId(EnvSetup.TEST_SESSION_ID.get());
+    String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
+    softAssert.assertTrue(STOPPED.equalsIgnoreCase(buildStatus),
+      "Build status doesn't match. Expected: " + buildStatus + ", Actual: " + buildStatus_ind);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void verifyTunnelStatusViaAPI(String tunnelName, String expectedTunnelStatus) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    Map<String, String> runningTunnelNameToTunnelIDMap = apiHelper.getAllRunningTunnels();
+    switch (expectedTunnelStatus) {
+    case RUNNING -> softAssert.assertTrue(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
+      "There is no running tunnel with name: " + tunnelName);
+    case STOPPED -> softAssert.assertFalse(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
+      "The tunnel with name: " + tunnelName + " is in running state. But expected state is: " + expectedTunnelStatus);
+    default -> throw new IllegalStateException("Unexpected value: " + expectedTunnelStatus);
+    }
+    String currentTunnelId = runningTunnelNameToTunnelIDMap.get(tunnelName);
+    TEST_TUNNEL_ID.set(currentTunnelId);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void stopRunningTunnelViaAPI(String tunnelID) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String status = apiHelper.stopTunnel(tunnelID);
+    softAssert.assertTrue(status.equalsIgnoreCase("success"),
+      "Stop tunnel failed with tunnel id: " + tunnelID + ", Status: " + status);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void waitForTestToGetIdleTimeout() {
+    int timeForIdleTimeout = Integer.parseInt(TEST_CAPS_MAP.get().getOrDefault(IDLE_TIMEOUT, "120").toString());
+    waitForTime(timeForIdleTimeout);
+    ltLogger.info("Test should be idle timeout.");
   }
 }

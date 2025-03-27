@@ -10,6 +10,10 @@ A Selenium-based test automation framework using Cucumber for BDD testing.
    ```
 2. Create a `cucumber.yaml` file in the path `src/test/resources/cucumber.yaml` using the same structure as
    `cucumber.sample.yaml`, but with your own credentials.
+3. Install ffmpeg, this library is used for video verification. You can ignore this if that is not your use-case:
+    ```bash
+    brew install ffmpeg
+    ```
 
 ---
 

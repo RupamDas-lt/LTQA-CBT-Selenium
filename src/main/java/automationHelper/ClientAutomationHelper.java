@@ -11,8 +11,6 @@ import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import static utility.EnvSetup.TEST_SCENARIO_NAME;
-import static utility.FrameworkConstants.LAMBDA_TEST_CASE_END;
-import static utility.FrameworkConstants.LAMBDA_TEST_CASE_START;
 
 public class ClientAutomationHelper extends BaseClass {
 
@@ -35,17 +33,9 @@ public class ClientAutomationHelper extends BaseClass {
     driverManager.quit();
   }
 
-  private void startTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_START + "=" + actionName);
-  }
-
-  private void endTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + actionName);
-  }
-
   public void loginToLTDashboard() {
     CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-    startTestContext("login");
+    LTHooks.startStepContext(driverManager, "login");
     LoginPage loginPage = new LoginPage(driverManager);
     boolean status = loginPage.navigateToLoginPage();
     if (!status)
@@ -56,6 +46,6 @@ public class ClientAutomationHelper extends BaseClass {
     }
     clientSoftAssert.assertTrue(loginPage.verifyUserIsLoggedIn(), "User is not logged in");
     EnvSetup.CLIENT_SOFT_ASSERT.set(clientSoftAssert);
-    endTestContext("login");
+    LTHooks.endStepContext(driverManager, "login");
   }
 }

@@ -51,10 +51,14 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
+  public static final String BUILDS_API_ENDPOINT = "/automation/api/v1/builds/";
+  public static final String TUNNELS_API_ENDPOINT = "/automation/api/v1/tunnels";
   public static final String SESSIONS_API_V2_ENDPOINT = "/automation/api/v2/sessions/";
   public static final String GEOLOCATIONS_API_ENDPOINT = "/api/v1/geolocation?unique=true";
   public static final String BROWSER_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&os=<TEMPLATE>";
   public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
+  public static final String BUILD_STOP_API_ENDPOINT = "/api/v1/test/stop/?buildId=";
+  public static final String SESSION_LIGHTHOUSE_REPORT_ENDPOINT = "/automation/api/v1/lighthouse/report/";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -88,6 +92,9 @@ public class FrameworkConstants extends BaseClass {
 
   // Test Status
   public static final String COMPLETED = "completed";
+  public static final String RUNNING = "running";
+  public static final String STOPPED = "stopped";
+  public static final String IDLE_TIMEOUT_STATUS = "idle_timeout";
   public static final String IGNORED = "ignored";
   public static final String FAILED = "failed";
   public static final String PASSED = "passed";
@@ -115,9 +122,11 @@ public class FrameworkConstants extends BaseClass {
   public static final String VIDEO = "video";
   public static final String VISUAL = "visual";
   public static final String CONSOLE = "console";
+  public static final String PERFORMANCE = "performance";
   public static final String WEBDRIVER_MODE = "webdriverMode";
   public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
   public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
+  public static final String IDLE_TIMEOUT = "idleTimeout";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -144,6 +153,11 @@ public class FrameworkConstants extends BaseClass {
   public static final String LAMBDA_TEST_TAGS = "lambda-test-tags";
   public static final String LAMBDA_TEST_CASE_START = "lambda-testCase-start";
   public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
+
+  // Lambda keyboard events
+  public static final String LAMBDA_KEYBOARD_PASTE = "^v";
+  public static final String LAMBDA_KEYBOARD_TAB = "{TAB}";
+  public static final String LAMBDA_KEYBOARD_ENTER = "{ENTER}";
 
   // File paths
   public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
@@ -201,16 +215,16 @@ public class FrameworkConstants extends BaseClass {
   public static final Map<String, String> osTemplateNameToKeywordMap = osKeywordToTemplateNameMap.entrySet().stream()
     .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-  public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL, NETWORK),
-    "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
+  public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL), "selfSigned",
+    Set.of(NETWORK, TUNNEL), "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
 
-  public static final Map<String, Set<String>> testArtefactsToCapsMap = new HashMap<>() {{
-    put("network", Set.of(NETWORK));
-    put("full.har", Set.of(NETWORK_FULL_HAR));
-    put("terminal", Set.of(TERMINAL));
-    put("selenium", Set.of(SELENIUM_VERSION, SELENIUM_CDP));
-    put("screenshot", Set.of(VISUAL));
-    put("console", Set.of(CONSOLE));
+  public static final Map<String, Map<String, Object>> testArtefactsToCapsMap = new HashMap<>() {{
+    put("network", Map.of(NETWORK, "true"));
+    put("full.har", Map.of(NETWORK_FULL_HAR, "true", NETWORK, "true"));
+    put("terminal", Map.of(TERMINAL, "true"));
+    put("screenshot", Map.of(VISUAL, "true"));
+    put("console", Map.of(CONSOLE, "true", BROWSER_NAME, List.of("chrome", "edge")));
+    put("performance report", Map.of(PERFORMANCE, "true", BROWSER_NAME, List.of("chrome")));
   }};
 
   public static final String IST_TimeZone = "Asia/Kolkata";

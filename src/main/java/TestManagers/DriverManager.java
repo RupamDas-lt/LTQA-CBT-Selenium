@@ -284,4 +284,24 @@ public class DriverManager extends BaseClass {
   public void setLocalFileDetector() {
     driver.setFileDetector(new LocalFileDetector());
   }
+
+  public void getURLWithCustomPageLoadTimeout(String url, Duration timeoutInSeconds) {
+    Duration defaultPageLoadTimeout = driver.manage().timeouts().getPageLoadTimeout();
+    ltLogger.info("Default page load timeout: {}", defaultPageLoadTimeout.toString());
+    driver.manage().timeouts().pageLoadTimeout(timeoutInSeconds);
+    getURL(url);
+    driver.manage().timeouts().pageLoadTimeout(defaultPageLoadTimeout);
+    ltLogger.info("After reset page load timeout: {}", driver.manage().timeouts().getPageLoadTimeout().toString());
+  }
+
+  public void getUrlWithoutTimeoutException(String url, Duration... timeoutInSeconds) {
+    Duration timeout = timeoutInSeconds != null && timeoutInSeconds.length > 0 ?
+      timeoutInSeconds[0] :
+      Duration.ofSeconds(10);
+    try {
+      getURLWithCustomPageLoadTimeout(url, timeout);
+    } catch (org.openqa.selenium.TimeoutException e) {
+      ltLogger.error("Unable to find url with timeout: {}. Error: {}", timeout, e.getMessage());
+    }
+  }
 }
