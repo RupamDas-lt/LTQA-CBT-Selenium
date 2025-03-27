@@ -164,18 +164,6 @@ public class Hooks {
     apiHelper.updateSessionDetailsViaAPI(testId, updatedPayload);
   }
 
-  private void setTestStatus() {
-    HashMap<String, String> updatedPayload = new HashMap<>();
-    updatedPayload.put("status_ind", testStatus);
-
-    if (FAILED.equalsIgnoreCase(testStatus)) {
-      String formattedErrorMessage = errorMessage.replaceAll("(\r\n|\n|\r)", "\\\\n").replaceAll("\t", "");
-      updatedPayload.put("reason", formattedErrorMessage);
-    }
-
-    apiHelper.updateSessionDetailsViaAPI(TEST_SESSION_ID.get(), updatedPayload);
-  }
-
   private void updateTestReport() {
     TEST_REPORT.get().put("scenarioName", scenarioName);
     TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());

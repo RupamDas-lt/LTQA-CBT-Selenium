@@ -71,7 +71,7 @@ public class AutomationHelper extends BaseClass {
 
     ltLogger.info("Executing test action: {}", actionName);
 
-    startTestContext(actionName);
+    LTHooks.startStepContext(driverManager, actionName);
     try {
       switch (actionName) {
       case "local":
@@ -127,23 +127,39 @@ public class AutomationHelper extends BaseClass {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
-    endTestContext(actionName);
+    LTHooks.endStepContext(driverManager, actionName);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void startTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_START + "=" + actionName);
-  }
-
-  private void endTestContext(String actionName) {
-    driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + actionName);
-  }
-
   private void basicAuthentication() {
+    String browserName = TEST_CAPS_MAP.get().getOrDefault(BROWSER_NAME, "chrome").toString();
+    if (browserName.equalsIgnoreCase("safari")) {
+      ltLogger.info("Basic auth test is not valid in Safari");
+      return;
+    }
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(BASIC_AUTH);
     String pageHeading = driverManager.getText(basicAuthHeading);
     softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+
+  }
+
+  private void basicAuthenticationUsingKeyboardEvents() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getUrlWithoutTimeoutException(BASIC_AUTH_URL_WITHOUT_AUTH_HEADERS);
+    waitForTime(5);
+    LTHooks.setClipboard(driverManager, "admin");
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_TAB);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_PASTE);
+    waitForTime(2);
+    LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_ENTER);
+    waitForTime(5);
+    String pageHeading = driverManager.getText(basicAuthHeading);
+    softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed using keyboard events.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -186,7 +202,7 @@ public class AutomationHelper extends BaseClass {
         10);
       ltLogger.info("SelfSigned fallback website text: {}", selfsignedText);
     }
-    softAssert.assertTrue(validSelfSignedValues.contains(selfsignedText),
+    softAssert.assertTrue(validSelfSignedValues.contains(Objects.requireNonNull(selfsignedText).trim()),
       "Self-signed site not open. There might be a certificate issue or website didn't open.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }

@@ -154,6 +154,11 @@ public class FrameworkConstants extends BaseClass {
   public static final String LAMBDA_TEST_CASE_START = "lambda-testCase-start";
   public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
 
+  // Lambda keyboard events
+  public static final String LAMBDA_KEYBOARD_PASTE = "^v";
+  public static final String LAMBDA_KEYBOARD_TAB = "{TAB}";
+  public static final String LAMBDA_KEYBOARD_ENTER = "{ENTER}";
+
   // File paths
   public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
   public static final String RESOLUTION_DATA_PATH = "src/test/resources/TestData/resolutions.json";
@@ -210,8 +215,8 @@ public class FrameworkConstants extends BaseClass {
   public static final Map<String, String> osTemplateNameToKeywordMap = osKeywordToTemplateNameMap.entrySet().stream()
     .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-  public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL, NETWORK),
-    "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
+  public static final Map<String, Set<String>> testActionsToCapsMap = Map.of("local", Set.of(TUNNEL), "selfSigned",
+    Set.of(NETWORK, TUNNEL), "geolocation", Set.of(GEO_LOCATION), "timezone", Set.of(TIMEZONE));
 
   public static final Map<String, Map<String, Object>> testArtefactsToCapsMap = new HashMap<>() {{
     put("network", Map.of(NETWORK, "true"));

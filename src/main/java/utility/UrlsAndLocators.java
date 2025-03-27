@@ -7,6 +7,7 @@ public class UrlsAndLocators {
   public static final String GOOGLE_URL = "https://www.google.com/";
 
   public static final String BASIC_AUTH = "https://admin:admin@the-internet.herokuapp.com/basic_auth";
+  public static final String BASIC_AUTH_URL_WITHOUT_AUTH_HEADERS = "https://the-internet.herokuapp.com/basic_auth";
   public static final Locator basicAuthHeading = new Locator(LocatorTypes.CSS, "#content h3");
 
   public static final String LOCAL_URL = "http://localhost:8000/";
