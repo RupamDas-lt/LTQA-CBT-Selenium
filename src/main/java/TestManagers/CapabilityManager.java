@@ -61,13 +61,30 @@ public class CapabilityManager extends BaseClass {
     ltLogger.info("Created test caps: {}", capabilities.asMap());
   }
 
-  private void setCustomValues(@NonNull Map<String, Object> capabilityMap) {
+  private String getTestBuildName(String purpose) {
+    String buildNamePrefix = "CBT_Selenium_" + purpose;
+    String currentDate = getCurrentTimeIST("yyyy-MM-dd");
+    String pipelineJobIdentifier = System.getProperty(JOB_IDENTIFIER);
+    String buildName = StringUtils.isNullOrEmpty(pipelineJobIdentifier) ?
+      buildNamePrefix + "_" + currentDate :
+      buildNamePrefix + "_" + pipelineJobIdentifier + "_" + currentDate;
+    if (buildName.length() >= 255)
+      // Build name should be less than 255 characters
+      buildName = buildName.substring(0, 255);
+    return buildName;
+  }
+
+  private void setCustomValues(@NonNull Map<String, Object> capabilityMap, String purpose) {
+    purpose = purpose.toLowerCase().contains("client") ? "Client" : "Test";
     if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")) && StringUtils.isNullOrEmpty(
       (String) capabilityMap.getOrDefault(TUNNEL_NAME, "")) && EnvSetup.TEST_TUNNEL_NAME.get() != null)
       capabilityMap.put(TUNNEL_NAME, EnvSetup.TEST_TUNNEL_NAME.get());
 
     if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TEST_NAME, "")))
       capabilityMap.put(TEST_NAME, capsString);
+
+    if (StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(BUILD_NAME, "")))
+      capabilityMap.put(BUILD_NAME, getTestBuildName(purpose));
 
     if (capabilityMap.getOrDefault(LOAD_PUBLIC_EXTENSION, "false").equals("true"))
       insertToMapWithRandom(capabilityMap, LOAD_PUBLIC_EXTENSION, DASHLANE_EXTENSION_PUBLIC_URL, String.class,
@@ -208,7 +225,7 @@ public class CapabilityManager extends BaseClass {
     }
 
     // Set default custom values to caps map
-    setCustomValues(capabilityMap);
+    setCustomValues(capabilityMap, customCapsSource);
 
     // Set random values if applicable
     if (capsString.contains(".*")) {
