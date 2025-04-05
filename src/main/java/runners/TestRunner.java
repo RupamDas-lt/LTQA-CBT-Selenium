@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
-import static utility.FrameworkConstants.TEST_PREREQUISITES;
+import static utility.FrameworkConstants.*;
 
 @CucumberOptions(features = { "src/test/features" }, glue = { "stepDefinitions", "Hooks" }, plugin = { "pretty",
   "rerun:rerun/failed_scenarios.txt", "json:target/cucumber-reports/CucumberTestReport.json",
@@ -37,9 +37,19 @@ public class TestRunner extends AbstractTestNGCucumberTests {
 
   @BeforeSuite
   public void beforeSuite() {
-    initializeReportPortalParameters();
+
+    if (isReportPortalSetupRequiredWithLocalCreds())
+      initializeReportPortalParameters();
+
     if (getProperty(TEST_PREREQUISITES, "true").equals("true"))
       setPrerequisite();
+  }
+
+  private boolean isReportPortalSetupRequiredWithLocalCreds() {
+    if (Boolean.parseBoolean(System.getProperty(PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG, "true"))) {
+      return REPORT_PORTAL_KEYS.stream().allMatch(key -> Boolean.parseBoolean(System.getProperty(key, "false")));
+    }
+    return false;
   }
 
   private void initializeReportPortalParameters() {

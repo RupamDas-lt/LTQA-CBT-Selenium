@@ -80,6 +80,10 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_CLIENT_CAPS = "CUSTOM_CLIENT_CAPS";
   public static final String REMOVE_TEST_CAPS = "REMOVE_TEST_CAPS";
   public static final String REMOVE_CLIENT_TEST_CAPS = "REMOVE_CLIENT_TEST_CAPS";
+  public static final String JOB_IDENTIFIER = "JOB_IDENTIFIER";
+  public static final String PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG = "PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG";
+  // RP keys
+  public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
 
   // Test Meta data
   public static final String TEST_SETUP_TIME = "test_setup_time";
@@ -109,6 +113,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String TUNNEL = "tunnel";
   public static final String TUNNEL_NAME = "tunnelName";
   public static final String TEST_NAME = "name";
+  public static final String BUILD_NAME = "build";
   public static final String SELENIUM_VERSION = "selenium_version";
   public static final String GEO_LOCATION = "geoLocation";
   public static final String TIMEZONE = "timezone";

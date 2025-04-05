@@ -10,7 +10,7 @@ import static java.lang.System.setProperty;
 
 @CucumberOptions(features = { "@rerun/failed_scenarios.txt" }, glue = { "stepDefinitions",
   "Hooks" }, monochrome = true, plugin = { "pretty", "rerun:rerun/failed_scenarios_post_rerun.txt",
-  "json:target/cucumber-reports/CucumberTestReport.json",
+  "json:target/cucumber-reports/CucumberTestReport_failedTest.json",
   "com.epam.reportportal.cucumber.ScenarioReporter" }) public class FailedTestRunner
   extends AbstractTestNGCucumberTests {
   public FailedTestRunner() {
