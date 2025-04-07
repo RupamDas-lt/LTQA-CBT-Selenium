@@ -19,6 +19,7 @@ import utility.EnvSetup;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -74,6 +75,17 @@ public class CapabilityManager extends BaseClass {
     return buildName;
   }
 
+  private void handleSpecialCasesForTestNameAndBuildName(Map<String, Object> capabilityMap) {
+    String specialCaseIdentifier = "_randomName$";
+    Pattern pattern = Pattern.compile(specialCaseIdentifier, Pattern.CASE_INSENSITIVE);
+    if (pattern.matcher(capabilityMap.getOrDefault(BUILD_NAME, "").toString()).find())
+      capabilityMap.put(BUILD_NAME,
+        capabilityMap.get(BUILD_NAME).toString().replace("_randomName", getRandomAlphaNumericString(10)));
+    if (pattern.matcher(capabilityMap.getOrDefault(TEST_NAME, "").toString()).find())
+      capabilityMap.put(TEST_NAME,
+        capabilityMap.get(TEST_NAME).toString().replace("_randomName", getRandomAlphaNumericString(10)));
+  }
+
   private void setCustomValues(@NonNull Map<String, Object> capabilityMap, String purpose) {
     purpose = purpose.toLowerCase().contains("client") ? "Client" : "Test";
     if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")) && StringUtils.isNullOrEmpty(
@@ -89,6 +101,8 @@ public class CapabilityManager extends BaseClass {
     if (capabilityMap.getOrDefault(LOAD_PUBLIC_EXTENSION, "false").equals("true"))
       insertToMapWithRandom(capabilityMap, LOAD_PUBLIC_EXTENSION, DASHLANE_EXTENSION_PUBLIC_URL, String.class,
         String[].class);
+
+    handleSpecialCasesForTestNameAndBuildName(capabilityMap);
   }
 
   private void removeSpecificCaps(Map<String, Object> capsMap, String envVariable) {

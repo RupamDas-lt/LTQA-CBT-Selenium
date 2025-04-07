@@ -20,8 +20,8 @@ Feature: Verify all the public APIs
     Then I confirm the build status is stopped
 
     Examples:
-      | capabilities                                                                                                                  |
-      | browserName=chrome,platform=win11,version=latest,idleTimeout=900,name=Build_Stop_API_Verification_Test,build=Build_Stop_Tests |
+      | capabilities                                                                                                                             |
+      | browserName=chrome,platform=win11,version=latest,idleTimeout=900,name=Build_Stop_API_Verification_Test,build=Build_Stop_Tests_randomName |
 
 
   @tunnelStopApiVerification
