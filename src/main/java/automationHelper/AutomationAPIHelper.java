@@ -43,22 +43,42 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public String getSpecificSessionDetailsViaAPI(String session_id, String requiredDetail) {
-    String sessionAPIUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id);
-    String sessionResponse = getRequestWithBasicAuthAsString(sessionAPIUrl, EnvSetup.testUserName.get(),
-      EnvSetup.testAccessKey.get());
-    GetSessionResponseDTO getSessionResponseDTO = convertJsonStringToPojo(sessionResponse,
-      new TypeToken<GetSessionResponseDTO>() {
-      });
-    GetSessionResponseDTO.Data data = getSessionResponseDTO.getData();
-    try {
-      Field field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
-      field.setAccessible(true);
-      return field.get(data).toString();
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      ltLogger.error("Unable to get the session details {} from the Sessions API response.", requiredDetail);
-      throw new RuntimeException("Unable to extract " + requiredDetail + " detail from Session details api response",
-        e);
+    final int maxRetries = 10;
+    final int retryDelaySecs = 5;
+    int attempt = 0;
+    Exception lastException = null;
+
+    while (attempt < maxRetries) {
+      attempt++;
+      try {
+        String sessionAPIUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id);
+        String sessionResponse = getRequestWithBasicAuthAsString(sessionAPIUrl, EnvSetup.testUserName.get(),
+          EnvSetup.testAccessKey.get());
+
+        GetSessionResponseDTO getSessionResponseDTO = convertJsonStringToPojo(sessionResponse,
+          new TypeToken<GetSessionResponseDTO>() {
+          });
+
+        GetSessionResponseDTO.Data data = getSessionResponseDTO.getData();
+        Field field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
+        field.setAccessible(true);
+        return field.get(data).toString();
+
+      } catch (Exception e) {
+        lastException = e;
+        ltLogger.error("Attempt {}/{} failed to get session details {}: {}", attempt, maxRetries, requiredDetail,
+          e.getMessage());
+
+        if (attempt < maxRetries) {
+          waitForTime(retryDelaySecs);
+        }
+      }
     }
+
+    ltLogger.error("Failed to get session details {} after {} attempts", requiredDetail, maxRetries);
+    throw new RuntimeException(
+      "Unable to extract " + requiredDetail + " detail from Session details api response after " + maxRetries + " attempts",
+      lastException);
   }
 
   public String getSpecificBuildDetailsViaAPI(String build_id, String requiredDetail) {
