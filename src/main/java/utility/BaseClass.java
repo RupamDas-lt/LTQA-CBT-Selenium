@@ -17,7 +17,10 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -274,56 +279,118 @@ public class BaseClass {
   }
 
   public JsonObject processZipFile(String zipFilePath) throws IOException {
-    // Create a temporary directory
     Path tempDir = Files.createTempDirectory("zipExtract");
-    JsonArray combinedJsonArray = new JsonArray();
-    StringBuilder otherFileContent = new StringBuilder();
-    Gson gson = new Gson();
-    JsonParser parser = new JsonParser();
-
-    try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
-      ZipEntry entry;
-      while ((entry = zipInputStream.getNextEntry()) != null) {
-        Path filePath = tempDir.resolve(entry.getName());
-
-        if (!filePath.normalize().startsWith(tempDir)) {
-          throw new IOException("Invalid zip entry: " + entry.getName());
-        }
-
-        // Skip directories
-        if (entry.isDirectory()) {
-          Files.createDirectories(filePath);
-        } else {
-          Files.copy(zipInputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-
-          // Read and parse the file content using the locked readFileContent method
-          File file = getFileWithFileLock(filePath.toString());
-          String fileContent = new String(Files.readAllBytes(file.toPath()));
-
-          String fileName = entry.getName().toLowerCase();
-          if (fileName.endsWith(".json") || fileName.endsWith(".har")) {
-            // Parse JSON or HAR files
-            JsonElement jsonElement = parser.parse(fileContent);
-            if (jsonElement.isJsonArray()) {
-              combinedJsonArray.addAll(jsonElement.getAsJsonArray());
-            } else {
-              combinedJsonArray.add(jsonElement);
-            }
-          } else {
-            // Append content of other file types (e.g., .txt)
-            otherFileContent.append(fileContent).append("\n");
-          }
-        }
-      }
+    try {
+      Map<Boolean, List<ZipEntry>> partitionedEntries = partitionEntriesBySequence(zipFilePath);
+      return processAllEntries(zipFilePath, tempDir, partitionedEntries);
     } finally {
-      // Delete the temporary directory and its contents
       deleteDirectory(tempDir.toFile());
     }
+  }
 
+  private Map<Boolean, List<ZipEntry>> partitionEntriesBySequence(String zipFilePath) throws IOException {
+    Map<Boolean, List<ZipEntry>> partitionedEntries = new HashMap<>();
+    partitionedEntries.put(true, new ArrayList<>());  // Sequenced files
+    partitionedEntries.put(false, new ArrayList<>()); // Non-sequenced files
+
+    try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+      ZipEntry entry;
+      while ((entry = zipStream.getNextEntry()) != null) {
+        boolean isSequenced = hasSequenceNumber(entry.getName());
+        partitionedEntries.get(isSequenced).add(entry);
+      }
+    }
+    // Sort only the sequenced files
+    partitionedEntries.get(true).sort(Comparator.comparingInt(this::extractSequenceNumber));
+    ltLogger.info("Partitioned entries after sorting of the files based on numeric value in the file name: {}",
+      partitionedEntries);
+    return partitionedEntries;
+  }
+
+  private JsonObject processAllEntries(String zipFilePath, Path tempDir,
+    Map<Boolean, List<ZipEntry>> partitionedEntries) throws IOException {
+    JsonArray combinedJson = new JsonArray();
+    StringBuilder otherFilesContent = new StringBuilder();
+    JsonParser parser = new JsonParser();
+
+    // Process sequenced files first in order
+    processEntryBatch(zipFilePath, tempDir, partitionedEntries.get(true), combinedJson, otherFilesContent, parser);
+
+    // Then process non-sequenced files in any order
+    processEntryBatch(zipFilePath, tempDir, partitionedEntries.get(false), combinedJson, otherFilesContent, parser);
+
+    return buildResultObject(combinedJson, otherFilesContent);
+  }
+
+  private void processEntryBatch(String zipFilePath, Path tempDir, List<ZipEntry> entries, JsonArray combinedJson,
+    StringBuilder otherFilesContent, JsonParser parser) throws IOException {
+    for (ZipEntry entry : entries) {
+      if (entry.isDirectory())
+        continue;
+
+      Path filePath = tempDir.resolve(entry.getName());
+      validatePathSafety(tempDir, filePath);
+
+      extractSingleFile(zipFilePath, entry, filePath);
+      processFileContent(entry, filePath, combinedJson, otherFilesContent, parser);
+    }
+  }
+
+  private boolean hasSequenceNumber(String filename) {
+    return Pattern.compile(".*-\\d+\\.json$").matcher(filename.toLowerCase()).find();
+  }
+
+  private int extractSequenceNumber(ZipEntry entry) {
+    Matcher matcher = Pattern.compile(".*-(\\d+)\\.json$").matcher(entry.getName().toLowerCase());
+    return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
+  }
+
+  private void extractSingleFile(String zipFilePath, ZipEntry entry, Path destPath) throws IOException {
+    try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+      ZipEntry current;
+      while ((current = zipStream.getNextEntry()) != null) {
+        if (current.getName().equals(entry.getName())) {
+          Files.copy(zipStream, destPath);
+          return;
+        }
+      }
+    }
+    throw new IOException("File not found in zip: " + entry.getName());
+  }
+
+  private void validatePathSafety(Path baseDir, Path filePath) throws IOException {
+    if (!filePath.normalize().startsWith(baseDir)) {
+      throw new IOException("Invalid zip entry: " + filePath);
+    }
+  }
+
+  private JsonObject buildResultObject(JsonArray jsonData, StringBuilder otherContent) {
     JsonObject result = new JsonObject();
-    result.add("jsonData", combinedJsonArray);
-    result.addProperty("otherFileContent", otherFileContent.toString());
+    result.add("jsonData", jsonData);
+    result.addProperty("otherFileContent", otherContent.toString());
     return result;
+  }
+
+  private void processFileContent(ZipEntry entry, Path filePath, JsonArray combinedJson,
+    StringBuilder otherFilesContent, JsonParser parser) throws IOException {
+
+    String content = Files.readString(filePath);
+    String fileName = entry.getName().toLowerCase();
+
+    if (fileName.endsWith(".json") || fileName.endsWith(".har")) {
+      addJsonContent(parser, content, combinedJson);
+    } else {
+      otherFilesContent.append(content).append("\n");
+    }
+  }
+
+  private void addJsonContent(JsonParser parser, String content, JsonArray combinedJson) {
+    JsonElement element = parser.parse(content);
+    if (element.isJsonArray()) {
+      combinedJson.addAll(element.getAsJsonArray());
+    } else {
+      combinedJson.add(element);
+    }
   }
 
   public JsonElement processZipFileAndExtractDataAsJson(String zipFilePath) throws IOException {
