@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.COMPLETED;
@@ -143,7 +145,10 @@ public class Hooks {
     ltLogger.debug("Scenario failed with stacktrace: {}", errorStackTrace);
 
     // Update test status if the failed step is critical
-    if (failedStepName.contains("I start session to test")) {
+    Pattern patterForCriticalStep = Pattern.compile(
+      "^I start session ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$");
+    Matcher matcher = patterForCriticalStep.matcher(failedStepName);
+    if (matcher.find()) {
       testStatus = "failed";
       errorMessage = clientTestErrorMessage;
     }
