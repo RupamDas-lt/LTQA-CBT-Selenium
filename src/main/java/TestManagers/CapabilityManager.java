@@ -262,7 +262,9 @@ public class CapabilityManager extends BaseClass {
   }
 
   private void updatePlatform(Map<String, Object> capabilityMap) {
-    String platform = (String) capabilityMap.get("platform");
+    String platform = (String) capabilityMap.getOrDefault("platform", "");
+    if (StringUtils.isNullOrEmpty(platform))
+      return;
     capabilityMap.put("platform", osKeywordToTemplateNameMap.get(platform));
     ltLogger.info("Updating platform: {}", platform);
   }
@@ -283,7 +285,7 @@ public class CapabilityManager extends BaseClass {
       CapsType.DESIRED_CAPABILITIES;
     createTestCaps(new HashMap<>(capabilityMap), capsType);
     finalCaps.set(capabilities);
-    ltLogger.info("{} caps set in LocalThread: {}", testEnv, CLIENT_TEST_CAPS.get());
+    ltLogger.info("{} caps set in LocalThread: {}", testEnv, finalCaps.get());
   }
 
   private enum CapsType {
