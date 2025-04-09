@@ -44,3 +44,4 @@ src/test/resources/TestData/browser_versions
 LT_Linux
 LT_Mac
 LT_Win
+rerunFailedFirstAttempt
