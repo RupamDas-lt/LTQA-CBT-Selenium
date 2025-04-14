@@ -16,6 +16,14 @@ public class FrameworkConstants extends BaseClass {
   public static final String LOCAL_HOST_URL = "http://127.0.0.1:";
   public static final String DASHLANE_EXTENSION_PUBLIC_URL = "https://stage-lambda-devops-use-only.lambdatestinternal.com/magicleap/qa/dashlane-extension.zip";
 
+  // Cloud platform specs
+  public enum cloudPlatforms {
+    LAMBDATEST, SAUCELAB, BROWSERSTACK
+  }
+
+  public static final Map<cloudPlatforms, String> cloudPlatformsToCapabilityRootsMap = Map.of(cloudPlatforms.LAMBDATEST,
+    LT_OPTIONS, cloudPlatforms.BROWSERSTACK, "bstack:options", cloudPlatforms.SAUCELAB, "sauce:options");
+
   // API Constants
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
   public static final String SUMO_LOGIC_URL = "https://endpoint4.collection.sumologic.com/receiver/v1/http/ZaVnC4dhaV1BGey4GE8Y98SqULi08X1lrc4PXMlSghL_8tntkfgr38QuaSrgsvF44nqzlbKs38AVE7I0ras7--0sxak3LfUAkMk2UbSOrcjcOwQRBRMpjQ==";
@@ -86,6 +94,7 @@ public class FrameworkConstants extends BaseClass {
   public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
 
   // Test Meta data
+  public static final String CLOUD_PLATFORM_NAME = "cloud_platform_name";
   public static final String TEST_SETUP_TIME = "test_setup_time";
   public static final String TEST_EXECUTION_TIME = "test_execution_time";
   public static final String TEST_STOP_TIME = "test_stop_time";

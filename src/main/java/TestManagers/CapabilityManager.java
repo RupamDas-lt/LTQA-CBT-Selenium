@@ -30,7 +30,7 @@ public class CapabilityManager extends BaseClass {
   MutableCapabilities capabilities;
   String capsString;
 
-  private void createTestCaps(Map<String, Object> capsHash, CapsType capsType) {
+  private void createTestCaps(Map<String, Object> capsHash, CapsType capsType, String capabilityRootName) {
     if (capsType == CapsType.FIRST_MATCH) {
       String browserName = capsHash.get("browserName").toString();
       BrowserType browserType = BrowserType.valueOf(browserName.toUpperCase());
@@ -52,11 +52,11 @@ public class CapabilityManager extends BaseClass {
       if (TEST_ENV.equals("local")) {
         capsHash.forEach(capabilities::setCapability);
       } else {
-        capabilities.setCapability(LT_OPTIONS, capsHash);
+        capabilities.setCapability(capabilityRootName, capsHash);
       }
     } else {
       DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-      desiredCapabilities.setCapability(LT_OPTIONS, capsHash);
+      desiredCapabilities.setCapability(capabilityRootName, capsHash);
       capabilities = desiredCapabilities;
     }
     ltLogger.info("Created test caps: {}", capabilities.asMap());
@@ -211,24 +211,17 @@ public class CapabilityManager extends BaseClass {
     return topFive[new Random().nextInt(topFive.length)];
   }
 
-  private void buildCapabilities(String capabilityString, String purpose, String... capsType) {
+  private void buildCapabilities(String capabilityString, cloudPlatforms cloudPlatform, String purpose,
+    String... capsType) {
     String expectedCapsType = capsType.length > 0 ? capsType[0] : "desiredCapabilities";
     Map<String, Object> capabilityMap = purpose.equals("client") ?
-      buildCapabilityMap(capabilityString, CUSTOM_CLIENT_CAPS, REMOVE_CLIENT_TEST_CAPS) :
-      buildCapabilityMap(capabilityString, CUSTOM_TEST_CAPS, REMOVE_TEST_CAPS);
-    setFinalCapabilities(capabilityMap, expectedCapsType, purpose);
+      buildCapabilityMap(cloudPlatform, capabilityString, CUSTOM_CLIENT_CAPS, REMOVE_CLIENT_TEST_CAPS) :
+      buildCapabilityMap(cloudPlatform, capabilityString, CUSTOM_TEST_CAPS, REMOVE_TEST_CAPS);
+    setFinalCapabilities(capabilityMap, expectedCapsType, purpose, cloudPlatform);
   }
 
-  public void buildTestCapability(String capabilityString, String... capsType) {
-    buildCapabilities(capabilityString, "test", capsType);
-  }
-
-  public void buildClientTestCapability(String capabilityString, String... capsType) {
-    buildCapabilities(capabilityString, "client", capsType);
-  }
-
-  private Map<String, Object> buildCapabilityMap(String capabilityString, String customCapsSource,
-    String... removeCapsSource) {
+  private Map<String, Object> buildCapabilityMap(cloudPlatforms cloudPlatform, String capabilityString,
+    String customCapsSource, String... removeCapsSource) {
     capsString = capabilityString;
     // Get hashmap from caps string and build caps hashmap
     Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getHashMapFromString(capsString));
@@ -239,7 +232,9 @@ public class CapabilityManager extends BaseClass {
     }
 
     // Set default custom values to caps map
-    setCustomValues(capabilityMap, customCapsSource);
+    if (cloudPlatform == cloudPlatforms.LAMBDATEST) {
+      setCustomValues(capabilityMap, customCapsSource);
+    }
 
     // Set random values if applicable
     if (capsString.contains(".*")) {
@@ -265,30 +260,52 @@ public class CapabilityManager extends BaseClass {
     String platform = (String) capabilityMap.getOrDefault("platform", "");
     if (StringUtils.isNullOrEmpty(platform))
       return;
-    capabilityMap.put("platform", osKeywordToTemplateNameMap.get(platform));
+    capabilityMap.put("platform", osKeywordToTemplateNameMap.getOrDefault(platform, platform));
     ltLogger.info("Updating platform: {}", platform);
   }
 
-  private void setFinalCapabilities(Map<String, Object> capabilityMap, String expectedCapsType, String testEnv) {
+  private void setFinalCapabilities(Map<String, Object> capabilityMap, String expectedCapsType, String testEnv,
+    cloudPlatforms cloudPlatform) {
 
     ThreadLocal<Map<String, Object>> capsMap = (testEnv.equals("client")) ? CLIENT_TEST_CAPS_MAP : TEST_CAPS_MAP;
     ThreadLocal<Boolean> isExtensionTest = (testEnv.equals("client")) ? IS_EXTENSION_CLIENT_TEST : IS_EXTENSION_TEST;
     ThreadLocal<MutableCapabilities> finalCaps = (testEnv.equals("client")) ? CLIENT_TEST_CAPS : TEST_CAPS;
     capsMap.set(capabilityMap);
     ltLogger.info("Final {} caps: {}", testEnv, capsMap.get());
+
+    /// Check for extensions in capability map to handle new tab opening in the start of the session
     boolean hasExtensions = capabilityMap.containsKey(LOAD_PUBLIC_EXTENSION) || capabilityMap.containsKey(
       LOAD_PRIVATE_EXTENSION);
     isExtensionTest.set(hasExtensions);
     ltLogger.info("Is {} contains extensions: {}", testEnv, isExtensionTest.get());
+
     CapsType capsType = (TEST_ENV.equals("local") || expectedCapsType.equals("firstMatch")) ?
       CapsType.FIRST_MATCH :
       CapsType.DESIRED_CAPABILITIES;
-    createTestCaps(new HashMap<>(capabilityMap), capsType);
+
+    /// Handle different capability names for first match and put rest of the capabilities in Remote Platform specific options example: lt:options, bstack:options
+    createTestCaps(new HashMap<>(capabilityMap), capsType, cloudPlatformsToCapabilityRootsMap.get(cloudPlatform));
     finalCaps.set(capabilities);
     ltLogger.info("{} caps set in LocalThread: {}", testEnv, finalCaps.get());
   }
 
   private enum CapsType {
     DESIRED_CAPABILITIES, FIRST_MATCH
+  }
+
+  public void buildTestCapability(String capabilityString, String... capsType) {
+    buildCapabilities(capabilityString, cloudPlatforms.LAMBDATEST, "test", capsType);
+  }
+
+  public void buildClientTestCapability(String capabilityString, String... capsType) {
+    buildCapabilities(capabilityString, cloudPlatforms.LAMBDATEST, "client", capsType);
+  }
+
+  public void buildTestCapabilityForBS(String capabilityString) {
+    buildCapabilities(capabilityString, cloudPlatforms.BROWSERSTACK, "test");
+  }
+
+  public void buildTestCapabilityForSL(String capabilityString) {
+    buildCapabilities(capabilityString, cloudPlatforms.SAUCELAB, "test", "firstMatch");
   }
 }

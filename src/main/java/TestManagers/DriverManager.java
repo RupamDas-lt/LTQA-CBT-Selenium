@@ -17,6 +17,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -24,8 +25,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import utility.BaseClass;
 import utility.EnvSetup;
 
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
@@ -139,11 +138,14 @@ public class DriverManager extends BaseClass {
     gridUrl = getGridUrl();
     ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
     try {
-      driver = new RemoteWebDriver(URI.create(gridUrl).toURL(), capabilities);
+      ClientConfig clientConfig = ClientConfig.defaultConfig().connectionTimeout(Duration.ofMinutes(20))
+        .readTimeout(Duration.ofMinutes(20));
+      driver = (RemoteWebDriver) RemoteWebDriver.builder().oneOf(capabilities).address(gridUrl).config(clientConfig)
+        .build();
       sessionId.set(driver.getSessionId().toString());
       EnvSetup.TEST_REPORT.get().put(sessionIdKey, sessionId.get());
       ltLogger.info("Remote driver created. Test session ID: {}", sessionId.get());
-    } catch (MalformedURLException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

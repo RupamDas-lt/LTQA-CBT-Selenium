@@ -30,9 +30,27 @@ public class AutomationHelper extends BaseClass {
   AutomationAPIHelper apiHelper = new AutomationAPIHelper();
   TestArtefactsVerificationHelper artefactsHelper = new TestArtefactsVerificationHelper();
 
-  private void createTestSession(String testCapability) {
+  private void createTestSession(String testCapability, String... givenCloudPlatformName) {
     StopWatch stopWatch = new StopWatch();
-    capabilityManager.buildTestCapability(testCapability);
+    String cloudPlatformName = (givenCloudPlatformName != null && givenCloudPlatformName.length > 0) ?
+      givenCloudPlatformName[0].toLowerCase() :
+      cloudPlatforms.LAMBDATEST.name().toLowerCase();
+
+    TEST_REPORT.get().put(CLOUD_PLATFORM_NAME, cloudPlatformName);
+
+    switch (cloudPlatformName) {
+    case "saucelab":
+      capabilityManager.buildTestCapabilityForSL(testCapability);
+      break;
+    case "browserstack":
+      capabilityManager.buildTestCapabilityForBS(testCapability);
+      break;
+    case "lambdatest":
+    default:
+      capabilityManager.buildTestCapability(testCapability);
+      break;
+    }
+
     ltLogger.info("Test Caps: {}", EnvSetup.TEST_CAPS.get().toJson());
     TEST_REPORT.get().put("Caps", EnvSetup.TEST_CAPS.get().toJson());
     stopWatch.start();
@@ -455,9 +473,10 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions) {
+  public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions,
+    String... cloudPlatformName) {
     String startTime = getCurrentTimeIST();
-    createTestSession(testCapability);
+    createTestSession(testCapability, cloudPlatformName);
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     String[] testActionsArray = testActions.split(",");

@@ -178,23 +178,42 @@ public class Hooks {
     TEST_REPORT.get().put("client_test_status", EnvSetup.IS_UI_VERIFICATION_ENABLED.get() ? clientTestStatus : "NA");
   }
 
-  private void printTestDashboardAndRetinaLinks(Scenario scenario) {
-    StringBuilder stringBuilder = new StringBuilder();
-    String testDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, "/test?testID=",
-      TEST_SESSION_ID.get());
-    stringBuilder.append("Dashboard URL: ").append(testDashboardUrl).append("\n");
-    String testRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=",
-      TEST_SESSION_ID.get());
-    stringBuilder.append("Test Retina URL: ").append(testRetinaUrl).append("\n");
-    if (EnvSetup.IS_UI_VERIFICATION_ENABLED.get()) {
-      String clientTestDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, "/test?testID=",
-        EnvSetup.CLIENT_SESSION_ID.get());
-      stringBuilder.append("Client test dashboard URL: ").append(clientTestDashboardUrl).append("\n");
-      String clientTestRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=",
-        EnvSetup.CLIENT_SESSION_ID.get());
-      stringBuilder.append("Client test retina URL: ").append(clientTestRetinaUrl);
+  private void printTestDashboardAndRetinaLinks(Scenario scenario, String testEnv) {
+    if ("local".equalsIgnoreCase(testEnv)) {
+      ltLogger.info("Local test environment, no dashboard URLs to print...");
+      return;
     }
-    ltLogger.info("Test dashboard URL: {},\nTest Retina url: {}", testDashboardUrl, testRetinaUrl);
+
+    String endPoint = switch (testEnv.toLowerCase()) {
+      case "browserstack" -> "/dashboard/v2/sessions/";
+      case "saucelab" -> "/tests/";
+      default -> "/test?testID=";
+    };
+
+    String testSessionId = TEST_SESSION_ID.get();
+    StringBuilder stringBuilder = new StringBuilder();
+
+    String testDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, endPoint, testSessionId);
+    stringBuilder.append("Dashboard URL: ").append(testDashboardUrl).append("\n");
+
+    String testRetinaUrl = "NA";
+    if (!"browserstack".equalsIgnoreCase(testEnv) && !"saucelab".equalsIgnoreCase(testEnv)) {
+      testRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=", testSessionId);
+      stringBuilder.append("Test Retina URL: ").append(testRetinaUrl).append("\n");
+    }
+
+    if (EnvSetup.IS_UI_VERIFICATION_ENABLED.get()) {
+      String clientSessionId = EnvSetup.CLIENT_SESSION_ID.get();
+      String clientDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, endPoint,
+        clientSessionId);
+      String clientRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=",
+        clientSessionId);
+
+      stringBuilder.append("Client test dashboard URL: ").append(clientDashboardUrl).append("\n")
+        .append("Client test retina URL: ").append(clientRetinaUrl);
+    }
+
+    ltLogger.info("Test dashboard URL: {},\nTest Retina URL: {}", testDashboardUrl, testRetinaUrl);
     scenario.log(stringBuilder.toString());
   }
 
@@ -262,12 +281,7 @@ public class Hooks {
     }
   }
 
-  @After(order = 1)
-  public void afterScenario(Scenario scenario) {
-    closeAllActiveDrivers();
-
-    apiHelper.waitForTime(5);
-
+  private void updateLTTestStatus() {
     if (!StringUtils.isNullOrEmpty(TEST_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
       apiHelper.getStatusOfSessionViaAPI(TEST_SESSION_ID.get()))) {
       ltLogger.warn("Test status: {}, Test Error message: {}", testStatus, errorMessage);
@@ -279,10 +293,21 @@ public class Hooks {
       ltLogger.warn("Client test status: {}, Client Test Error message: {}", clientTestStatus, clientTestErrorMessage);
       setTestStatus(CLIENT_SESSION_ID.get(), clientTestStatus, clientTestErrorMessage);
     }
+  }
+
+  @After(order = 1)
+  public void afterScenario(Scenario scenario) {
+    closeAllActiveDrivers();
+
+    apiHelper.waitForTime(5);
+
+    if (!TEST_ENV.equalsIgnoreCase("browserStack") && !TEST_ENV.equalsIgnoreCase("sauceLab")) {
+      updateLTTestStatus();
+    }
 
     updateTestReport();
 
-    printTestDashboardAndRetinaLinks(scenario);
+    printTestDashboardAndRetinaLinks(scenario, TEST_ENV);
 
     apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
 
