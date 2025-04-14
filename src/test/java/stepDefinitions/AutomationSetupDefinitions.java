@@ -19,6 +19,13 @@ public class AutomationSetupDefinitions {
     automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions);
   }
 
+  @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit on ([a-zA-Z0-9_=,: ]+) to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
+  public void startSessionOnSpecificCloudPlatformAndPerformActivity(String quitDriverStatus, String cloudPlatform,
+    String testActions, String capability) {
+    automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions,
+      cloudPlatform);
+  }
+
   @Given("Setup user details")
   public void setupUserDetails() {
     testUserName.set(getPropertyOrDefault(CUSTOM_USER_NAME, USER_NAME));
