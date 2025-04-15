@@ -53,6 +53,37 @@ public class UrlsAndLocators {
   public static final Locator countryCode = new Locator(LocatorTypes.ID, "geotargetly_country_code");
   public static final Locator countryName = new Locator(LocatorTypes.ID, "geotargetly_country_name");
 
+  public static final String INTERNET_HEROKU_APP_ABTEST = "https://the-internet.herokuapp.com/abtest";
+  public static final Locator abtestHeadingIHA = new Locator(LocatorTypes.TAG_NAME, "h3");
+
+  public static final String INTERNET_HEROKU_APP_ADD_REMOVE_ELEMENT_URL = "https://the-internet.herokuapp.com/add_remove_elements/";
+  public static final Locator addElementButtonIHA = new Locator(LocatorTypes.CSS, "[onclick='addElement()']");
+  public static final Locator deleteElementButtonIHA = new Locator(LocatorTypes.CSS, "[onclick='deleteElement()']");
+
+  public static final String INTERNET_HEROKU_APP_BROKEN_IMAGES_URL = "https://the-internet.herokuapp.com/add_remove_elements/";
+  public static final Locator brokenImagesIHA = new Locator(LocatorTypes.TAG_NAME, "img");
+
+  public static final String INTERNET_HEROKU_APP_CHECK_BOXES_URL = "https://the-internet.herokuapp.com/checkboxes";
+  public static final Locator checkboxesIHA = new Locator(LocatorTypes.CSS, "input:first-child");
+
+  public static final String INTERNET_HEROKU_APP_DYNAMIC_CONTENT_URL = "https://the-internet.herokuapp.com/dynamic_content";
+  public static final Locator dynamicContentClickIHA = new Locator(LocatorTypes.CSS, "p a");
+  public static final Locator staticParagraphIHA = new Locator(LocatorTypes.CSS,
+    "#content > div:first-child.row > div.large-10");
+
+  public static final String INTERNET_HEROKU_APP_DYNAMIC_CONTROLS_URL = "https://the-internet.herokuapp.com/dynamic_controls";
+  public static final Locator checkBoxSwapButtonIHA = new Locator(LocatorTypes.CSS, "[onclick='swapCheckbox()']");
+  public static final Locator textBoxEnableButtonIHA = new Locator(LocatorTypes.CSS, "[onclick='swapInput()']");
+  public static final Locator messageInDynamicControlsPageIHA = new Locator(LocatorTypes.CSS, "#message");
+
+  public static final String INTERNET_HEROKU_APP_LOGIN_PAGE_URL = "https://the-internet.herokuapp.com/login";
+  public static final Locator userNameInputTHA = new Locator(LocatorTypes.ID, "username");
+  public static final Locator passwordInputTHA = new Locator(LocatorTypes.ID, "password");
+  public static final Locator loginButtonTHA = new Locator(LocatorTypes.CSS, ".radius");
+  public static final Locator loginSuccessHeaderTHA = new Locator(LocatorTypes.CSS, ".subheader");
+  public static final Locator logoutButtonTHA = new Locator(LocatorTypes.CSS, ".button");
+  public static final Locator loginPageHeadingTHA = new Locator(LocatorTypes.TAG_NAME, "h2");
+
   public static final String LT_LOGIN_URL = EnvSetup.TEST_ENV.contains("stage") ?
     "https://stage-accounts.lambdatestinternal.com/login" :
     "https://accounts.lambdatest.com/login";

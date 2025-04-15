@@ -108,4 +108,9 @@ public class AutomationSetupDefinitions {
     String tunnelID = TEST_TUNNEL_ID.get();
     automationHelper.stopRunningTunnelViaAPI(tunnelID);
   }
+
+  @Then("^I set test actions repeat count to ([0-9])$")
+  public void iSetTestActionsRepeatCountToTestActionsRepeatCount(String count) {
+    System.setProperty(REPEAT_TEST_ACTIONS, count);
+  }
 }

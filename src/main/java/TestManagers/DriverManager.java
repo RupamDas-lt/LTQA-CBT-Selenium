@@ -165,6 +165,11 @@ public class DriverManager extends BaseClass {
     return driver.findElement(toBy(locator));
   }
 
+  public List<WebElement> findElements(Locator locator) {
+    ltLogger.info("Finding elements with locator: {}", locator);
+    return driver.findElements(toBy(locator));
+  }
+
   public String getText(Locator locator, int... timeout) {
     ltLogger.info("Finding text with locator: {}", locator.toString());
     int waitTime = Optional.ofNullable(timeout).filter(t -> t.length > 0).map(t -> t[0]).orElse(0);
@@ -283,6 +288,12 @@ public class DriverManager extends BaseClass {
       driver.findElement(toBy(locator)).click();
   }
 
+  public boolean isSelected(Locator locator, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 5 : customTimeout[0];
+    ltLogger.info("Checking element with locator: {} is selected.", locator.toString());
+    return waitForElementToBeVisible(locator, timeout).isSelected();
+  }
+
   public void setLocalFileDetector() {
     driver.setFileDetector(new LocalFileDetector());
   }
@@ -305,5 +316,10 @@ public class DriverManager extends BaseClass {
     } catch (org.openqa.selenium.TimeoutException e) {
       ltLogger.error("Unable to find url with timeout: {}. Error: {}", timeout, e.getMessage());
     }
+  }
+
+  public void refreshPage() {
+    ltLogger.info("Refreshing page ...");
+    driver.navigate().refresh();
   }
 }

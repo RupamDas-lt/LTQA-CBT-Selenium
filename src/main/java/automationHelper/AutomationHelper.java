@@ -8,6 +8,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import utility.BaseClass;
 import utility.CustomSoftAssert;
@@ -99,7 +100,7 @@ public class AutomationHelper extends BaseClass {
         throwNewError();
         break;
       case "basicAuthentication":
-        basicAuthentication();
+        basicAuthenticationIHA();
         break;
       case "selfSigned":
         selfSignedCertificate();
@@ -136,6 +137,9 @@ public class AutomationHelper extends BaseClass {
         break;
       case "noAction":
         break;
+      case "herokuAppAllTests":
+        runDifferentHerokuAppTest();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -149,7 +153,7 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void basicAuthentication() {
+  private void basicAuthenticationIHA() {
     String browserName = TEST_CAPS_MAP.get().getOrDefault(BROWSER_NAME, "chrome").toString();
     if (browserName.equalsIgnoreCase("safari")) {
       ltLogger.info("Basic auth test is not valid in Safari");
@@ -473,10 +477,109 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  private void runABTestIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_ABTEST);
+    String abTestHeading = driverManager.getText(abtestHeadingIHA);
+    softAssert.assertTrue(abTestHeading.equals("A/B Test Variation 1"), "A/B Test Variation failed.");
+  }
+
+  private void addOrRemoveElementIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_ADD_REMOVE_ELEMENT_URL);
+    driverManager.click(addElementButtonIHA);
+    softAssert.assertTrue(driverManager.isDisplayed(deleteElementButtonIHA, 5), "Add element test verification failed");
+  }
+
+  private void testBrokenImagesIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_BROKEN_IMAGES_URL);
+    List<WebElement> elements = driverManager.findElements(brokenImagesIHA);
+    softAssert.assertFalse(elements.isEmpty(), "Broken Images are not displayed");
+  }
+
+  private void checkBoxIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_CHECK_BOXES_URL);
+    driverManager.click(checkboxesIHA);
+    softAssert.assertTrue(driverManager.isSelected(checkboxesIHA, 5), "Checkboxes are not selected");
+  }
+
+  private void dynamicContentIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_DYNAMIC_CONTENT_URL);
+    driverManager.click(dynamicContentClickIHA);
+    String s1 = driverManager.getText(staticParagraphIHA);
+    driverManager.refreshPage();
+    String s2 = driverManager.getText(staticParagraphIHA);
+    softAssert.assertTrue(s1.equals(s2),
+      "Dynamic Content test failed as static messages are not same after page refresh");
+  }
+
+  private void dynamicControlsIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_DYNAMIC_CONTROLS_URL);
+    driverManager.click(checkBoxSwapButtonIHA);
+    softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's gone!"),
+      "First swap failed.");
+    driverManager.click(checkBoxSwapButtonIHA);
+    softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's back!"),
+      "Second swap failed.");
+    driverManager.click(textBoxEnableButtonIHA);
+    softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's enabled!"),
+      "Text box enable failed.");
+    driverManager.click(textBoxEnableButtonIHA);
+    softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's disabled!"),
+      "Text box disable failed.");
+  }
+
+  private void loginFormFillUpIHA(CustomSoftAssert softAssert) {
+    driverManager.getURL(INTERNET_HEROKU_APP_LOGIN_PAGE_URL);
+    driverManager.sendKeys(userNameInputTHA, "tomsmith");
+    driverManager.sendKeys(passwordInputTHA, "SuperSecretPassword!");
+    driverManager.click(loginButtonTHA);
+    softAssert.assertTrue(driverManager.getText(loginSuccessHeaderTHA).contains("Welcome to the Secure Area"),
+      "Form login is not successful");
+    if (driverManager.isSelected(loginSuccessHeaderTHA)) {
+      driverManager.click(logoutButtonTHA);
+      softAssert.assertTrue(driverManager.getText(loginPageHeadingTHA).contains("Login Page"), "Form logout failed.");
+    }
+  }
+
+  private void runDifferentHerokuAppTest() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    //    runABTestIHA(softAssert);
+    addOrRemoveElementIHA(softAssert);
+    basicAuthenticationIHA();
+    testBrokenImagesIHA(softAssert);
+    checkBoxIHA(softAssert);
+    dynamicContentIHA(softAssert);
+    dynamicControlsIHA(softAssert);
+    loginFormFillUpIHA(softAssert);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private String multiplyTestActionsIfNeeded(String testActions) {
+    StringBuilder updatedTestActions = new StringBuilder(testActions);
+    String actionsRepeatCountString = System.getProperty(REPEAT_TEST_ACTIONS);
+    ltLogger.info("REPEAT_TEST_ACTIONS value is: {}", actionsRepeatCountString);
+    if (actionsRepeatCountString != null) {
+      try {
+        int actionsRepeatCount = Integer.parseInt(actionsRepeatCountString);
+        for (int i = 0; i < actionsRepeatCount; i++) {
+          updatedTestActions.append(",").append(testActions);
+        }
+      } catch (Exception e) {
+        ltLogger.warn("Unable to parse repeat actions count string: {}", actionsRepeatCountString);
+      }
+      ltLogger.info("Updated test actions string: {}", updatedTestActions);
+      return updatedTestActions.toString();
+    }
+    return testActions;
+  }
+
   public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions,
     String... cloudPlatformName) {
     String startTime = getCurrentTimeIST();
     createTestSession(testCapability, cloudPlatformName);
+
+    /// Check if user wants to repeat the same test actions multiple times
+    testActions = multiplyTestActionsIfNeeded(testActions);
+
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     String[] testActionsArray = testActions.split(",");
