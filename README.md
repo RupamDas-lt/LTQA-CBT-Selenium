@@ -81,6 +81,28 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DREMOVE_TEST_CAPS=resolution,geoLocation
 ```
 
+- **`PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG`**: This flag can be used to push the logs of tests running on your local
+  machine to Report portal. In this scenario the rp config will be picked from
+  `src/main/resources/reportportal.properties`, so make sure this file is present.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DPUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG=true
+```
+
+- **`REPEAT_TEST_ACTIONS`**: This is used to repeat the same test actions multiple times. The same thing can also be
+  done in the step : `Then I set test actions repeat count to <testActionsRepeatCount>`.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DREPEAT_TEST_ACTIONS=5
+```
+
+- **`SEND_DATA_TO_SUMO`**: Set this value to true if you want to push the test data to sumo logic. Before using this
+  make sure `sumologic_url`, this variable has correct endpoint available in your `cucumber.yaml` file.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DSEND_DATA_TO_SUMO=true
+```
+
 ---
 
 ## Tunnel
