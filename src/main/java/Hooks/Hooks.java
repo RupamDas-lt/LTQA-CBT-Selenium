@@ -22,8 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static utility.EnvSetup.*;
-import static utility.FrameworkConstants.COMPLETED;
-import static utility.FrameworkConstants.FAILED;
+import static utility.FrameworkConstants.*;
 
 public class Hooks {
   private final Logger ltLogger = LogManager.getLogger(Hooks.class);
@@ -309,7 +308,9 @@ public class Hooks {
 
     printTestDashboardAndRetinaLinks(scenario, TEST_ENV);
 
-    apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
+    if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
+      apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
+    }
 
     resetTestData();
   }
