@@ -322,4 +322,18 @@ public class DriverManager extends BaseClass {
     ltLogger.info("Refreshing page ...");
     driver.navigate().refresh();
   }
+
+  public void setCookies(Set<Cookie> cookies) {
+    ltLogger.info("Setting cookies to {}", cookies);
+    for (Cookie cookie : cookies) {
+      driver.manage().addCookie(cookie);
+    }
+  }
+
+  public void setCookies(Map<String, String> cookies) {
+    ltLogger.info("Setting cookies from cookies map: {}", cookies);
+    for (Map.Entry<String, String> entry : cookies.entrySet()) {
+      driver.manage().addCookie(new Cookie(entry.getKey(), entry.getValue()));
+    }
+  }
 }

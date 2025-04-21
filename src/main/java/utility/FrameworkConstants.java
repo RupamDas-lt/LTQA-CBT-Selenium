@@ -25,6 +25,8 @@ public class FrameworkConstants extends BaseClass {
     LT_OPTIONS, cloudPlatforms.BROWSERSTACK, "bstack:options", cloudPlatforms.SAUCELAB, "sauce:options");
 
   // API Constants
+  public static final Map<String, String> AUTH_API_BASE = Map.of("prod", "auth.lambdatest.com", "stage",
+    "stage-auth.lambdatestinternal.com");
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
   public static final String SUMO_LOGIC_URL = "https://endpoint4.collection.sumologic.com/receiver/v1/http/ZaVnC4dhaV1BGey4GE8Y98SqULi08X1lrc4PXMlSghL_8tntkfgr38QuaSrgsvF44nqzlbKs38AVE7I0ras7--0sxak3LfUAkMk2UbSOrcjcOwQRBRMpjQ==";
   public static final String GET = "GET";
@@ -57,6 +59,7 @@ public class FrameworkConstants extends BaseClass {
     return sessionApiUriPart2;
   }
 
+  public static final String AUTH_API_ENDPOINT = "/api/login";
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   public static final String BUILDS_API_ENDPOINT = "/automation/api/v1/builds/";
