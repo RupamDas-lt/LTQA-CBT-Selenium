@@ -25,6 +25,8 @@ public class FrameworkConstants extends BaseClass {
     LT_OPTIONS, cloudPlatforms.BROWSERSTACK, "bstack:options", cloudPlatforms.SAUCELAB, "sauce:options");
 
   // API Constants
+  public static final Map<String, String> AUTH_API_BASE = Map.of("prod", "auth.lambdatest.com", "stage",
+    "stage-auth.lambdatestinternal.com");
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
   public static final String SUMO_LOGIC_URL = "https://endpoint4.collection.sumologic.com/receiver/v1/http/ZaVnC4dhaV1BGey4GE8Y98SqULi08X1lrc4PXMlSghL_8tntkfgr38QuaSrgsvF44nqzlbKs38AVE7I0ras7--0sxak3LfUAkMk2UbSOrcjcOwQRBRMpjQ==";
   public static final String GET = "GET";
@@ -57,6 +59,7 @@ public class FrameworkConstants extends BaseClass {
     return sessionApiUriPart2;
   }
 
+  public static final String AUTH_API_ENDPOINT = "/api/login";
   public static final String TEST_API_ENDPOINT = "/api/v1/test/";
   public static final String SESSIONS_API_ENDPOINT = "/automation/api/v1/sessions/";
   public static final String BUILDS_API_ENDPOINT = "/automation/api/v1/builds/";
@@ -265,5 +268,7 @@ public class FrameworkConstants extends BaseClass {
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
+  public static final String jsForScrollCertainHeightOnSpecificElement = "arguments[0].scrollTop += arguments[1];";
+  public static final String jsForSettingDocumentCookies = "document.cookie = ";
 
 }

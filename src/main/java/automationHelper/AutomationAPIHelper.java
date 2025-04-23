@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
+import io.restassured.http.Method;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static utility.EnvSetup.TEST_VERIFICATION_DATA;
+import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
 public class AutomationAPIHelper extends ApiManager {
@@ -412,5 +413,12 @@ public class AutomationAPIHelper extends ApiManager {
     Response response = deleteRequest(uri);
     ltLogger.info("Tunnel stop API response: {}", response.body().asString());
     return response.getBody().jsonPath().get("status").toString();
+  }
+
+  public Map<String, String> getCookiesFromLoginAPI() {
+    Map<String, String> body = Map.of("email", testEmail.get(), "password", testPassword.get());
+    String authApiBase = AUTH_API_BASE.get(TEST_ENV.contains("stage") ? "stage" : "prod");
+    String uri = constructAPIUrl(authApiBase, AUTH_API_ENDPOINT);
+    return getCookiesFromResponse(uri, Method.POST, body, null, null);
   }
 }

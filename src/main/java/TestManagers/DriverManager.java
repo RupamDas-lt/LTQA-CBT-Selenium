@@ -5,10 +5,7 @@ import factory.Locator;
 import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -50,13 +47,24 @@ public class DriverManager extends BaseClass {
   RemoteWebDriver driver;
   MutableCapabilities capabilities;
   String gridUrl;
+  private boolean putDriverActionsToTestVerificationData = false;
 
-  private static By toBy(Locator locator) {
+  public DriverManager() {
+  }
+
+  public DriverManager(boolean putDriverActionsToTestVerificationData) {
+    this.putDriverActionsToTestVerificationData = putDriverActionsToTestVerificationData;
+  }
+
+  private By toBy(Locator locator) {
     putValueToVerificationData(testVerificationDataKeys.LOCATORS, locator.value());
     return LOCATOR_MAP.get(locator.type()).apply(locator.value());
   }
 
-  private static void putValueToVerificationData(testVerificationDataKeys key, String value) {
+  private void putValueToVerificationData(testVerificationDataKeys key, String value) {
+    if (!putDriverActionsToTestVerificationData) {
+      return;
+    }
     Map<testVerificationDataKeys, Object> verificationData = TEST_VERIFICATION_DATA.get();
     Queue<String> queue;
     if (verificationData.get(key) == null) {
@@ -223,15 +231,16 @@ public class DriverManager extends BaseClass {
 
   public Object executeScriptAndFetchValue(String script) {
     putValueToVerificationData(testVerificationDataKeys.JAVA_SCRIPTS, script);
-    try {
-      Object response = driver.executeScript(script);
-      ltLogger.info("JS Script executed successfully. Script: {}", script);
-      ltLogger.info("JS Script response: {}", response == null ? "null" : response.toString());
-      return response;
-    } catch (Exception e) {
-      ltLogger.error("JS Script execution failed. Script: {}", script);
-      return null;
-    }
+    Object response = driver.executeScript(script);
+    ltLogger.info("JS Script executed successfully. Script: {}", script);
+    ltLogger.info("JS Script response: {}", response == null ? "null" : response.toString());
+    return response;
+  }
+
+  public void executeJavaScriptOnSpecificElement(String script, WebElement element, Object... args) {
+    ltLogger.info("Executing JavaScript {} on specific element: {} with args: {}", script, element, args);
+    Object object = args == null ? driver.executeScript(script, element) : driver.executeScript(script, element, args);
+    ltLogger.info("JS Script execution response: {}", object == null ? "null" : object.toString());
   }
 
   public String openUrlAndGetLocatorText(String url, Locator locator, int timeout) {
@@ -245,13 +254,13 @@ public class DriverManager extends BaseClass {
     return text;
   }
 
-  public void sendKeys(Locator locator, CharSequence keys) {
+  public void sendKeys(Locator locator, CharSequence... keys) {
     ltLogger.info("Sending {} keys to element using ['{}', '{}']", keys, locator.type(), locator.value());
     WebElement element = waitForElementToBeVisible(locator, 5);
     if (element != null) {
       try {
         element.sendKeys(keys);
-        ltLogger.info("Successfully sent keys '{}' to the element.", keys);
+        ltLogger.info("Successfully sent keys '{}' to the element.", (Object[]) keys);
       } catch (Exception e) {
         ltLogger.error("Error sending keys to element '{}': {}", locator.value(), e.getMessage());
       }
@@ -322,4 +331,49 @@ public class DriverManager extends BaseClass {
     ltLogger.info("Refreshing page ...");
     driver.navigate().refresh();
   }
+
+  public void setCookies(Set<Cookie> cookies) {
+    ltLogger.info("Setting cookies to {}", cookies);
+    for (Cookie cookie : cookies) {
+      driver.manage().addCookie(cookie);
+    }
+  }
+
+  public void setCookies(Map<String, String> cookies) {
+    ltLogger.info("Setting cookies from cookies map: {}", cookies);
+    for (Map.Entry<String, String> entry : cookies.entrySet()) {
+      driver.manage().addCookie(new Cookie(entry.getKey(), entry.getValue()));
+    }
+  }
+
+  public String getCssValue(Locator locator, String attributeName, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 5 : customTimeout[0];
+    ltLogger.info("Getting {} attribute value with locator: {}", attributeName, locator);
+    String attributeValue = waitForElementToBeVisible(locator, timeout).getCssValue(attributeName);
+    ltLogger.info("Found {} attribute value with locator: {} is: {}", attributeName, locator, attributeValue);
+    return attributeValue;
+  }
+
+  public void clearText(Locator locator, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 2 : customTimeout[0];
+    ltLogger.info("Clearing text with locator: {}", locator);
+    waitForElementToBeVisible(locator, timeout).clear();
+  }
+
+  public void clearTextUsingKeyboardForWindows(Locator locator) {
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    ltLogger.info("[Win] Selecting all the text in element with locator: {}", locator);
+    sendKeys(locator, Keys.CONTROL, "a");
+    ltLogger.info("[Win] Clearing text with locator via keyboard action: {}", locator);
+    sendKeys(locator, Keys.BACK_SPACE);
+  }
+
+  public void clearTextUsingKeyboardForMac(Locator locator) {
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    ltLogger.info("[Mac] Selecting all the text in element with locator: {}", locator);
+    sendKeys(locator, Keys.COMMAND, "a");
+    ltLogger.info("[Mac] Clearing text with locator via keyboard action: {}", locator);
+    sendKeys(locator, Keys.DELETE);
+  }
+
 }

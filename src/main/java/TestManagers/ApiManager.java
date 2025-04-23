@@ -2,6 +2,7 @@ package TestManagers;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.io.FileUtils;
@@ -117,6 +118,10 @@ public abstract class ApiManager extends BaseClass {
       .response();
   }
 
+  public Response postRequestWithBasicAuth(String uri, Object body, String username, String password) {
+    return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200, username, password);
+  }
+
   public Response postRequestWithBasicAuth(String uri, HashMap<String, Object> body, String username, String password) {
     ltLogger.info("POST Request body: {}", body);
     ContentType contentType = ContentType.JSON; // Default content type
@@ -155,6 +160,10 @@ public abstract class ApiManager extends BaseClass {
 
   public Response deleteRequest(String uri) {
     return httpMethod(DELETE_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
+  }
+
+  public Response postRequest(String uri, Object body) {
+    return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200);
   }
 
   public String getRequestAsString(String uri) {
@@ -235,5 +244,24 @@ public abstract class ApiManager extends BaseClass {
       return logsFromDownloadedFile;
     }
     return null;
+  }
+
+  public Map<String, String> getCookiesFromResponse(String uri, Method method, Object requestBody, String username,
+    String password) {
+
+    ltLogger.info("Getting cookies from uri: {}, with method: {}, request body: {}, username: {}, password: {}", uri,
+      method, requestBody, username, password);
+    Response response = switch (method) {
+      case GET ->
+        username == null || password == null ? getRequest(uri) : getRequestWithBasicAuth(uri, username, password);
+      case POST -> username == null || password == null ?
+        postRequest(uri, requestBody) :
+        postRequestWithBasicAuth(uri, requestBody, username, password);
+      default -> throw new RuntimeException("Method not implemented: " + method);
+    };
+
+    Map<String, String> cookies = response.getCookies();
+    ltLogger.info("Extracted cookies: {}", cookies);
+    return cookies;
   }
 }

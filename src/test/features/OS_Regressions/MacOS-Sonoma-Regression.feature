@@ -46,7 +46,7 @@ Feature: Automation of sonoma machine with different browsers.
     Examples:
       | capabilities                                                                                                                                                                      |
       | browserName=edge,platform=sonoma,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
-    
+
     @gdpr_smoke
     Examples:
       | capabilities                                                                                                                                                                         |
@@ -72,14 +72,17 @@ Feature: Automation of sonoma machine with different browsers.
     Then I start tunnel
     Then I start session with driver quit to test local,consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I stop tunnel
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
-    Then I verify performance report Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I stop client test session
+#    Then I verify console Log via API
+#    Then I verify selenium Log via API
+#    Then I verify command Log via API
+#    Then I verify network Log via API
+#    Then I verify performance report Log via API
 
     Examples:
       | capabilities                                                                                                                   |

@@ -14,7 +14,6 @@ import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +25,7 @@ import static utility.UrlsAndLocators.*;
 public class AutomationHelper extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(AutomationHelper.class);
   CapabilityManager capabilityManager = new CapabilityManager();
-  DriverManager driverManager = new DriverManager();
+  DriverManager driverManager = new DriverManager(true);
   TunnelManager tunnelManager;
   AutomationAPIHelper apiHelper = new AutomationAPIHelper();
   TestArtefactsVerificationHelper artefactsHelper = new TestArtefactsVerificationHelper();
@@ -642,19 +641,6 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(int seconds) {
-    String currentTime = getCurrentTimeIST();
-    ltLogger.info("Time while checking for logs: {}", currentTime);
-    String testEndTime = EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString();
-    ltLogger.info("Time of test completion: {}", testEndTime);
-    Duration durationTillTestEnded = getTimeDifference(testEndTime, currentTime, IST_TimeZone);
-    if (durationTillTestEnded.getSeconds() <= seconds) {
-      int requiredTime = (int) (seconds - Math.floor(durationTillTestEnded.getSeconds()));
-      ltLogger.info("Waiting for {} before verifying the logs.", requiredTime);
-      waitForTime(requiredTime);
-    }
-  }
-
   private boolean isWebdriverModeEnabled(String session_id, Map<String, Object> testCaps) {
     final String webDriverModeFlagKey = "ml_webdriver_mode";
     boolean isWebdriverModeEnabled = true;
@@ -669,7 +655,8 @@ public class AutomationHelper extends BaseClass {
 
   public void verifyLogs(String logs) {
     // Wait for logs to be uploaded
-    waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(120);
+    waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString(),
+      120);
 
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     Map<String, Object> testCaps = TEST_CAPS_MAP.get();
