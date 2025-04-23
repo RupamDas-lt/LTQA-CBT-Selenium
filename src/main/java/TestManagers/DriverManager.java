@@ -5,10 +5,7 @@ import factory.Locator;
 import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -257,13 +254,13 @@ public class DriverManager extends BaseClass {
     return text;
   }
 
-  public void sendKeys(Locator locator, CharSequence keys) {
+  public void sendKeys(Locator locator, CharSequence... keys) {
     ltLogger.info("Sending {} keys to element using ['{}', '{}']", keys, locator.type(), locator.value());
     WebElement element = waitForElementToBeVisible(locator, 5);
     if (element != null) {
       try {
         element.sendKeys(keys);
-        ltLogger.info("Successfully sent keys '{}' to the element.", keys);
+        ltLogger.info("Successfully sent keys '{}' to the element.", (Object[]) keys);
       } catch (Exception e) {
         ltLogger.error("Error sending keys to element '{}': {}", locator.value(), e.getMessage());
       }
@@ -361,6 +358,22 @@ public class DriverManager extends BaseClass {
     int timeout = customTimeout == null || customTimeout.length == 0 ? 2 : customTimeout[0];
     ltLogger.info("Clearing text with locator: {}", locator);
     waitForElementToBeVisible(locator, timeout).clear();
+  }
+
+  public void clearTextUsingKeyboardForWindows(Locator locator) {
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    ltLogger.info("[Win] Selecting all the text in element with locator: {}", locator);
+    sendKeys(locator, Keys.CONTROL, "a");
+    ltLogger.info("[Win] Clearing text with locator via keyboard action: {}", locator);
+    sendKeys(locator, Keys.BACK_SPACE);
+  }
+
+  public void clearTextUsingKeyboardForMac(Locator locator) {
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    ltLogger.info("[Mac] Selecting all the text in element with locator: {}", locator);
+    sendKeys(locator, Keys.COMMAND, "a");
+    ltLogger.info("[Mac] Clearing text with locator via keyboard action: {}", locator);
+    sendKeys(locator, Keys.DELETE);
   }
 
 }
