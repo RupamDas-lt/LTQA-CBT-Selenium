@@ -24,7 +24,7 @@ A Selenium-based test automation framework using Cucumber for BDD testing.
 To run tests:
 
 ```bash
-  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DsuiteXmlFile=testng.xml -DENV=prod
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DsuiteXmlFile=testng.xml -DENV=prod -Dcucumber.features="src/test/features"
 ```
 
 ### Re-running Failed Tests

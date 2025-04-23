@@ -9,6 +9,7 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -521,6 +522,30 @@ public class BaseClass {
     String bitrate = executeFFprobeCommand(BITRATE_COMMAND, videoFilePath);
     metadataMap.put(videoMetadataTypes.BITRATE.getValue(), bitrate);
     return metadataMap;
+  }
+
+  public double extractNumberFromString(@NonNull String string) {
+    Pattern pattern = Pattern.compile("\\d+");
+    Matcher matcher = pattern.matcher(string);
+    if (matcher.find()) {
+      String numberString = matcher.group();
+      ltLogger.info("Extracted number from string: {} is: {}", numberString, numberString);
+      return Double.parseDouble(numberString);
+    } else {
+      return 0.0;
+    }
+  }
+
+  public void waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(String testEndTime, int seconds) {
+    String currentTime = getCurrentTimeIST();
+    ltLogger.info("Time while checking for logs: {}", currentTime);
+    ltLogger.info("Time of test completion: {}", testEndTime);
+    Duration durationTillTestEnded = getTimeDifference(testEndTime, currentTime, IST_TimeZone);
+    if (durationTillTestEnded.getSeconds() <= seconds) {
+      int requiredTime = (int) (seconds - Math.floor(durationTillTestEnded.getSeconds()));
+      ltLogger.info("Waiting for {} secs before verifying the logs.", requiredTime);
+      waitForTime(requiredTime);
+    }
   }
 
 }
