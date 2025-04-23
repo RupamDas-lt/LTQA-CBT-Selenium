@@ -156,7 +156,6 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
   }
 
   public void verifyCommandLogs() {
-    openCommandLogsTab();
     verifyCommandsCount();
     boolean firstAndLastCommandsArePresent = verifyFirstAndLastCommandsAreDisplayed();
     if (firstAndLastCommandsArePresent) {

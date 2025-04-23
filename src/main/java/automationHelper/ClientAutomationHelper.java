@@ -76,7 +76,12 @@ public class ClientAutomationHelper extends BaseClass {
       switch (logName) {
       case "command":
         TestCommandLogsPage testCommandLogsPage = new TestCommandLogsPage(testId, driverManager, clientSoftAssert);
-        testCommandLogsPage.verifyCommandLogs();
+        boolean openCommandLogsTabOpenStatus = testCommandLogsPage.openCommandLogsTab();
+        if (openCommandLogsTabOpenStatus) {
+          testCommandLogsPage.verifyCommandLogs();
+        } else {
+          clientSoftAssert.fail("Unable to open command logs tab...");
+        }
         break;
       case "network":
         break;
