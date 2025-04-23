@@ -59,6 +59,7 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
   private void verifyCommandsCount() {
     String commandCountHeading = driver.getText(commandLogsCountHeading);
     int commandCount = (int) extractNumberFromString(commandCountHeading);
+    softAssert.assertTrue(commandCount > 0, "Command count should be greater than 0. Current count is " + commandCount);
     ltLogger.info("command count: {}", commandCount);
   }
 
@@ -156,6 +157,7 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
   public void verifyCommandLogs() {
     openCommandLogsTab();
+    verifyCommandsCount();
     boolean firstAndLastCommandsArePresent = verifyFirstAndLastCommandsAreDisplayed();
     if (firstAndLastCommandsArePresent) {
       verifyAllExpectedCommandsArePresentInTheUI();
