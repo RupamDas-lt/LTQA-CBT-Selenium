@@ -113,9 +113,9 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
     for (String item : items) {
       clearSearchBarIfNeeded();
-      performSearch(item);
+      performCommandLogsSearch(item);
 
-      if (isItemNotFoundInResults(item)) {
+      if (isItemNotFoundInCommandLogsResults(item)) {
         ltLogger.info("Item {} not found in search results", item);
         notFoundItems.add(item);
       }
@@ -131,12 +131,12 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
     }
   }
 
-  private void performSearch(String searchTerm) {
-    ltLogger.info("Performing command search: {}", searchTerm);
+  private void performCommandLogsSearch(String searchTerm) {
+    ltLogger.info("Performing command search command logs: {}", searchTerm);
     driver.sendKeys(commandLogsSearchBar, searchTerm);
   }
 
-  private boolean isItemNotFoundInResults(String item) {
+  private boolean isItemNotFoundInCommandLogsResults(String item) {
     if (driver.isDisplayed(noCommandLogsFound, 5)) {
       ltLogger.info("No command logs found message displayed for command {}", item);
       return true;

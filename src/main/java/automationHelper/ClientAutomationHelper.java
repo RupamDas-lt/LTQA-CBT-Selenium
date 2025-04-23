@@ -3,6 +3,7 @@ package automationHelper;
 import Pages.LTDashboardCommonActions;
 import Pages.LoginPage;
 import Pages.TestCommandLogsPage;
+import Pages.TestNetworkLogsPage;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import com.mysql.cj.util.StringUtils;
@@ -13,8 +14,10 @@ import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.util.Map;
+
 import static utility.EnvSetup.TEST_SCENARIO_NAME;
-import static utility.FrameworkConstants.TEST_END_TIMESTAMP;
+import static utility.FrameworkConstants.*;
 
 public class ClientAutomationHelper extends BaseClass {
 
@@ -64,31 +67,71 @@ public class ClientAutomationHelper extends BaseClass {
     Assert.assertTrue(testHomePage.navigateToHomePageOfSpecificTest(), "Unable to open test home page");
   }
 
-  public void verifyTestLogsFromUI(String testId, String logName) {
+  private String constructNetworkLogsFileName(Map<String, Object> capabilities) {
+    final String postFixForNetworkLogsWithExtension = "network-logs.har";
+    String buildName = (String) capabilities.get(BUILD_NAME);
+    String testName = (String) capabilities.get(TEST_NAME);
+    String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogsWithExtension)
+      .replace("*", "_");
+    ltLogger.info("Network logs file name: {}", finalNetworkLogsFileName);
+    return finalNetworkLogsFileName;
+  }
 
+  public void verifyTestLogsFromUI(String testId, String logName) {
     // Wait for logs to be uploaded
     waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString(),
       120);
 
     CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+    String stepName = String.format("Verify %s logs from UI", logName);
+
     try {
-      LTHooks.startStepContext(driverManager, String.format("Verify %s logs from UI", logName));
-      switch (logName) {
-      case "command":
-        TestCommandLogsPage testCommandLogsPage = new TestCommandLogsPage(testId, driverManager, clientSoftAssert);
-        boolean openCommandLogsTabOpenStatus = testCommandLogsPage.openCommandLogsTab();
-        if (openCommandLogsTabOpenStatus) {
-          testCommandLogsPage.verifyCommandLogs();
-        } else {
-          clientSoftAssert.fail("Unable to open command logs tab...");
-        }
-        break;
-      case "network":
-        break;
-      }
+      LTHooks.startStepContext(driverManager, stepName);
+      verifyLogs(testId, logName, clientSoftAssert);
     } finally {
-      LTHooks.endStepContext(driverManager, String.format("Verify %s logs from UI", logName));
+      LTHooks.endStepContext(driverManager, stepName);
+      EnvSetup.CLIENT_SOFT_ASSERT.set(clientSoftAssert);
     }
-    EnvSetup.CLIENT_SOFT_ASSERT.set(clientSoftAssert);
+  }
+
+  private void verifyLogs(String testId, String logName, CustomSoftAssert softAssert) {
+    switch (logName.toLowerCase()) {
+    case "command":
+      verifyCommandLogs(testId, softAssert);
+      break;
+    case "network":
+      verifyNetworkLogs(testId, softAssert);
+      break;
+    case "system":
+      verifySystemLogs(testId, softAssert);
+      break;
+    default:
+      softAssert.fail(String.format("Unsupported log type: %s", logName));
+      break;
+    }
+  }
+
+  private void verifyCommandLogs(String testId, CustomSoftAssert softAssert) {
+    TestCommandLogsPage commandLogsPage = new TestCommandLogsPage(testId, driverManager, softAssert);
+    if (!commandLogsPage.openCommandLogsTab()) {
+      softAssert.fail("Unable to open command logs tab");
+      return;
+    }
+    commandLogsPage.verifyCommandLogs();
+  }
+
+  private void verifyNetworkLogs(String testId, CustomSoftAssert softAssert) {
+    TestNetworkLogsPage networkLogsPage = new TestNetworkLogsPage(testId, driverManager, softAssert);
+    if (!networkLogsPage.openNetworkLogsTab()) {
+      softAssert.fail("Unable to open network logs tab");
+      return;
+    }
+    networkLogsPage.verifyAllExpectedNetworkCallsArePresentInTheUI();
+    String networkLogsName = constructNetworkLogsFileName(EnvSetup.TEST_CAPS_MAP.get());
+    networkLogsPage.downloadNewNetworkLogsFromUI(networkLogsName);
+  }
+
+  private void verifySystemLogs(String testId, CustomSoftAssert softAssert) {
+
   }
 }

@@ -75,6 +75,8 @@ Feature: Automation of sonoma machine with different browsers.
     Then I start client test session
     And Login to LT dashboard
     Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
     Then I stop client test session
 #    Then I verify console Log via API
 #    Then I verify selenium Log via API
