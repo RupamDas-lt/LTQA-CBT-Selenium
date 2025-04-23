@@ -50,13 +50,24 @@ public class DriverManager extends BaseClass {
   RemoteWebDriver driver;
   MutableCapabilities capabilities;
   String gridUrl;
+  private boolean putDriverActionsToTestVerificationData = false;
 
-  private static By toBy(Locator locator) {
+  public DriverManager() {
+  }
+
+  public DriverManager(boolean putDriverActionsToTestVerificationData) {
+    this.putDriverActionsToTestVerificationData = putDriverActionsToTestVerificationData;
+  }
+
+  private By toBy(Locator locator) {
     putValueToVerificationData(testVerificationDataKeys.LOCATORS, locator.value());
     return LOCATOR_MAP.get(locator.type()).apply(locator.value());
   }
 
-  private static void putValueToVerificationData(testVerificationDataKeys key, String value) {
+  private void putValueToVerificationData(testVerificationDataKeys key, String value) {
+    if (!putDriverActionsToTestVerificationData) {
+      return;
+    }
     Map<testVerificationDataKeys, Object> verificationData = TEST_VERIFICATION_DATA.get();
     Queue<String> queue;
     if (verificationData.get(key) == null) {
@@ -223,15 +234,16 @@ public class DriverManager extends BaseClass {
 
   public Object executeScriptAndFetchValue(String script) {
     putValueToVerificationData(testVerificationDataKeys.JAVA_SCRIPTS, script);
-    try {
-      Object response = driver.executeScript(script);
-      ltLogger.info("JS Script executed successfully. Script: {}", script);
-      ltLogger.info("JS Script response: {}", response == null ? "null" : response.toString());
-      return response;
-    } catch (Exception e) {
-      ltLogger.error("JS Script execution failed. Script: {}", script);
-      return null;
-    }
+    Object response = driver.executeScript(script);
+    ltLogger.info("JS Script executed successfully. Script: {}", script);
+    ltLogger.info("JS Script response: {}", response == null ? "null" : response.toString());
+    return response;
+  }
+
+  public void executeJavaScriptOnSpecificElement(String script, WebElement element, Object... args) {
+    ltLogger.info("Executing JavaScript {} on specific element: {} with args: {}", script, element, args);
+    Object object = args == null ? driver.executeScript(script, element) : driver.executeScript(script, element, args);
+    ltLogger.info("JS Script execution response: {}", object == null ? "null" : object.toString());
   }
 
   public String openUrlAndGetLocatorText(String url, Locator locator, int timeout) {
@@ -336,4 +348,19 @@ public class DriverManager extends BaseClass {
       driver.manage().addCookie(new Cookie(entry.getKey(), entry.getValue()));
     }
   }
+
+  public String getCssValue(Locator locator, String attributeName, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 5 : customTimeout[0];
+    ltLogger.info("Getting {} attribute value with locator: {}", attributeName, locator);
+    String attributeValue = waitForElementToBeVisible(locator, timeout).getCssValue(attributeName);
+    ltLogger.info("Found {} attribute value with locator: {} is: {}", attributeName, locator, attributeValue);
+    return attributeValue;
+  }
+
+  public void clearText(Locator locator, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 2 : customTimeout[0];
+    ltLogger.info("Clearing text with locator: {}", locator);
+    waitForElementToBeVisible(locator, timeout).clear();
+  }
+
 }

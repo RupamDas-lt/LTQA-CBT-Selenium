@@ -113,4 +113,14 @@ public class AutomationSetupDefinitions {
   public void iSetTestActionsRepeatCountToTestActionsRepeatCount(String count) {
     System.setProperty(REPEAT_TEST_ACTIONS, count);
   }
+
+  @Then("I navigate to ML dashboard of current test")
+  public void iNavigateToMLDashboardOfCurrentTest() {
+    clientAutomationHelper.navigateToDashboardOfSpecificTest(TEST_SESSION_ID.get());
+  }
+
+  @Then("^I verify ([a-zA-Z ]+) logs from UI$")
+  public void iVerifyCommandLogsFromUI(String logName) {
+    clientAutomationHelper.verifyTestLogsFromUI(TEST_SESSION_ID.get(), logName);
+  }
 }
