@@ -103,7 +103,7 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
     return true;
   }
 
-  public void downloadNewNetworkLogsFromUI(String expectedFileName) {
+  public void downloadNetworkLogsFromUI(String expectedFileName) {
     driver.click(networkLogsDownloadButton);
     waitForTime(10);
     boolean isNetworkLogsDownloaded = LTHooks.isFileExist(driver, expectedFileName, 5);

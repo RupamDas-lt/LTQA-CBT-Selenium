@@ -285,6 +285,39 @@ public class DriverManager extends BaseClass {
     }
   }
 
+  public void closeCurrentTab() {
+    ltLogger.info("Closing the current tab");
+    driver.close();
+  }
+
+  public void closeCurrentTabAndSwitchContextToLastTab() {
+    try {
+      Set<String> windowHandles = driver.getWindowHandles();
+
+      if (windowHandles.size() < 2) {
+        ltLogger.error("There are not enough tabs open to close and switch.");
+        throw new RuntimeException("There are not enough tabs open.");
+      }
+
+      closeCurrentTab();
+
+      // Wait for the number of window handles to change (indicating the tab was closed)
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+      wait.until(d -> d.getWindowHandles().size() == windowHandles.size() - 1);
+
+      // Switch to the last tab (new context after closing the current one)
+      Set<String> newWindowHandles = driver.getWindowHandles();
+      ArrayList<String> tabs = new ArrayList<>(newWindowHandles);
+      String lastTab = tabs.getLast();
+      driver.switchTo().window(lastTab);
+      ltLogger.info("Successfully switched to the last tab.");
+
+    } catch (Exception e) {
+      ltLogger.error("Failed to close the current tab and switch to the last tab. Error: {}", e.getMessage());
+      throw new RuntimeException("Failed to close and switch tabs", e);
+    }
+  }
+
   public String getCurrentURL() {
     return driver.getCurrentUrl();
   }
