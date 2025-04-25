@@ -1,7 +1,6 @@
 package Pages;
 
 import TestManagers.DriverManager;
-import automationHelper.LTHooks;
 import factory.Locator;
 import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
@@ -38,8 +37,6 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
     "input[aria-label='Search Network Logs']");
   private static final Locator networkLogsRowName = new Locator(LocatorTypes.CSS,
     "tr[id*='network-log-row']>td[class*='NetworkTableHeader-styles__filename'] span");
-  private static final Locator networkLogsDownloadButton = new Locator(LocatorTypes.CSS,
-    "button[aria-label*='Download']");
 
   public boolean openNetworkLogsTab() {
     navigateToHomePageOfSpecificTest();
@@ -104,10 +101,12 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
   }
 
   public void downloadNetworkLogsFromUI(String expectedFileName) {
-    driver.click(networkLogsDownloadButton);
-    waitForTime(10);
-    boolean isNetworkLogsDownloaded = LTHooks.isFileExist(driver, expectedFileName, 5);
+    boolean isNetworkLogsDownloaded = downloadLogFile(expectedFileName, "Network", 10);
     softAssert.assertTrue(isNetworkLogsDownloaded, "Unable to download network logs from UI");
   }
 
+  public void openNetworkLogsInNewTabAndVerify() {
+    String errorMessage = openLogsInNewTabAndVerify("network", networkLogsRows, 5);
+    softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
+  }
 }
