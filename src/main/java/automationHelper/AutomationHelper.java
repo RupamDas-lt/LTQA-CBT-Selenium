@@ -186,11 +186,12 @@ public class AutomationHelper extends BaseClass {
 
   private void addConsoleLogs() {
     driverManager.getURL(GOOGLE_URL);
-    consoleLogs.forEach(consoleLog -> {
-      driverManager.executeScript("console.error('" + consoleLog + "')");
+    consoleLogs.keySet().forEach(consoleLogLevel -> {
+      String logMessage = consoleLogs.get(consoleLogLevel);
+      driverManager.executeScript(String.format("console.%s('%s')", consoleLogLevel, logMessage));
       ArrayList<String> consoleLogsList = (ArrayList<String>) TEST_VERIFICATION_DATA.get()
         .getOrDefault(testVerificationDataKeys.CONSOLE_LOG, new ArrayList<>());
-      consoleLogsList.add(consoleLog);
+      consoleLogsList.add(logMessage);
       TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.CONSOLE_LOG, consoleLogsList);
     });
   }

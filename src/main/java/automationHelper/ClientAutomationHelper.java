@@ -1,9 +1,6 @@
 package automationHelper;
 
-import Pages.LTDashboardCommonActions;
-import Pages.LoginPage;
-import Pages.TestCommandLogsPage;
-import Pages.TestNetworkLogsPage;
+import Pages.*;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import com.mysql.cj.util.StringUtils;
@@ -68,6 +65,7 @@ public class ClientAutomationHelper extends BaseClass {
   }
 
   private String constructNetworkLogsFileName(Map<String, Object> capabilities) {
+    /// CBT_Selenium_Test_2025-04-23-browserName=chrome,platform=sonoma,version=._,performance=true,resolution=._,network=true,visual=true,tunnel=true,console=true-network-logs.har
     final String postFixForNetworkLogsWithExtension = "network-logs.har";
     String buildName = (String) capabilities.get(BUILD_NAME);
     String testName = (String) capabilities.get(TEST_NAME);
@@ -75,6 +73,24 @@ public class ClientAutomationHelper extends BaseClass {
       .replace("*", "_");
     ltLogger.info("Network logs file name: {}", finalNetworkLogsFileName);
     return finalNetworkLogsFileName;
+  }
+
+  private String constructSystemLogsFileName(String testID) {
+    /// lambda-logs-selenium-DA-WIN-375492-1745478266638369730JAA.log
+    final String systemLogsFileNamePrefix = "lambda-logs-selenium-";
+    final String fileExtension = ".log";
+    String finalSystemLogsFileName = systemLogsFileNamePrefix + testID + fileExtension;
+    ltLogger.info("System logs file name: {}", finalSystemLogsFileName);
+    return finalSystemLogsFileName;
+  }
+
+  private String constructConsoleLogFileName(String testID) {
+    /// lambda-logs-console-DA-MAC-672987-1745494124374001474CIL.log
+    final String consoleLogsFileNamePrefix = "lambda-logs-console-";
+    final String fileExtension = ".log";
+    String finalConsoleLogsFileName = consoleLogsFileNamePrefix + testID + fileExtension;
+    ltLogger.info("Console logs file name: {}", finalConsoleLogsFileName);
+    return finalConsoleLogsFileName;
   }
 
   public void verifyTestLogsFromUI(String testId, String logName) {
@@ -105,6 +121,9 @@ public class ClientAutomationHelper extends BaseClass {
     case "system":
       verifySystemLogs(testId, softAssert);
       break;
+    case "console":
+      verifyConsoleLogs(testId, softAssert);
+      break;
     default:
       softAssert.fail(String.format("Unsupported log type: %s", logName));
       break;
@@ -128,10 +147,33 @@ public class ClientAutomationHelper extends BaseClass {
     }
     networkLogsPage.verifyAllExpectedNetworkCallsArePresentInTheUI();
     String networkLogsName = constructNetworkLogsFileName(EnvSetup.TEST_CAPS_MAP.get());
-    networkLogsPage.downloadNewNetworkLogsFromUI(networkLogsName);
+    networkLogsPage.downloadNetworkLogsFromUI(networkLogsName);
+    networkLogsPage.openNetworkLogsInNewTabAndVerify();
   }
 
   private void verifySystemLogs(String testId, CustomSoftAssert softAssert) {
+    TestSystemLogsPage systemLogsPage = new TestSystemLogsPage(testId, driverManager, softAssert);
+    if (!systemLogsPage.openSystemLogsTab()) {
+      softAssert.fail("Unable to open system logs tab");
+      return;
+    }
+    systemLogsPage.verifySystemLogs();
+    String testID = systemLogsPage.getTestIDFromTestDashboard();
+    String systemLogsName = constructSystemLogsFileName(testID);
+    systemLogsPage.downloadSystemLogsFromUI(systemLogsName);
+    systemLogsPage.openAndVerifySystemLogsInNewTab();
+  }
 
+  private void verifyConsoleLogs(String testId, CustomSoftAssert softAssert) {
+    TestConsoleLogsPage consoleLogsPage = new TestConsoleLogsPage(testId, driverManager, softAssert);
+    if (!consoleLogsPage.openConsoleLogsTab()) {
+      softAssert.fail("Unable to open console logs tab");
+      return;
+    }
+    consoleLogsPage.verifyConsoleLogsFromUI();
+    String testID = consoleLogsPage.getTestIDFromTestDashboard();
+    String consoleLogFileName = constructConsoleLogFileName(testID);
+    consoleLogsPage.downloadConsoleLogsFromUI(consoleLogFileName);
+    consoleLogsPage.openConsoleLogsInNewTabAndVerify();
   }
 }

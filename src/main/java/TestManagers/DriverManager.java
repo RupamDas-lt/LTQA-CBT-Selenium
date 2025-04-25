@@ -178,6 +178,13 @@ public class DriverManager extends BaseClass {
     return driver.findElements(toBy(locator));
   }
 
+  public String getText(WebElement element) {
+    ltLogger.info("Getting text of webElement: {}", element);
+    String text = element.getText();
+    ltLogger.info("Found text from element: {}", text);
+    return text;
+  }
+
   public String getText(Locator locator, int... timeout) {
     ltLogger.info("Finding text with locator: {}", locator.toString());
     int waitTime = Optional.ofNullable(timeout).filter(t -> t.length > 0).map(t -> t[0]).orElse(0);
@@ -185,9 +192,7 @@ public class DriverManager extends BaseClass {
       WebElement element = (waitTime > 0) ?
         waitForElementToBeVisible(locator, waitTime) :
         driver.findElement(toBy(locator));
-      String text = element.getText();
-      ltLogger.info("Found text from element: {}", text);
-      return text;
+      return getText(element);
     } catch (Exception e) {
       ltLogger.error("Failed to get text from element with locator: {}. Error: {}", locator.toString(), e.getMessage());
       throw new RuntimeException("Unable to get text from locator: " + locator, e);
@@ -285,8 +290,44 @@ public class DriverManager extends BaseClass {
     }
   }
 
+  public void closeCurrentTab() {
+    ltLogger.info("Closing the current tab");
+    driver.close();
+  }
+
+  public void closeCurrentTabAndSwitchContextToLastTab() {
+    try {
+      Set<String> windowHandles = driver.getWindowHandles();
+
+      if (windowHandles.size() < 2) {
+        ltLogger.error("There are not enough tabs open to close and switch.");
+        throw new RuntimeException("There are not enough tabs open.");
+      }
+
+      closeCurrentTab();
+
+      // Wait for the number of window handles to change (indicating the tab was closed)
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+      wait.until(d -> d.getWindowHandles().size() == windowHandles.size() - 1);
+
+      // Switch to the last tab (new context after closing the current one)
+      Set<String> newWindowHandles = driver.getWindowHandles();
+      ArrayList<String> tabs = new ArrayList<>(newWindowHandles);
+      String lastTab = tabs.getLast();
+      driver.switchTo().window(lastTab);
+      ltLogger.info("Successfully switched to the last tab.");
+
+    } catch (Exception e) {
+      ltLogger.error("Failed to close the current tab and switch to the last tab. Error: {}", e.getMessage());
+      throw new RuntimeException("Failed to close and switch tabs", e);
+    }
+  }
+
   public String getCurrentURL() {
-    return driver.getCurrentUrl();
+    ltLogger.info("Getting current url.");
+    String url = driver.getCurrentUrl();
+    ltLogger.info("Current url is: {}", url);
+    return url;
   }
 
   public void click(Locator locator, int... timeout) {
@@ -376,4 +417,15 @@ public class DriverManager extends BaseClass {
     sendKeys(locator, Keys.DELETE);
   }
 
+  public WebElement getNestedElement(WebElement parentElement, Locator locator) {
+    ltLogger.info("Getting nested element with locator: {}", locator);
+    return parentElement.findElement(toBy(locator));
+  }
+
+  public WebElement getNestedElement(Locator parentLocator, Locator childLocator, int... customTimeout) {
+    int timeout = customTimeout == null || customTimeout.length == 0 ? 5 : customTimeout[0];
+    ltLogger.info("Getting nested element with parent locator: {} child locator: {}", parentLocator, childLocator);
+    WebElement parentElement = waitForElementToBeVisible(parentLocator, timeout);
+    return getNestedElement(parentElement, childLocator);
+  }
 }
