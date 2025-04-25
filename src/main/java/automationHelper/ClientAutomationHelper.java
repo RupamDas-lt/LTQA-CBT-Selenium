@@ -84,6 +84,15 @@ public class ClientAutomationHelper extends BaseClass {
     return finalSystemLogsFileName;
   }
 
+  private String constructConsoleLogFileName(String testID) {
+    /// lambda-logs-console-DA-MAC-672987-1745494124374001474CIL.log
+    final String consoleLogsFileNamePrefix = "lambda-logs-console-";
+    final String fileExtension = ".log";
+    String finalConsoleLogsFileName = consoleLogsFileNamePrefix + testID + fileExtension;
+    ltLogger.info("Console logs file name: {}", finalConsoleLogsFileName);
+    return finalConsoleLogsFileName;
+  }
+
   public void verifyTestLogsFromUI(String testId, String logName) {
     // Wait for logs to be uploaded
     waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString(),
@@ -112,6 +121,9 @@ public class ClientAutomationHelper extends BaseClass {
     case "system":
       verifySystemLogs(testId, softAssert);
       break;
+    case "console":
+      verifyConsoleLogs(testId, softAssert);
+      break;
     default:
       softAssert.fail(String.format("Unsupported log type: %s", logName));
       break;
@@ -136,6 +148,7 @@ public class ClientAutomationHelper extends BaseClass {
     networkLogsPage.verifyAllExpectedNetworkCallsArePresentInTheUI();
     String networkLogsName = constructNetworkLogsFileName(EnvSetup.TEST_CAPS_MAP.get());
     networkLogsPage.downloadNetworkLogsFromUI(networkLogsName);
+    networkLogsPage.openNetworkLogsInNewTabAndVerify();
   }
 
   private void verifySystemLogs(String testId, CustomSoftAssert softAssert) {
@@ -149,5 +162,18 @@ public class ClientAutomationHelper extends BaseClass {
     String systemLogsName = constructSystemLogsFileName(testID);
     systemLogsPage.downloadSystemLogsFromUI(systemLogsName);
     systemLogsPage.openAndVerifySystemLogsInNewTab();
+  }
+
+  private void verifyConsoleLogs(String testId, CustomSoftAssert softAssert) {
+    TestConsoleLogsPage consoleLogsPage = new TestConsoleLogsPage(testId, driverManager, softAssert);
+    if (!consoleLogsPage.openConsoleLogsTab()) {
+      softAssert.fail("Unable to open console logs tab");
+      return;
+    }
+    consoleLogsPage.verifyConsoleLogsFromUI();
+    String testID = consoleLogsPage.getTestIDFromTestDashboard();
+    String consoleLogFileName = constructConsoleLogFileName(testID);
+    consoleLogsPage.downloadConsoleLogsFromUI(consoleLogFileName);
+    consoleLogsPage.openConsoleLogsInNewTabAndVerify();
   }
 }

@@ -213,11 +213,11 @@ public class FrameworkConstants extends BaseClass {
     add("self-signed.badssl.com");
     add("SSL.com - Test Website");
   }};
-  public static final Set<String> consoleLogs = new HashSet<>() {{
-    add("console log is working fine via log command");
-    add("console log is working fine via error command");
-    add("console log is working fine via warn command");
-    add("console log is working fine via info command");
+  public static final HashMap<String, String> consoleLogs = new HashMap<>() {{
+    put("log", "console log is working fine via log command");
+    put("error", "console log is working fine via error command");
+    put("warn", "console log is working fine via warn command");
+    put("info", "console log is working fine via info command");
   }};
   public static final List<Locator> locatorsForExceptionLogs = new ArrayList<>() {{
     add(new Locator(LocatorTypes.CSS, "#invalid_css_selector"));
