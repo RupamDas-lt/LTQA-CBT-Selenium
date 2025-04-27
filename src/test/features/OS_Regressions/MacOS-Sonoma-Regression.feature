@@ -93,13 +93,14 @@ Feature: Automation of sonoma machine with different browsers.
     Given Setup user details
     Then I start session with driver quit to test consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I upload sample terminal logs
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I verify console logs from UI
+    Then I verify test video from UI
+    Then I stop client test session
 
     Examples:
       | capabilities                                                                                                                         |
