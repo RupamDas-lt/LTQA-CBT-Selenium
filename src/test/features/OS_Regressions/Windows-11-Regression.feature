@@ -72,7 +72,7 @@ Feature: Automation of windows11 machine with different browsers.
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
 
   @win11_regression_5 @ui_verification @tunnel_verification @martian_verification
-  Scenario Outline: PT-13416871 network logs, console & selenium logs should be generated and visible on UI for windows11 browser with tunnel true
+  Scenario Outline: Network logs, console & selenium logs should be generated and visible on UI for windows11 browser with tunnel true
     Given Setup user details
     Then I start tunnel
     Then I start session with driver quit to test local,consoleLog,exceptionLogTesting,networkLog with <capabilities>
