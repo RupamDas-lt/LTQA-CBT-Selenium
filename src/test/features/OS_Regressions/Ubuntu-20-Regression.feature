@@ -13,8 +13,12 @@ Feature: Automation of ubuntu-20 machine with different browsers.
     Then I verify video via API
 
     Examples:
+      | capabilities                                                                                                                                                      |
+      | browserName=chrome,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+
+    @london_smoke_new
+    Examples:
       | capabilities                                                                                                                                                                                   |
-      | browserName=chrome,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true                              |
       | browserName=edge,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
 
@@ -27,9 +31,13 @@ Feature: Automation of ubuntu-20 machine with different browsers.
     Then I verify command Log via API
 
     Examples:
+      | capabilities                                                                                                                   |
+      | browserName=firefox,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.* |
+
+    @virginia_smoke_new
+    Examples:
       | capabilities                                                                                                                                      |
       | browserName=chrome,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
-      | browserName=firefox,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.*                    |
 
 
   @ubuntu_regression_3 @tunnel_verification @martian_verification

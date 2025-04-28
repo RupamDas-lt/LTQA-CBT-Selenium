@@ -13,13 +13,13 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                                                                                                                    |
-      | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+      | capabilities                                                                                                                                                                                      |
+      | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
-    @frankfurt_smoke
+    @frankfurt_smoke @ireland_smoke_new
     Examples:
-      | capabilities                                                                                                                                                       |
-      | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+      | capabilities                                                                                                                                                     |
+      | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
 
   @ventura_regression_2 @geoLocations_verification
@@ -30,7 +30,7 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
-    @ohio_smoke
+    @ohio_smoke @london_smoke_new
     Examples:
       | capabilities                                                                                                                                       |
       | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
@@ -51,7 +51,7 @@ Feature: Automation of ventura machine with different browsers.
       | capabilities                                                                                                                                                                       |
       | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
 
-    @ireland_smoke
+    @ireland_smoke @sydney_smoke_new
     Examples:
       | capabilities                                                                                                                                                                          |
       | browserName=firefox,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
@@ -66,7 +66,7 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
-    @mumbai_smoke
+    @mumbai_smoke @virginia_smoke_new
     Examples:
       | capabilities                                                                                                                                                             |
       | browserName=safari,platform=ventura,version=latest,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |

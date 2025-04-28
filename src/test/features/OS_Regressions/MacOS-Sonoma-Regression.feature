@@ -26,7 +26,7 @@ Feature: Automation of sonoma machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
-    @eu_central_smoke
+    @eu_central_smoke @california_smoke_new
     Examples:
       | capabilities                                                                                                                                      |
       | browserName=chrome,platform=sonoma,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
@@ -62,6 +62,7 @@ Feature: Automation of sonoma machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
+    @eu_central_smoke_new
     Examples:
       | capabilities                                                                                                                                                            |
       | browserName=safari,platform=sonoma,version=latest,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |

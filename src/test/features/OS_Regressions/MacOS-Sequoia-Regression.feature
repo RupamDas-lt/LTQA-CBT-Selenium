@@ -13,13 +13,13 @@ Feature: Automation of sequoia machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                                                                                                                    |
-      | browserName=edge,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+      | capabilities                                                                                                                                                     |
+      | browserName=edge,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
-    @eu_central_smoke
+    @eu_central_smoke @eu_central_smoke_new
     Examples:
-      | capabilities                                                                                                                                                       |
-      | browserName=chrome,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+      | capabilities                                                                                                                                                                                      |
+      | browserName=chrome,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
 
   @sequoia_regression_2 @geoLocations_verification
@@ -30,6 +30,7 @@ Feature: Automation of sequoia machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
+    @mumbai_smoke_new
     Examples:
       | capabilities                                                                                                                                       |
       | browserName=chrome,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
@@ -47,8 +48,12 @@ Feature: Automation of sequoia machine with different browsers.
     Then I verify network Log via API
 
     Examples:
+      | capabilities                                                                                                                                                                       |
+      | browserName=edge,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
+
+    @ohio_smoke_new
+    Examples:
       | capabilities                                                                                                                                                                          |
-      | browserName=edge,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true    |
       | browserName=firefox,platform=sequoia,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
 
 
