@@ -1,14 +1,84 @@
 package Pages;
 
 import TestManagers.DriverManager;
+import factory.Locator;
+import factory.LocatorTypes;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import utility.CustomSoftAssert;
+import utility.FrameworkConstants;
 
 public class TestVideoPage extends LTDashboardCommonActions {
 
-  DriverManager driver;
+  private final Logger ltLogger = LogManager.getLogger(TestVideoPage.class);
 
-  public TestVideoPage(String testId, DriverManager driverManager) {
+  DriverManager driver;
+  CustomSoftAssert softAssert;
+
+  private static final Locator videoNotPresentMessage = new Locator(LocatorTypes.CSS,
+    "div[class*='VideoContainer_errorMsg']");
+  private static final Locator video = new Locator(LocatorTypes.TAG_NAME, "video");
+  private static final Locator playVideoButton = new Locator(LocatorTypes.CSS, "button[aria-label='Play Video']");
+  private static final Locator pauseVideoButton = new Locator(LocatorTypes.CSS, "button[aria-label='Pause Video']");
+
+  public TestVideoPage(String testId, DriverManager driverManager, CustomSoftAssert softAssert) {
     super(testId, driverManager);
     driver = driverManager;
+    this.softAssert = softAssert;
+  }
+
+  private boolean isVideoPresent(int retryCount) {
+    retryCount = Math.max(1, retryCount);
+
+    ltLogger.info("Checking if video is present");
+    boolean isVideoPresent = false;
+
+    for (int attempt = 1; attempt <= retryCount && !isVideoPresent; attempt++) {
+      isVideoPresent = driver.isDisplayed(video, 20);
+      ltLogger.info("Attempt: {} -> Video status: {}", attempt, isVideoPresent);
+
+      if (!isVideoPresent && attempt < retryCount) {
+        driver.refreshPage();
+      }
+    }
+
+    if (!isVideoPresent) {
+      String errorMessage = driver.isDisplayed(videoNotPresentMessage, 10) ?
+        "Video verification failed from UI. Video is generated." :
+        "Video verification is not valid. Please check from UI and review the script.";
+      softAssert.fail(errorMessage);
+    }
+
+    return isVideoPresent;
+  }
+
+  private void validateVideoIsPlayable() {
+    double videoDuration = Double.parseDouble(
+      driver.executeScriptAndFetchValue(FrameworkConstants.jsToGetVideoDurationFromDOM).toString());
+    ltLogger.info("Video duration: {}", videoDuration);
+    if (videoDuration < 10) {
+      softAssert.fail("Video duration is less than 10 seconds. Duration: " + videoDuration);
+      return;
+    }
+    driver.click(playVideoButton);
+    double videoCurrentTimeStamp;
+    waitForTime(10);
+    videoCurrentTimeStamp = Double.parseDouble(
+      driver.executeScriptAndFetchValue(FrameworkConstants.jsToGetVideoCurrentTimeStampFromDOM).toString());
+    ltLogger.info("Video currentTimeStamp after clicking on video play button and waiting for 10 secs : {}",
+      videoCurrentTimeStamp);
+    softAssert.assertTrue(videoCurrentTimeStamp > 5,
+      "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: " + videoCurrentTimeStamp);
+    if (driver.isDisplayed(pauseVideoButton, 2)) {
+      driver.click(pauseVideoButton);
+      ltLogger.info("Video paused");
+    }
+  }
+
+  public void validateTestVideo() {
+    if (isVideoPresent(2)) {
+      validateVideoIsPlayable();
+    }
   }
 
 }

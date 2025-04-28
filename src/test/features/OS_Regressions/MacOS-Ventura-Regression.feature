@@ -13,13 +13,13 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                                                                                                                    |
-      | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+      | capabilities                                                                                                                                                                                      |
+      | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
 
-    @frankfurt_smoke
+    @frankfurt_smoke @ireland_smoke_new
     Examples:
-      | capabilities                                                                                                                                                       |
-      | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+      | capabilities                                                                                                                                                     |
+      | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
 
   @ventura_regression_2 @geoLocations_verification
@@ -30,7 +30,7 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
-    @ohio_smoke
+    @ohio_smoke @london_smoke_new
     Examples:
       | capabilities                                                                                                                                       |
       | browserName=chrome,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
@@ -51,7 +51,7 @@ Feature: Automation of ventura machine with different browsers.
       | capabilities                                                                                                                                                                       |
       | browserName=edge,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
 
-    @ireland_smoke
+    @ireland_smoke @sydney_smoke_new
     Examples:
       | capabilities                                                                                                                                                                          |
       | browserName=firefox,platform=ventura,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
@@ -66,25 +66,27 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
-    @mumbai_smoke
+    @mumbai_smoke @virginia_smoke_new
     Examples:
       | capabilities                                                                                                                                                             |
       | browserName=safari,platform=ventura,version=latest,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
 
   @ventura_regression_5 @ui_verification @tunnel_verification @martian_verification
-  Scenario Outline: PT-13416871 network logs, console & selenium logs should be generated and visible on UI for ventura browser with tunnel true
+  Scenario Outline: Network logs, console & selenium logs should be generated and visible on UI for ventura browser with tunnel true
     Given Setup user details
     Then I start tunnel
     Then I start session with driver quit to test local,consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I stop tunnel
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I verify console logs from UI
+    Then I verify test video from UI
+    Then I verify test performanceReport from UI
     Then I verify performance report Log via API
+    Then I stop client test session
 
     @california_smoke
     Examples:
@@ -97,13 +99,14 @@ Feature: Automation of ventura machine with different browsers.
     Given Setup user details
     Then I start session with driver quit to test consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I upload sample terminal logs
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I verify console logs from UI
+    Then I verify test video from UI
+    Then I stop client test session
 
     Examples:
       | capabilities                                                                                                                    |

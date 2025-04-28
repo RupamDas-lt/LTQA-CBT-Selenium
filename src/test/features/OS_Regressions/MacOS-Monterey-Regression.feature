@@ -15,8 +15,8 @@ Feature: Automation of monterey machine with different browsers.
     Examples:
       | capabilities                                                                                                                                                        |
       | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
-    
-    @singapore_smoke
+
+    @singapore_smoke @singapore_smoke_new
     Examples:
       | capabilities                                                                                                                                                                                     |
       | browserName=edge,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
@@ -30,6 +30,7 @@ Feature: Automation of monterey machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
+    @frankfurt_smoke_new
     Examples:
       | capabilities                                                                                                                                        |
       | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
@@ -66,19 +67,21 @@ Feature: Automation of monterey machine with different browsers.
       | browserName=safari,platform=monterey,version=latest,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
 
   @monterey_regression_5 @ui_verification @tunnel_verification @martian_verification
-  Scenario Outline: PT-13416871 network logs, console & selenium logs should be generated and visible on UI for monterey browser with tunnel true
+  Scenario Outline: Network logs, console & selenium logs should be generated and visible on UI for monterey browser with tunnel true
     Given Setup user details
     Then I start tunnel
     Then I start session with driver quit to test local,consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I stop tunnel
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I verify console logs from UI
+    Then I verify test video from UI
+    Then I verify test performanceReport from UI
     Then I verify performance report Log via API
+    Then I stop client test session
 
     Examples:
       | capabilities                                                                                                                     |
@@ -90,13 +93,14 @@ Feature: Automation of monterey machine with different browsers.
     Given Setup user details
     Then I start session with driver quit to test consoleLog,exceptionLogTesting,networkLog with <capabilities>
     Then I upload sample terminal logs
-#    Then I start client test session
-#    And Login to LT dashboard
-#    Then I stop client test session
-    Then I verify console Log via API
-    Then I verify selenium Log via API
-    Then I verify command Log via API
-    Then I verify network Log via API
+    Then I start client test session
+    And Login to LT dashboard
+    Then I verify command logs from UI
+    Then I verify network logs from UI
+    Then I verify system logs from UI
+    Then I verify console logs from UI
+    Then I verify test video from UI
+    Then I stop client test session
 
     Examples:
       | capabilities                                                                                                                           |

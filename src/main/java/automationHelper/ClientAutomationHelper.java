@@ -94,23 +94,31 @@ public class ClientAutomationHelper extends BaseClass {
   }
 
   public void verifyTestLogsFromUI(String testId, String logName) {
-    // Wait for logs to be uploaded
+    verifyTestArtifactFromUI(testId, logName, "logs");
+  }
+
+  public void verifyTestMediaFromUI(String testId, String testMediaName) {
+    verifyTestArtifactFromUI(testId, testMediaName, "media");
+  }
+
+  private void verifyTestArtifactFromUI(String testId, String artifactName, String artifactType) {
+    // Wait for artifact to be uploaded
     waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString(),
       120);
 
     CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-    String stepName = String.format("Verify %s logs from UI", logName);
+    String stepName = String.format("Verify %s %s from UI", artifactName, artifactType);
 
     try {
       LTHooks.startStepContext(driverManager, stepName);
-      verifyLogs(testId, logName, clientSoftAssert);
+      verifyTestLogsAndMediaFromUI(testId, artifactName, clientSoftAssert);
     } finally {
       LTHooks.endStepContext(driverManager, stepName);
       EnvSetup.CLIENT_SOFT_ASSERT.set(clientSoftAssert);
     }
   }
 
-  private void verifyLogs(String testId, String logName, CustomSoftAssert softAssert) {
+  private void verifyTestLogsAndMediaFromUI(String testId, String logName, CustomSoftAssert softAssert) {
     switch (logName.toLowerCase()) {
     case "command":
       verifyCommandLogs(testId, softAssert);
@@ -123,6 +131,12 @@ public class ClientAutomationHelper extends BaseClass {
       break;
     case "console":
       verifyConsoleLogs(testId, softAssert);
+      break;
+    case "video":
+      verifyTestVideo(testId, softAssert);
+      break;
+    case "performancereport":
+      verifyPerformanceReport(testId, softAssert);
       break;
     default:
       softAssert.fail(String.format("Unsupported log type: %s", logName));
@@ -175,5 +189,21 @@ public class ClientAutomationHelper extends BaseClass {
     String consoleLogFileName = constructConsoleLogFileName(testID);
     consoleLogsPage.downloadConsoleLogsFromUI(consoleLogFileName);
     consoleLogsPage.openConsoleLogsInNewTabAndVerify();
+  }
+
+  private void verifyTestVideo(String testId, CustomSoftAssert softAssert) {
+    TestVideoPage testVideoPage = new TestVideoPage(testId, driverManager, softAssert);
+    testVideoPage.navigateToHomePageOfSpecificTest();
+    testVideoPage.validateTestVideo();
+  }
+
+  private void verifyPerformanceReport(String testId, CustomSoftAssert softAssert) {
+    TestPerformanceReportPage performanceReportPage = new TestPerformanceReportPage(testId, driverManager, softAssert);
+    if (!performanceReportPage.openPerformanceReportTab()) {
+      softAssert.fail(
+        "Unable to open performance report tab. Please check if you have passed capability performance true or UI is breaking.");
+      return;
+    }
+    performanceReportPage.isPerformanceReportDisplayed();
   }
 }

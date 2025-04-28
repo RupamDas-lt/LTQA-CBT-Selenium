@@ -75,7 +75,7 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
       return;
     }
     List<String> expectedConsoleLogs = constructExpectedConsoleLogMessage();
-    String consoleLogsPresentInDashboard = driver.getText(consoleLogsRowsContainer);
+    String consoleLogsPresentInDashboard = driver.getText(consoleLogsRowsContainer, 5);
     List<String> notFoundConsoleLogs = new ArrayList<>();
     for (String consoleLog : expectedConsoleLogs) {
       ltLogger.info("Searching for console log: {}", consoleLog);

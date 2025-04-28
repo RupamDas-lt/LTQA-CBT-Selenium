@@ -123,4 +123,9 @@ public class AutomationSetupDefinitions {
   public void iVerifyCommandLogsFromUI(String logName) {
     clientAutomationHelper.verifyTestLogsFromUI(TEST_SESSION_ID.get(), logName);
   }
+
+  @Then("^I verify test (video|screenshot|performanceReport) from UI$")
+  public void iVerifyTestVideoFromUI(String testMediaType) {
+    clientAutomationHelper.verifyTestMediaFromUI(TEST_SESSION_ID.get(), testMediaType);
+  }
 }
