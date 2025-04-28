@@ -16,7 +16,7 @@ Feature: Automation of monterey machine with different browsers.
       | capabilities                                                                                                                                                        |
       | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
-    @singapore_smoke
+    @singapore_smoke @singapore_smoke_new
     Examples:
       | capabilities                                                                                                                                                                                     |
       | browserName=edge,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
@@ -30,6 +30,7 @@ Feature: Automation of monterey machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
+    @frankfurt_smoke_new
     Examples:
       | capabilities                                                                                                                                        |
       | browserName=chrome,platform=monterey,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |

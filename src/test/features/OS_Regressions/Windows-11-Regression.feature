@@ -16,7 +16,7 @@ Feature: Automation of windows11 machine with different browsers.
       | capabilities                                                                                                                                                     |
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
 
-    @oregon_smoke
+    @oregon_smoke @frankfurt_smoke_new
     Examples:
       | capabilities                                                                                                                                                                                  |
       | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
@@ -30,6 +30,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
 
+    @ohio_smoke_new
     Examples:
       | capabilities                                                                                                                 |
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,console=true,geoLocation=.* |
@@ -51,7 +52,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
-    @paris_smoke
+    @paris_smoke @london_smoke_new
     Examples:
       | capabilities                                                                                                                                                                        |
       | browserName=firefox,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,tunnel=true,network.har=true,network.full.har=true,console=true |
@@ -66,7 +67,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify command Log via API
     Then I verify network Log via API
 
-    @singapore_smoke
+    @singapore_smoke @singapore_smoke_new
     Examples:
       | capabilities                                                                                                                                                       |
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
