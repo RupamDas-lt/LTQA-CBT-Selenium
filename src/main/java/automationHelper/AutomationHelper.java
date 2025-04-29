@@ -148,7 +148,9 @@ public class AutomationHelper extends BaseClass {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
-    LTHooks.endStepContext(driverManager, actionName);
+    if (!actionName.toLowerCase().contains("timeout")) {
+      LTHooks.endStepContext(driverManager, actionName);
+    }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
