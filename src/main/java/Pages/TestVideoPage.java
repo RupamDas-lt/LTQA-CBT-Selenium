@@ -34,7 +34,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
     boolean isVideoPresent = false;
 
     for (int attempt = 1; attempt <= retryCount && !isVideoPresent; attempt++) {
-      isVideoPresent = driver.isDisplayed(video, 20);
+      isVideoPresent = driver.isDisplayed(video, 20) && driver.isDisplayed(playVideoButton, 20);
       ltLogger.info("Attempt: {} -> Video status: {}", attempt, isVideoPresent);
 
       if (!isVideoPresent && attempt < retryCount) {
