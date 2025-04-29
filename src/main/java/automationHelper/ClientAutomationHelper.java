@@ -93,6 +93,25 @@ public class ClientAutomationHelper extends BaseClass {
     return finalConsoleLogsFileName;
   }
 
+  private boolean isLogValidForCurrentTestConfig(String logType) {
+    Map<String, Object> capsMap = EnvSetup.TEST_CAPS_MAP.get();
+    if (capsMap == null) {
+      return false;
+    }
+    switch (logType) {
+    case "console" -> {
+      return capsMap.get(BROWSER_NAME).toString().equalsIgnoreCase("chrome") || capsMap.get(BROWSER_NAME).toString()
+        .equalsIgnoreCase("edge");
+    }
+    case "performance" -> {
+      return capsMap.get(BROWSER_NAME).toString().equalsIgnoreCase("chrome");
+    }
+    default -> {
+      return true;
+    }
+    }
+  }
+
   public void verifyTestLogsFromUI(String testId, String logName) {
     verifyTestArtifactFromUI(testId, logName, "logs");
   }
@@ -184,6 +203,9 @@ public class ClientAutomationHelper extends BaseClass {
       softAssert.fail("Unable to open console logs tab");
       return;
     }
+    if (isLogValidForCurrentTestConfig("console")) {
+      consoleLogsPage.verifyConsoleLogsNotSupportedMessageDisplayed();
+    }
     consoleLogsPage.verifyConsoleLogsFromUI();
     String testID = consoleLogsPage.getTestIDFromTestDashboard();
     String consoleLogFileName = constructConsoleLogFileName(testID);
@@ -198,6 +220,9 @@ public class ClientAutomationHelper extends BaseClass {
   }
 
   private void verifyPerformanceReport(String testId, CustomSoftAssert softAssert) {
+    if (isLogValidForCurrentTestConfig("performance")) {
+      return;
+    }
     TestPerformanceReportPage performanceReportPage = new TestPerformanceReportPage(testId, driverManager, softAssert);
     if (!performanceReportPage.openPerformanceReportTab()) {
       softAssert.fail(

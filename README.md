@@ -103,6 +103,13 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DSEND_DATA_TO_SUMO=true
 ```
 
+-**`PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD`**: This can be used to add custom data in sumo payload from CLI. Use this with
+`SEND_DATA_TO_SUMO` flag. This data will be available under key: `custom_data_from_cli`.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DSEND_DATA_TO_SUMO=true -DPUT_CUSTOM_DATA_TO_SUMO_PAYLOAD="key1=value1,key2=value2"
+```
+
 ---
 
 ## Tunnel

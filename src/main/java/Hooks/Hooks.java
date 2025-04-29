@@ -9,6 +9,7 @@ import io.cucumber.java.Scenario;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utility.BaseClass;
 import utility.EnvSetup;
 
 import java.io.PrintWriter;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
-public class Hooks {
+public class Hooks extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(Hooks.class);
   private final AutomationAPIHelper apiHelper = new AutomationAPIHelper();
   private final StringBuilder combinedAssertionErrorMessage = new StringBuilder();
@@ -294,6 +295,17 @@ public class Hooks {
     }
   }
 
+  private void handleTestDataForSumoLogic() {
+    if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
+      String customDataFromEnvVar = System.getProperty(PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD, "");
+      if (!StringUtils.isNullOrEmpty(customDataFromEnvVar)) {
+        HashMap<String, Object> customDataMapFromCLI = getHashMapFromString(customDataFromEnvVar);
+        TEST_REPORT.get().put("custom_data_from_cli", customDataMapFromCLI);
+      }
+      apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
+    }
+  }
+
   @After(order = 1)
   public void afterScenario(Scenario scenario) {
     closeAllActiveDrivers();
@@ -307,10 +319,8 @@ public class Hooks {
     updateTestReport();
 
     printTestDashboardAndRetinaLinks(scenario, TEST_ENV);
-
-    if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
-      apiHelper.sendCustomDataToSumo(TEST_REPORT.get());
-    }
+    
+    handleTestDataForSumoLogic();
 
     resetTestData();
   }

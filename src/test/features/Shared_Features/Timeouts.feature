@@ -10,6 +10,7 @@ Feature: Verify test timeouts
     Then I verify console Log via API
     Then I verify network Log via API
     Then I verify command Log via API
+    Then I verify video via API
 
     Examples:
       | capabilities                                                                                                 |
