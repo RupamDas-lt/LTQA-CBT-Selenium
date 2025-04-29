@@ -112,10 +112,9 @@ public abstract class ApiManager extends BaseClass {
       password);
   }
 
-  public Response putRequestWithURLEncoding(String uri, HashMap<String, Object> body) {
-    RestAssured.urlEncodingEnabled = false;
-    return RestAssured.given().body(body).contentType(ContentType.JSON).put(uri).then().statusCode(200).extract()
-      .response();
+  public Response postRequestWithURLEncoding(String uri, Object body) {
+    return RestAssured.given().body(body).contentType(ContentType.JSON).urlEncodingEnabled(false).post(uri).then()
+      .statusCode(200).extract().response();
   }
 
   public Response postRequestWithBasicAuth(String uri, Object body, String username, String password) {

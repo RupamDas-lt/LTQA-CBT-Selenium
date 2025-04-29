@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import io.restassured.http.Method;
@@ -132,9 +133,12 @@ public class AutomationAPIHelper extends ApiManager {
 
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {
     customData.put("message", "New_Framework_Testing-2");
-    ltLogger.info("Custom data to push to SumoLogic: {}", customData);
+    String jsonString = new JSONObject(customData).toString();
+    ltLogger.info("Custom data to push to SumoLogic: {}", jsonString);
     try {
-      putRequestWithURLEncoding(SUMO_LOGIC_URL, customData);
+      Response response = postRequestWithURLEncoding(SUMO_LOGIC_URL, jsonString);
+      ltLogger.info("Response of send data to sumo: {}", response.asString());
+      assert response.statusCode() == 200;
     } catch (AssertionError e) {
       ltLogger.error("Got Exception while sending data to sumo", e);
       if (!e.getMessage().contains("Expected status code <200> but was <429>")) {
