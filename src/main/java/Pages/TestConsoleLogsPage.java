@@ -29,6 +29,8 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
 
   private static final Locator allLogsTab = new Locator(LocatorTypes.ID, "test-detail-logs-tab");
   private static final Locator consoleLogsTab = new Locator(LocatorTypes.CSS, "li[id='lt-test-detail-logs-console']");
+  private static final Locator consoleLogsNotSupportedMessageContainer = new Locator(LocatorTypes.CSS,
+    "div[class*='ComponentNoDataFound'] h2");
   private static final Locator consoleLogsParentContainer = new Locator(LocatorTypes.CSS,
     "div[id='test-detail-logs-console']");
   private static final Locator consoleLogsNotFoundMessage = new Locator(LocatorTypes.CSS,
@@ -95,6 +97,13 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
   public void openConsoleLogsInNewTabAndVerify() {
     String errorMessage = openLogsInNewTabAndVerify("console", consoleLogRowLocator);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
+  }
+
+  public void verifyConsoleLogsNotSupportedMessageDisplayed() {
+    final String expectedErrorMessage = "Console Logs are not supported on the selected Browser";
+    String message = driver.getText(consoleLogsNotSupportedMessageContainer, 2);
+    softAssert.assertTrue(message.contains(expectedErrorMessage),
+      "Error message of not supported browser for console logs is incorrect. Actual Message: " + message + ", Expected Message: " + expectedErrorMessage);
   }
 
 }
