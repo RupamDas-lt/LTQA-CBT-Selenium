@@ -29,6 +29,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify console Log via API
     Then I verify selenium Log via API
     Then I verify command Log via API
+    Then I verify video via API
 
     @ohio_smoke_new
     Examples:
@@ -51,6 +52,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
     Then I verify network Log via API
+    Then I verify video via API
 
     @paris_smoke @london_smoke_new
     Examples:
@@ -66,6 +68,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify selenium Log via API
     Then I verify command Log via API
     Then I verify network Log via API
+    Then I verify video via API
 
     @singapore_smoke @singapore_smoke_new
     Examples:
@@ -118,6 +121,7 @@ Feature: Automation of windows11 machine with different browsers.
   Scenario Outline: User is able to run multiple sessions on for win11 machine with different browsers and latest and random versions
     Given Setup user details
     Then I start session with driver quit to test browserOSDetails with <capabilities>
+    Then I verify video via API
 
     @latest_browser_and_selenium_versions
     Examples:
