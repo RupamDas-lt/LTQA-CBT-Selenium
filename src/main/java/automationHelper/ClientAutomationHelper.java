@@ -205,6 +205,7 @@ public class ClientAutomationHelper extends BaseClass {
     }
     if (!isLogValidForCurrentTestConfig("console")) {
       consoleLogsPage.verifyConsoleLogsNotSupportedMessageDisplayed();
+      return;
     }
     consoleLogsPage.verifyConsoleLogsFromUI();
     String testID = consoleLogsPage.getTestIDFromTestDashboard();
