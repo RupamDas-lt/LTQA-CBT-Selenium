@@ -523,7 +523,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     ltLogger.info("Extracted video metadata: {}", videoMetaData);
 
     // Verify Resolution
-    verifyResolution(videoMetaData, testCaps, softAssert);
+    if (testCaps.containsKey(RESOLUTION)) {
+      verifyResolution(videoMetaData, testCaps, softAssert);
+    }
 
     // Verify Duration
     verifyDuration(videoMetaData, softAssert);

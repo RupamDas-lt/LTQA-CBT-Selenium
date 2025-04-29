@@ -203,7 +203,7 @@ public class ClientAutomationHelper extends BaseClass {
       softAssert.fail("Unable to open console logs tab");
       return;
     }
-    if (isLogValidForCurrentTestConfig("console")) {
+    if (!isLogValidForCurrentTestConfig("console")) {
       consoleLogsPage.verifyConsoleLogsNotSupportedMessageDisplayed();
     }
     consoleLogsPage.verifyConsoleLogsFromUI();
