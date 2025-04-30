@@ -404,6 +404,7 @@ public class AutomationHelper extends BaseClass {
     driverManager.switchToTab(1);
     softAssert.assertTrue(driverManager.getCurrentURL().contains("chrome-extension"),
       "Extension not working, or might be tab not switched");
+    driverManager.switchToTab(0);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
