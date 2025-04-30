@@ -192,6 +192,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
 
   // ffprobe commands to extract video data
+  public static final String[] VIDEO_INFO_COMMAND = { "ffmpeg", "-v", "error", "-i" };
+
   public static final String[] DURATION_COMMAND = { "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
     "default=noprint_wrappers=1:nokey=1" };
 
