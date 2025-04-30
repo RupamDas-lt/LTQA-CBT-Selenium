@@ -496,7 +496,16 @@ public class BaseClass {
   }
 
   public Map<String, Object> extractMetaDataOfSpecificVideoFile(String videoFilePath) {
+    final String expectedErrorMessageForInvalidVideoFile = "Invalid data found when processing input";
     Map<String, Object> metadataMap = new HashMap<>();
+
+    // Check if video file is valid
+    ltLogger.info("Checking validity of the video file...");
+    String videoInfo = executeFFprobeCommand(VIDEO_INFO_COMMAND, videoFilePath);
+    ltLogger.info("Video info: {}", videoInfo);
+    if (videoInfo.contains(expectedErrorMessageForInvalidVideoFile))
+      return null;
+
     // Extract duration
     ltLogger.info("Extracting video duration...");
     String duration = executeFFprobeCommand(DURATION_COMMAND, videoFilePath);

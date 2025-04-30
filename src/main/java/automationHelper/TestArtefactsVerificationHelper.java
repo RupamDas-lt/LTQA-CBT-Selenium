@@ -522,6 +522,12 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     Map<String, Object> videoMetaData = extractMetaDataOfSpecificVideoFile(completeFilePath);
     ltLogger.info("Extracted video metadata: {}", videoMetaData);
 
+    // Check if the video file is valid
+    if (videoMetaData == null) {
+      softAssert.fail("Extracted video metadata is null. Possible cause: Downloaded video file is corrupted.");
+      return;
+    }
+
     // Verify Resolution
     if (testCaps.containsKey(RESOLUTION)) {
       verifyResolution(videoMetaData, testCaps, softAssert);
