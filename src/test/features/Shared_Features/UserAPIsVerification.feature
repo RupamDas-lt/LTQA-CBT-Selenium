@@ -1,7 +1,7 @@
 @publicAPIsVerification
 Feature: Verify all the public APIs
 
-  @testStopApiVerification
+  @testStopApiVerification @smoke_api
   Scenario Outline: User should be able to stop test via API
     Given Setup user details
     Then I start session without driver quit to test noAction with <capabilities>
@@ -12,7 +12,7 @@ Feature: Verify all the public APIs
       | capabilities                                                                                          |
       | browserName=chrome,platform=win10,version=latest,idleTimeout=900,name=Test_Stop_API_Verification_Test |
 
-  @buildStopApiVerification
+  @buildStopApiVerification @smoke_api
   Scenario Outline: User should be able to stop build via API
     Given Setup user details
     Then I start session without driver quit to test noAction with <capabilities>
@@ -24,7 +24,7 @@ Feature: Verify all the public APIs
       | browserName=chrome,platform=win11,version=latest,idleTimeout=900,name=Build_Stop_API_Verification_Test,build=Build_Stop_Tests_randomName |
 
 
-  @tunnelStopApiVerification
+  @tunnelStopApiVerification @smoke_api
   Scenario: User should be able to stop tunnel via API
     Given Setup user details
     Then I start tunnel
