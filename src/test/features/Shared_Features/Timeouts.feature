@@ -1,7 +1,7 @@
 @testTimeoutsVerification
 Feature: Verify test timeouts
 
-  @testIdleTimeoutVerification
+  @testIdleTimeoutVerification @smoke_api
   Scenario Outline: The test should idleTimeout after remaining in idle state for a specific time
     Given Setup user details
     Then I start session without driver quit to test consoleLog,networkLog,idleTimeout with <capabilities>
