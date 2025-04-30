@@ -12,7 +12,7 @@ Feature: Automation of windows10 machine with different browsers.
     Then I verify command Log via API
     Then I verify video via API
 
-    @oregon_smoke
+    @oregon_smoke @oregon_smoke_new
     Examples:
       | capabilities                                                                                                                                                   |
       | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
