@@ -69,6 +69,7 @@ Feature: Automation of sequoia machine with different browsers.
     Then I verify network Log via API
     Then I verify video via API
 
+    @oregon_smoke_new
     Examples:
       | capabilities                                                                                                                                                             |
       | browserName=safari,platform=sequoia,version=latest,resolution=.*,timezone=.*,visual=true,network=true,network.http2=true,geoLocation=.*,selenium_version=.*,console=true |
