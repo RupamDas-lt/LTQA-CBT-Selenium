@@ -2,6 +2,7 @@
 
 # Define directories and files to delete
 files_and_dirs=(
+  "./logs"
   "./src/test/resources/TestData/browser_versions"
   "./src/test/resources/TestData/geoLocations.json"
   "./target/cucumber-reports"
