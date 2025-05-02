@@ -142,6 +142,12 @@ To rerun failed tests:
 - Always ensure the `cucumber.yaml` file is correctly set up with valid credentials before running tests.
 - Adjust the `-DENV` flag as needed for your desired environment.
 - Use the `-DPARALLEL` flag to optimize test execution time by running tests concurrently.
+- For cleaning up the test results, cached test data like browser versions, geoLocation, you can run the following
+  command:
+
+```bash
+  bash ./Utility/Bash/Cleanup.sh
+```
 
 ---
 
