@@ -14,7 +14,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String HTTP = "http://";
   public static final String OS_NAME = "os.name";
   public static final String LOCAL_HOST_URL = "http://127.0.0.1:";
-  public static final String DASHLANE_EXTENSION_PUBLIC_URL = "https://stage-lambda-devops-use-only.lambdatestinternal.com/magicleap/qa/dashlane-extension.zip";
+  public static final String DASHLANE_EXTENSION_PUBLIC_URL = "https://stage-lambda-devops-use-only.lambdatestinternal.com/magicleap/qa/dashlane-extension-latest.zip";
 
   // Cloud platform specs
   public enum cloudPlatforms {
