@@ -654,6 +654,7 @@ public class AutomationHelper extends BaseClass {
       .equalsIgnoreCase("false") || testCaps.getOrDefault(SELENIUM_CDP, "false").toString()
       .equals("true") || testCaps.getOrDefault(SELENIUM_TELEMETRY_LOGS, "false").toString().equals("true"))
       isWebdriverModeEnabled = false;
+    ltLogger.info("isWebdriverModeEnabled status: {}", isWebdriverModeEnabled);
     return isWebdriverModeEnabled;
   }
 

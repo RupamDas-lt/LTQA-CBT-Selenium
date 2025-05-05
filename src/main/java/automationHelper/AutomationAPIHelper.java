@@ -133,6 +133,7 @@ public class AutomationAPIHelper extends ApiManager {
 
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {
     customData.put("message", "New_Framework_Testing-2");
+    customData.put("attempt", System.getProperty(TEST_ATTEMPT, "first"));
     String jsonString = new JSONObject(customData).toString();
     ltLogger.info("Custom data to push to SumoLogic: {}", jsonString);
     try {
