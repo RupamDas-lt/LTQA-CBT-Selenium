@@ -7,6 +7,7 @@ import utility.ScenarioUtils;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static utility.FrameworkConstants.TEST_ATTEMPT;
 
 @CucumberOptions(features = { "@rerun/failed_scenarios.txt" }, glue = { "stepDefinitions",
   "Hooks" }, monochrome = true, plugin = { "pretty", "rerun:rerunFailedFirstAttempt/failed_scenarios_post_rerun.txt",
@@ -16,6 +17,7 @@ import static java.lang.System.setProperty;
   public FailedTestRunner() {
     super();
     setProperty("log4j.configurationFile", "src/main/resources/log4j2.yaml");
+    setProperty(TEST_ATTEMPT, "rerun");
   }
 
   @Override

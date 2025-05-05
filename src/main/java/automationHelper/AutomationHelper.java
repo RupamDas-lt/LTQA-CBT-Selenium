@@ -650,10 +650,19 @@ public class AutomationHelper extends BaseClass {
     boolean isWebdriverModeEnabled = true;
     String isWebdriverModeFlagEnabled = apiHelper.getFeatureFlagValueOfSpecificSession(session_id,
       webDriverModeFlagKey);
-    if (testCaps.getOrDefault(WEBDRIVER_MODE, isWebdriverModeFlagEnabled).toString()
-      .equalsIgnoreCase("false") || testCaps.getOrDefault(SELENIUM_CDP, "false").toString()
-      .equals("true") || testCaps.getOrDefault(SELENIUM_TELEMETRY_LOGS, "false").toString().equals("true"))
+
+    String webDriverModeCapsValue = testCaps.getOrDefault(WEBDRIVER_MODE, isWebdriverModeFlagEnabled).toString();
+    String seCdpCapsValue = testCaps.getOrDefault(SELENIUM_CDP, "false").toString();
+    String seTelemetryCapsValue = testCaps.getOrDefault(SELENIUM_TELEMETRY_LOGS, "false").toString();
+
+    ltLogger.info(
+      "WebDriver mode constraint values: \nwebDriverModeFlag: {}\nwebDriverModeCapsValue: {}\nseCdpCapsValue: {}\nseTelemetryCapsValue: {}",
+      isWebdriverModeFlagEnabled, webDriverModeCapsValue, seCdpCapsValue, seTelemetryCapsValue);
+
+    if (webDriverModeCapsValue.equalsIgnoreCase("false") || seCdpCapsValue.equals(
+      "true") || seTelemetryCapsValue.equals("true"))
       isWebdriverModeEnabled = false;
+    ltLogger.info("isWebdriverModeEnabled status: {}", isWebdriverModeEnabled);
     return isWebdriverModeEnabled;
   }
 
