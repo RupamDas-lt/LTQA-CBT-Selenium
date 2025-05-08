@@ -658,6 +658,7 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info(
       "WebDriver mode constraint values: \nwebDriverModeFlag: {}\nwebDriverModeCapsValue: {}\nseCdpCapsValue: {}\nseTelemetryCapsValue: {}",
       isWebdriverModeFlagEnabled, webDriverModeCapsValue, seCdpCapsValue, seTelemetryCapsValue);
+    ltLogger.info("Test Capability used: {}", testCaps);
 
     if (webDriverModeCapsValue.equalsIgnoreCase("false") || seCdpCapsValue.equals(
       "true") || seTelemetryCapsValue.equals("true"))
