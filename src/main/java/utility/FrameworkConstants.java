@@ -140,7 +140,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String NETWORK_HAR = "network.har";
   public static final String NETWORK_FULL_HAR = "network.full.har";
   public static final String TERMINAL = "terminal";
-  public static final String SELENIUM_CDP = "scCdp";
+  public static final String SELENIUM_CDP = "seCdp";
   public static final String VIDEO = "video";
   public static final String VISUAL = "visual";
   public static final String CONSOLE = "console";
