@@ -54,6 +54,7 @@ public class TunnelManager extends BaseClass implements Runnable {
   }
 
   private String constructTunnelRunCommand(String params) {
+    ltLogger.info("Given custom tunnel params: {}", params);
     Map<String, Object> tunnelFlags = new HashMap<>(defaultTunnelFlags);
     tunnelFlags.putAll(getHashMapFromString(params, "--", " "));
     tunnelFlags.putAll(getHashMapFromString(customTunnelFlagsString, "--", " "));
@@ -66,6 +67,7 @@ public class TunnelManager extends BaseClass implements Runnable {
     tunnelName = tunnelFlags.get("tunnelName").toString();
     TEST_TUNNEL_NAME.set(tunnelName);
     ltLogger.info("Tunnel run command: {}", command);
+    TEST_REPORT.get().put("tunnel_start_command", command);
     return command;
   }
 

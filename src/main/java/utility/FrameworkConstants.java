@@ -29,6 +29,7 @@ public class FrameworkConstants extends BaseClass {
     "stage-auth.lambdatestinternal.com");
   public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
   public static final String SUMO_LOGIC_URL = "https://endpoint4.collection.sumologic.com/receiver/v1/http/ZaVnC4dhaV1BGey4GE8Y98SqULi08X1lrc4PXMlSghL_8tntkfgr38QuaSrgsvF44nqzlbKs38AVE7I0ras7--0sxak3LfUAkMk2UbSOrcjcOwQRBRMpjQ==";
+  public static final String API_TO_GET_IP = "https://ipinfo.io/ip";
   public static final String GET = "GET";
   public static final String GET_REDIRECT = "GET_REDIRECT";
   public static final String POST = "POST";

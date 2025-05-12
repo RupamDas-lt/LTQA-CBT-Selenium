@@ -48,6 +48,11 @@ public class AutomationSetupDefinitions {
     }
   }
 
+  @Then("^I start tunnel with (.+)$")
+  public void iStartTunnelWithTunnelFlags(String args) {
+    automationHelper.startTunnel(args);
+  }
+
   @Then("^I ([a-zA-Z0-9_=,: ]+) client test session$")
   public void iStartClientTestSession(String startOrStop) {
     if (startOrStop.equals("start")) {

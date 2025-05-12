@@ -426,4 +426,10 @@ public class AutomationAPIHelper extends ApiManager {
     String uri = constructAPIUrl(authApiBase, AUTH_API_ENDPOINT);
     return getCookiesFromResponse(uri, Method.POST, body, null, null);
   }
+
+  public String getCurrentIPFromAPI() {
+    String ip = getRequestAsString(API_TO_GET_IP);
+    ltLogger.info("Current local machine IP fetched from API: {}", ip);
+    return ip;
+  }
 }

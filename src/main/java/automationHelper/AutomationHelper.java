@@ -139,6 +139,15 @@ public class AutomationHelper extends BaseClass {
       case "herokuAppAllTests":
         runDifferentHerokuAppTest();
         break;
+      case "allowHost":
+        checkAllowHostFlagForTunnel();
+        break;
+      case "bypassHost":
+        checkBypassHostFlagForTunnel();
+        break;
+      case "forceLocal":
+        checkForceLocalFlagForTunnel();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -613,11 +622,12 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("Test verification data: {}", TEST_VERIFICATION_DATA.get());
   }
 
-  public void startTunnel() {
+  public void startTunnel(String... givenArgs) {
+    String args = (givenArgs != null && givenArgs.length > 0) ? givenArgs[0] : "";
     int maxTunnelStartRetry = 2;
     while (maxTunnelStartRetry > 0) {
       tunnelManager = new TunnelManager();
-      tunnelManager.startTunnel("");
+      tunnelManager.startTunnel(args);
       boolean tunnelInfoAPIServerStatus = tunnelManager.checkTunnelInfoAPIServerIsInitiated();
       boolean tunnelCLIStatus;
       try {
@@ -846,5 +856,64 @@ public class AutomationHelper extends BaseClass {
     int timeForIdleTimeout = Integer.parseInt(TEST_CAPS_MAP.get().getOrDefault(IDLE_TIMEOUT, "120").toString());
     waitForTime(timeForIdleTimeout);
     ltLogger.info("Test should be idle timeout.");
+  }
+
+  private void checkLocalWebSitesAreReachable(Map<String, String> urlsAndVerificationMessage) {
+    for (String url : urlsAndVerificationMessage.keySet()) {
+      int httpServerStatus = apiHelper.getStatusCode(url, null, null, null, null);
+      Assert.assertEquals(httpServerStatus, 200,
+        String.format("%s. Expected status code: 200, original status code: %d", urlsAndVerificationMessage.get(url),
+          httpServerStatus));
+    }
+  }
+
+  private String[] getCurrentIPAndLocationFromUrlInTestSession() {
+    driverManager.getURL(IP_INFO_IO_URL);
+    return new String[] { driverManager.getText(ipInfoIOIP, 5), driverManager.getText(ipInfoIOLocation, 5) };
+  }
+
+  private void checkAllowHostFlagForTunnel() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
+      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+      "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
+    checkLocalWebSitesAreReachable(expectedLocalUrls);
+    driverManager.getURL(LOCAL_LAMBDA_URL);
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
+      "allowHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel client as allowHosts='*lambda*' flag is used, but unable to open it.");
+    driverManager.getURL(LOCAL_URL);
+    softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
+      "allowHosts flag is not working. " + LOCAL_URL + " should be resolved in the DC or Tunnel Server not in Tunnel Client");
+    String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
+    System.out.printf("IP address for AllowHosts test: %s, Location: %s", ipAndLocation[0], ipAndLocation[1]);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void checkBypassHostFlagForTunnel() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
+      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+      "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
+    checkLocalWebSitesAreReachable(expectedLocalUrls);
+    driverManager.getURL(LOCAL_LAMBDA_URL);
+    softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
+      "bypassHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened.");
+    driverManager.getURL(LOCAL_URL);
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
+      "bypassHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.");
+    String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
+    System.out.printf("IP address for AllowHosts test: %s, Location: %s", ipAndLocation[0], ipAndLocation[1]);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void checkForceLocalFlagForTunnel() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String ip = apiHelper.getCurrentIPFromAPI();
+    String[] ipAndLocationOfTestSession = getCurrentIPAndLocationFromUrlInTestSession();
+    System.out.printf("IP address for ForceLocal test: %s, Location: %s", ipAndLocationOfTestSession[0],
+      ipAndLocationOfTestSession[1]);
+    softAssert.assertTrue(ipAndLocationOfTestSession[0].equals(ip),
+      "ForceLocal flag is not working. All the websites should be resolved from TunnelClient running locally. Expected IP of the local machine: " + ip + ", Actual IP in test session: " + ipAndLocationOfTestSession[0]);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }
