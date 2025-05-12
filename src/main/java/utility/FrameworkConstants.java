@@ -97,6 +97,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String SEND_DATA_TO_SUMO = "SEND_DATA_TO_SUMO";
   public static final String PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD = "PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD";
   public static final String TEST_ATTEMPT = "TEST_ATTEMPT";
+  public static final String JOB_PURPOSE = "JOB_PURPOSE";
 
   // RP keys
   public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
@@ -183,6 +184,7 @@ public class FrameworkConstants extends BaseClass {
 
   // File paths
   public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
+  public static final String GEOLOCATIONS_FOR_SMOKE_DATA_PATH = "src/test/resources/TestData/geoLocationsForSmoke.json";
   public static final String RESOLUTION_DATA_PATH = "src/test/resources/TestData/resolutions.json";
   public static final String TIMEZONE_DATA_PATH = "src/test/resources/TestData/timeZones.json";
   public static final String BROWSER_VERSIONS_DATA_PATH = "src/test/resources/TestData/browser_versions/<BROWSER_NAME>_<TEMPLATE>.json";
@@ -266,6 +268,16 @@ public class FrameworkConstants extends BaseClass {
     private final String value;
 
     videoMetadataTypes(String value) {
+      this.value = value;
+    }
+  }
+
+  @Getter public enum jobPurpose {
+    REGRESSION("regression"), SMOKE("smoke");
+
+    private final String value;
+
+    jobPurpose(String value) {
       this.value = value;
     }
   }

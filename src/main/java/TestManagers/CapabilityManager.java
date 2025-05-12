@@ -121,12 +121,13 @@ public class CapabilityManager extends BaseClass {
   }
 
   private void setRandomValue(Map<String, Object> capabilityMap) {
+    String jobPurpose = System.getProperty(JOB_PURPOSE, "");
     capabilityMap.entrySet().stream().filter(entry -> entry.getValue().toString().equals(".*")).forEach(entry -> {
       String key = entry.getKey();
       String randomValue = switch (key) {
-        case "timezone" -> getRandomTimeZone(capabilityMap.get("platform").toString());
-        case "geoLocation" -> getRandomGeoLocation();
-        case "resolution" -> getRandomResolution(capabilityMap.get("platform").toString());
+        case "timezone" -> getRandomTimeZone(capabilityMap.get("platform").toString(), jobPurpose);
+        case "geoLocation" -> getRandomGeoLocation(jobPurpose);
+        case "resolution" -> getRandomResolution(capabilityMap.get("platform").toString(), jobPurpose);
         case "version" -> getRandomBrowserVersionFromTopSix((String) capabilityMap.getOrDefault("browserName", ""));
         case "selenium_version" -> getRandomSelenium4Version();
         default -> throw new RuntimeException(
@@ -134,15 +135,25 @@ public class CapabilityManager extends BaseClass {
             randomValueSupportedCaps));
       };
       ltLogger.info("Set {} caps value: {}", key, randomValue);
-      capabilityMap.put(key, randomValue);
+      if (randomValue != null) {
+        capabilityMap.put(key, randomValue);
+      } else {
+        ltLogger.info("Removing {} from caps as random value is not applicable for this job {}", key,
+          System.getProperty(JOB_PURPOSE, "NA"));
+        capabilityMap.remove(key);
+      }
     });
   }
 
-  private String getRandomGeoLocation() {
+  private String getRandomGeoLocation(String purpose) {
+    String dataPath = purpose.equals(jobPurpose.SMOKE.getValue()) ?
+      GEOLOCATIONS_FOR_SMOKE_DATA_PATH :
+      GEOLOCATION_DATA_PATH;
     try {
       var objectMapper = new ObjectMapper();
-      var rootNode = objectMapper.readTree(getFileWithFileLock(GEOLOCATION_DATA_PATH));
+      var rootNode = objectMapper.readTree(getFileWithFileLock(dataPath));
       var geoDataArray = rootNode.path("geoData");
+      ltLogger.info("GeoLocation dataset: {}", geoDataArray);
       if (geoDataArray.isArray() && !geoDataArray.isEmpty()) {
         Random random = new Random();
         int randomIndex = random.nextInt(geoDataArray.size());
@@ -158,18 +169,16 @@ public class CapabilityManager extends BaseClass {
     return null;
   }
 
-  private String getRandomResolution(String platform) {
+  private String getRandomResolution(String platform, String purpose) {
+    String dataPath = purpose.equals(jobPurpose.SMOKE.getValue()) ?
+      jobPurpose.SMOKE.getValue() :
+      jobPurpose.REGRESSION.getValue();
     try {
       var objectMapper = new ObjectMapper();
       var rootNode = objectMapper.readTree(getFileWithFileLock(RESOLUTION_DATA_PATH));
-      JsonNode resDataArray;
-      if (platform.toLowerCase().contains("win"))
-        resDataArray = rootNode.path("win");
-      else if (platform.toLowerCase().contains("ubuntu"))
-        resDataArray = rootNode.path("ubuntu");
-      else
-        resDataArray = rootNode.path("mac");
+      JsonNode resDataArray = rootNode.path(platform.toLowerCase()).path(dataPath);
       if (resDataArray.isArray() && !resDataArray.isEmpty()) {
+        ltLogger.info("Resolution dataset: {}", resDataArray);
         Random random = new Random();
         int randomIndex = random.nextInt(resDataArray.size());
         String res = resDataArray.get(randomIndex).asText();
@@ -189,14 +198,18 @@ public class CapabilityManager extends BaseClass {
     return topFive[new Random().nextInt(topFive.length)];
   }
 
-  private String getRandomTimeZone(String platform) {
+  private String getRandomTimeZone(String platform, String purpose) {
     String timeZoneIndex = platform.toLowerCase().contains("win") ? "win" : "others";
-    ltLogger.info("timezone index: {}", timeZoneIndex);
+    String dataPath = purpose.equals(jobPurpose.SMOKE.getValue()) ?
+      jobPurpose.SMOKE.getValue() :
+      jobPurpose.REGRESSION.getValue();
+    ltLogger.info("timezone index: {} and data path: {}", timeZoneIndex, dataPath);
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       var rootNode = objectMapper.readTree(getFileWithFileLock(TIMEZONE_DATA_PATH));
       List<String> timezoneIds = new ArrayList<>();
-      rootNode.path(timeZoneIndex).fields().forEachRemaining(entry -> timezoneIds.add(entry.getKey()));
+      rootNode.path(timeZoneIndex).path(dataPath).fields().forEachRemaining(entry -> timezoneIds.add(entry.getKey()));
+      ltLogger.info("Timezone dataset: {}", timezoneIds);
       Random random = new Random();
       int randomIndex = random.nextInt(timezoneIds.size());
       return timezoneIds.get(randomIndex);

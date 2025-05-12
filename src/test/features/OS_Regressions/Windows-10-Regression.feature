@@ -5,7 +5,7 @@ Feature: Automation of windows10 machine with different browsers.
   Scenario Outline: User is able to run local test session and run session with tunnel for windows10 browser to test console,command log and video with network false
     Given Setup user details
     Then I start tunnel
-    Then I start session with driver quit to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,verifyExtension,uploadFile with <capabilities>
+    Then I start session with driver quit to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,uploadFile with <capabilities>
     Then I stop tunnel
     Then I verify console Log via API
     Then I verify selenium Log via API
@@ -14,13 +14,13 @@ Feature: Automation of windows10 machine with different browsers.
 
     @oregon_smoke @oregon_smoke_new
     Examples:
-      | capabilities                                                                                                                                                   |
-      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+      | capabilities                                                                                                                                |
+      | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,console=true |
 
     @gdpr_smoke @virginia_smoke_new
     Examples:
-      | capabilities                                                                                                                                                                                    |
-      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+      | capabilities                                                                                                                                                                 |
+      | browserName=chrome,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,selenium_version=.*,seCdp=true,console=true |
 
   @win10_regression_2 @geoLocations_verification
   Scenario Outline: User is able to verify network log, console log, selenium log, session video, timezone via api and driver start/stop time within its limit for windows10 browser with geolocation and network false
@@ -140,3 +140,19 @@ Feature: Automation of windows10 machine with different browsers.
       | browserName=firefox,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true                     |
       | browserName=edge,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true                        |
       | browserName=ie,platform=win10,version=.*,resolution=.*,timezone=.*,visual=true                          |
+
+  @win10_regression_8 @extension_verification
+  Scenario Outline: User is able to run test session with Extension on Windows 10
+    Given Setup user details
+    Then I start session with driver quit to test browserOSDetails,verifyExtension with <capabilities>
+    Then I verify video via API
+
+    @virginia_smoke_new
+    Examples:
+      | capabilities                                                                                           |
+      | browserName=chrome,platform=win10,version=135,visual=true,network=true,loadExtension=true,console=true |
+
+    @oregon_smoke_new
+    Examples:
+      | capabilities                                                                                          |
+      | browserName=edge,platform=win10,version=135,visual=true,network=false,loadExtension=true,console=true |

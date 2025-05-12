@@ -1,0 +1,106 @@
+{
+  "geoData": [
+    {
+      "countryCode": "US",
+      "countryName": "United States",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "US"
+    },
+    {
+      "countryCode": "DE",
+      "countryName": "Germany",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "DE"
+    },
+    {
+      "countryCode": "AU",
+      "countryName": "Australia",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "AU"
+    },
+    {
+      "countryCode": "IN",
+      "countryName": "India",
+      "geoVendor": "GeoEdge",
+      "geoVendorLocationCodes": "IN"
+    },
+    {
+      "countryCode": "GB",
+      "countryName": "United Kingdom",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "GB"
+    },
+    {
+      "countryCode": "RU",
+      "countryName": "Russian Federation",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "RU"
+    },
+    {
+      "countryCode": "CA",
+      "countryName": "Canada",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "CA"
+    },
+    {
+      "countryCode": "US/AU",
+      "countryName": "Austin,Texas(US)",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "austin"
+    },
+    {
+      "countryCode": "US/NO",
+      "countryName": "New Orleans,Louisiana(US)",
+      "geoVendor": "GeoEdge",
+      "geoVendorLocationCodes": "B7"
+    },
+    {
+      "countryCode": "BY",
+      "countryName": "Belarus",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "BY"
+    },
+    {
+      "countryCode": "ES",
+      "countryName": "Spain",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "ES"
+    },
+    {
+      "countryCode": "BG",
+      "countryName": "Bulgaria",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "BG"
+    },
+    {
+      "countryCode": "TR",
+      "countryName": "Turkey",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "TR"
+    },
+    {
+      "countryCode": "CA/ON",
+      "countryName": "Ontario(Canada) ",
+      "geoVendor": "GeoEdge",
+      "geoVendorLocationCodes": "D0"
+    },
+    {
+      "countryCode": "IE",
+      "countryName": "Ireland",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "IE"
+    },
+    {
+      "countryCode": "AR",
+      "countryName": "Argentina",
+      "geoVendor": "BrightData",
+      "geoVendorLocationCodes": "AR"
+    },
+    {
+      "countryCode": "Z0",
+      "countryName": "New York City, New York(US)",
+      "geoVendor": "GeoEdge",
+      "geoVendorLocationCodes": "Z0"
+    }
+  ]
+}

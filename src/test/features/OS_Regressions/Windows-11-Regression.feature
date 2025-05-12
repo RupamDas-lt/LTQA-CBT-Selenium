@@ -5,7 +5,7 @@ Feature: Automation of windows11 machine with different browsers.
   Scenario Outline: User is able to run local test session and run session with tunnel for windows11 browser to test console,command log and video with network false
     Given Setup user details
     Then I start tunnel
-    Then I start session with driver quit to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,verifyExtension,uploadFile with <capabilities>
+    Then I start session with driver quit to test local,selfSigned,consoleLog,timezone,basicAuthentication,fillFormUsingKeyboard,networkLog,exceptionLogTesting,browserOSDetails,uploadFile with <capabilities>
     Then I stop tunnel
     Then I verify console Log via API
     Then I verify selenium Log via API
@@ -13,13 +13,13 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                                                                                     |
-      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,console=true |
+      | capabilities                                                                                                                                  |
+      | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,console=true |
 
     @oregon_smoke @frankfurt_smoke_new
     Examples:
-      | capabilities                                                                                                                                                                                  |
-      | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,loadExtension=true,selenium_version=.*,seCdp=true,console=true |
+      | capabilities                                                                                                                                                               |
+      | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,tunnel=true,selenium_version=.*,seCdp=true,console=true |
 
 
   @win11_regression_2 @geoLocations_verification
@@ -139,3 +139,19 @@ Feature: Automation of windows11 machine with different browsers.
       | browserName=chrome,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true                      |
       | browserName=firefox,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true                     |
       | browserName=edge,platform=win11,version=.*,resolution=.*,timezone=.*,visual=true                        |
+
+
+  @win11_regression_8 @extension_verification
+  Scenario Outline: User is able to run test session with Extension on Windows 11
+    Given Setup user details
+    Then I start session with driver quit to test browserOSDetails,verifyExtension with <capabilities>
+    Then I verify video via API
+
+    Examples:
+      | capabilities                                                                                          |
+      | browserName=edge,platform=win11,version=135,visual=true,network=false,loadExtension=true,console=true |
+
+    @frankfurt_smoke_new
+    Examples:
+      | capabilities                                                                                           |
+      | browserName=chrome,platform=win11,version=135,visual=true,network=true,loadExtension=true,console=true |
