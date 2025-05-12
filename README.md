@@ -103,11 +103,20 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DSEND_DATA_TO_SUMO=true
 ```
 
--**`PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD`**: This can be used to add custom data in sumo payload from CLI. Use this with
-`SEND_DATA_TO_SUMO` flag. This data will be available under key: `custom_data_from_cli`.
+- **`PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD`**: This can be used to add custom data in sumo payload from CLI. Use this with
+  `SEND_DATA_TO_SUMO` flag. This data will be available under key: `custom_data_from_cli`.
 
 ```bash
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DSEND_DATA_TO_SUMO=true -DPUT_CUSTOM_DATA_TO_SUMO_PAYLOAD="key1=value1,key2=value2"
+```
+
+- **`JOB_PURPOSE`**: This variable can be passed through the CLI to define the job's purpose. Accepted values are
+  `smoke`
+  and `regression`. When the value `smoke` is passed, the framework randomizes the capability values to those most
+  commonly used by customers.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DJOB_PURPOSE="true"
 ```
 
 ---
@@ -147,6 +156,22 @@ To rerun failed tests:
 
 ```bash
   bash ./Utility/Bash/Cleanup.sh
+```
+
+- Sumo query for getting the customer's test data
+
+```sql
+  _index
+=prod_test_datails
+| where (product == "Web Automation Desktop Browsers") and user_status!="Internal" and %"capability.desiredcapabilities.lt:options.geoLocation" != null
+```
+
+- Sumo query for getting the test data pushed from this framework
+
+```sql
+_source
+="ml_qa_logs" AND _collector="qa-logs" 
+| where message="New_Framework_Testing-2"
 ```
 
 ---
