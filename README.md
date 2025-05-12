@@ -137,6 +137,16 @@ To rerun failed tests:
   bash Utility/Bash/SetupTunnelBinary.sh --env stage
 ```
 
+- **Update Hosts in Local Machine**: For tunnel sanity, we have pointed a custom domain to the localHost which is
+  `locallambda.com`.
+
+    - To add the entry, the flag is `--addEntry`.
+    - To remove the entry, the flag is `--removeEntry`.
+
+```bash
+  bash ./Utility/Bash/UpdateHostEntry.sh --addEntry
+```
+
 ---
 
 ## Random caps

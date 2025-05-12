@@ -67,6 +67,7 @@ public class TunnelManager extends BaseClass implements Runnable {
     tunnelName = tunnelFlags.get("tunnelName").toString();
     TEST_TUNNEL_NAME.set(tunnelName);
     ltLogger.info("Tunnel run command: {}", command);
+    TEST_REPORT.get().put("tunnel_start_command", command);
     return command;
   }
 
