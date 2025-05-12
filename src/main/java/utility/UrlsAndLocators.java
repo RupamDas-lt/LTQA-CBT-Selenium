@@ -11,6 +11,7 @@ public class UrlsAndLocators {
   public static final Locator basicAuthHeading = new Locator(LocatorTypes.CSS, "#content h3");
 
   public static final String LOCAL_URL = "http://localhost:8000/";
+  public static final String LOCAL_LAMBDA_URL = "http://locallambda.com:8000/"; // Add entry for locallambda in etc/hosts and point it to 127.0.0.1
   public static final String LOCAL_IOS = "http://localhost.lambdatest.com:8000/";
   public static final Locator localUrlHeading = new Locator(LocatorTypes.XPATH,
     "//h1[contains(text(),'Directory listing for')]");
@@ -92,4 +93,8 @@ public class UrlsAndLocators {
   public static final Locator ltLoginPageSubmitButton = new Locator(LocatorTypes.ID, "login-button");
   public static final Locator ltLoginSuccessVerification = new Locator(LocatorTypes.XPATH,
     "//*[@id='profile__dropdown__parent']|//*[@id='profile__dropdown']|//div[@role='dialog' and .//*[text()='How would you like to use LambdaTest?' or text()='Check Your Email']]|//*[@name='authentication_code']|//button[text()='Setup MFA']");
+
+  public static final String IP_INFO_IO_URL = "https://ipinfo.io/what-is-my-ip";
+  public static final Locator ipInfoIOIP = new Locator(LocatorTypes.CSS, "[class*='main-content'] h1");
+  public static final Locator ipInfoIOLocation = new Locator(LocatorTypes.CSS, "[class*='main-content'] h2[class*=h5]");
 }

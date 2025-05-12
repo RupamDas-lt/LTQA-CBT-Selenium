@@ -319,7 +319,7 @@ public class Hooks extends BaseClass {
     updateTestReport();
 
     printTestDashboardAndRetinaLinks(scenario, TEST_ENV);
-    
+
     handleTestDataForSumoLogic();
 
     resetTestData();
@@ -343,6 +343,7 @@ public class Hooks extends BaseClass {
     put("TEST_TUNNEL_NAME", TEST_TUNNEL_NAME);
     put("TEST_TUNNEL_ID", TEST_TUNNEL_ID);
     put("BUILD_ID", BUILD_ID);
+    put("TUNNEL_START_COMMAND", TUNNEL_START_COMMAND);
   }};
 
   private void resetTestData() {
