@@ -5,7 +5,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check allowHosts flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test allowHost,selfSigned with <capabilities>
+    Then I start session with driver quit to test allowHost,publicWebsitesResolutionCheckForAllowHosts,selfSigned with <capabilities>
     Then I verify network Log via API
 
     Examples:
@@ -17,7 +17,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check bypassHosts flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test bypassHost,selfSigned with <capabilities>
+    Then I start session with driver quit to test bypassHost,publicWebsitesResolutionCheckForBypassHosts,selfSigned with <capabilities>
     Then I verify network Log via API
 
     Examples:
@@ -30,7 +30,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check forceLocal flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test local,forceLocal,selfSigned with <capabilities>
+    Then I start session with driver quit to test local,publicWebsitesResolutionCheckForForceLocal,selfSigned with <capabilities>
     Then I verify network Log via API
 
     Examples:
