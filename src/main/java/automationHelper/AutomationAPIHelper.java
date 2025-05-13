@@ -344,7 +344,7 @@ public class AutomationAPIHelper extends ApiManager {
   public String getFeatureFlagValueOfSpecificSession(String session_id, String flagName) {
     JsonNode featureFlagsDetailsOfCurrentSession = fetchFeatureFlagDetailsOfSpecificSession(session_id);
     String flagStatus = featureFlagsDetailsOfCurrentSession.has(flagName) ?
-      featureFlagsDetailsOfCurrentSession.get(flagName).toString() :
+      featureFlagsDetailsOfCurrentSession.get(flagName).asText() :
       "false";
     ltLogger.info("Session id: {} :- {} feature flag status: {}", session_id, flagName, flagStatus);
     return flagStatus;

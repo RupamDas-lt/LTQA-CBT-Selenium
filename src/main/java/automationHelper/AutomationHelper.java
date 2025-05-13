@@ -145,8 +145,14 @@ public class AutomationHelper extends BaseClass {
       case "bypassHost":
         checkBypassHostFlagForTunnel();
         break;
-      case "forceLocal":
-        checkForceLocalFlagForTunnel();
+      case "publicWebsitesResolutionCheckForForceLocal":
+        verifyWebsiteResolutionBasedOnFlags("forceLocal");
+        break;
+      case "publicWebsitesResolutionCheckForAllowHosts":
+        verifyWebsiteResolutionBasedOnFlags("allowHosts");
+        break;
+      case "publicWebsitesResolutionCheckForBypassHosts":
+        verifyWebsiteResolutionBasedOnFlags("bypassHosts");
         break;
       case "networkLog":
       default:
@@ -871,7 +877,51 @@ public class AutomationHelper extends BaseClass {
 
   private String[] getCurrentIPAndLocationFromUrlInTestSession() {
     driverManager.getURL(IP_INFO_IO_URL);
-    return new String[] { driverManager.getText(ipInfoIOIP, 5), driverManager.getText(ipInfoIOLocation, 5) };
+    String ip = driverManager.getText(ipInfoIOIP, 5);
+    String location = driverManager.getText(ipInfoIOLocation, 5);
+    ltLogger.info("Current IP: {}, Current location: {}", ip, location);
+    return new String[] { ip, location };
+  }
+
+  private void checkPublicWebsitesAreResolvedInExpectedLocation(String expectedLocation, String tunnelFlagName) {
+    /// Expected expectedLocation values tunnelClient, tunnelServer, dc
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String localMachineIp = apiHelper.getCurrentIPFromAPI();
+    String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
+    String locationWherePublicWebsiteResolved;
+    if (ipAndLocation[0].equals(localMachineIp)) {
+      locationWherePublicWebsiteResolved = "tunnelClient";
+    } else if (tunnelServerIPs.contains(ipAndLocation[0])) {
+      locationWherePublicWebsiteResolved = "tunnelServer";
+    } else {
+      locationWherePublicWebsiteResolved = "dc";
+    }
+    softAssert.assertTrue(locationWherePublicWebsiteResolved.equals(expectedLocation), String.format(
+      "Public websites are not resolved in expected location for tunnel flag %s. Expected: %s, Actual: %s, Fetched IP: %s, Fetched location: %s",
+      tunnelFlagName, expectedLocation, locationWherePublicWebsiteResolved, ipAndLocation[0], ipAndLocation[1]));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  /**
+   * For forceLocal flag all the websites should be resolved in tunnel client
+   * For bypassHosts=*lambda* flag all the websites should be resolved in tunnel client except domains that match *lambda* that should be resolved in tunnel server or dc based on ml_resolve_tunnel_website_in_dc flag
+   * For allowHosts=*lambda* flag all the websites should be resolved in tunnel server or dc based on ml_resolve_tunnel_website_in_dc flag except domains that match *lambda*
+   */
+  private void verifyWebsiteResolutionBasedOnFlags(String tunnelFlagName) {
+    final String flagName = "ml_resolve_tunnel_website_in_dc";
+    String flagValue = apiHelper.getFeatureFlagValueOfSpecificSession(EnvSetup.TEST_SESSION_ID.get(), flagName);
+    switch (tunnelFlagName) {
+    case "forceLocal", "bypassHosts" ->
+      checkPublicWebsitesAreResolvedInExpectedLocation("tunnelClient", tunnelFlagName);
+    case "allowHosts" -> {
+      if (flagValue.equalsIgnoreCase("true")) {
+        checkPublicWebsitesAreResolvedInExpectedLocation("dc", tunnelFlagName);
+      } else {
+        checkPublicWebsitesAreResolvedInExpectedLocation("tunnelServer", tunnelFlagName);
+      }
+    }
+    default -> throw new IllegalStateException("Unexpected tunnel flag name passed: " + tunnelFlagName);
+    }
   }
 
   private void checkAllowHostFlagForTunnel() {
@@ -886,8 +936,6 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(LOCAL_URL);
     softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
       "allowHosts flag is not working. " + LOCAL_URL + " should be resolved in the DC or Tunnel Server not in Tunnel Client");
-    String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
-    System.out.printf("IP address for AllowHosts test: %s, Location: %s", ipAndLocation[0], ipAndLocation[1]);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -902,20 +950,7 @@ public class AutomationHelper extends BaseClass {
       "bypassHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened.");
     driverManager.getURL(LOCAL_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
-      "bypassHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.");
-    String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
-    System.out.printf("IP address for AllowHosts test: %s, Location: %s", ipAndLocation[0], ipAndLocation[1]);
-    EnvSetup.SOFT_ASSERT.set(softAssert);
-  }
-
-  private void checkForceLocalFlagForTunnel() {
-    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String ip = apiHelper.getCurrentIPFromAPI();
-    String[] ipAndLocationOfTestSession = getCurrentIPAndLocationFromUrlInTestSession();
-    System.out.printf("IP address for ForceLocal test: %s, Location: %s", ipAndLocationOfTestSession[0],
-      ipAndLocationOfTestSession[1]);
-    softAssert.assertTrue(ipAndLocationOfTestSession[0].equals(ip),
-      "ForceLocal flag is not working. All the websites should be resolved from TunnelClient running locally. Expected IP of the local machine: " + ip + ", Actual IP in test session: " + ipAndLocationOfTestSession[0]);
+      "bypassHosts flag is not working. " + LOCAL_URL + " should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.");
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }

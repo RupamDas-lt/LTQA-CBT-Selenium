@@ -194,6 +194,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_LOGS_DOWNLOAD_DIRECTORY = "logs/testLogsFromSwaggerV2/";
   public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
   public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
+  public static final String BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING = "Utility/Bash/UpdateHostEntry.sh";
 
   // ffprobe commands to extract video data
   public static final String[] VIDEO_INFO_COMMAND = { "ffmpeg", "-v", "error", "-i" };
@@ -282,6 +283,23 @@ public class FrameworkConstants extends BaseClass {
       this.value = value;
     }
   }
+
+  /// The updated tunnel server ips can be fetched by running GetTunnelServers.sh and the values will be saved in tunnelServers.json
+  public static final HashMap<String, String> tunnelServerDomainToIPMap = new HashMap<>() {
+    {
+      put("stage-ts.lambdatestinternal.com", "34.199.249.94");
+      put("ts-virginia.lambdatest.com", "3.214.241.254");
+      put("ts-oregon.lambdatest.com", "52.36.84.247");
+      put("ts-india.lambdatest.com", "13.126.37.58");
+      put("ts-frankfurt.lambdatest.com", "3.66.78.89");
+      put("ts-dc-virginia.lambdatest.com", "199.58.84.59");
+      put("ts-dc-oregon.lambdatest.com", "23.82.88.184");
+      put("ts-dc-singapore.lambdatest.com", "23.106.54.77");
+      put("ts-dc-london.lambdatest.com", "23.106.34.219");
+    }
+  };
+
+  public static final Set<String> tunnelServerIPs = new HashSet<>(tunnelServerDomainToIPMap.values());
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";

@@ -557,4 +557,31 @@ public class BaseClass {
     }
   }
 
+  /**
+   * Runs the provided Bash script with optional flags.
+   *
+   * @param bashFilePath The path to the Bash script.
+   * @param flags        Optional flags to pass to the script.
+   */
+  public void runBashScriptWithFlags(String bashFilePath, String... flags) {
+    StringBuilder command = new StringBuilder("bash " + bashFilePath);
+    for (String flag : flags) {
+      command.append(" ").append(flag);
+    }
+    System.out.println("Executing command: " + command);
+    try {
+      Process process = Runtime.getRuntime().exec(command.toString());
+      int exitCode = process.waitFor();
+
+      if (exitCode == 0) {
+        System.out.println("Bash script executed successfully.");
+      } else {
+        System.out.println("Bash script execution failed. Exit code: " + exitCode);
+      }
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+      System.out.println("Error executing the script.");
+    }
+  }
+
 }
