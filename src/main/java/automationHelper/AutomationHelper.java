@@ -700,10 +700,12 @@ public class AutomationHelper extends BaseClass {
     //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
     //        logs, Collections.emptyMap()));
 
-    if (!validLogsToCheck)
+    if (!validLogsToCheck) {
       System.err.println(
         logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
           logs, Collections.emptyMap()));
+      return;
+    }
 
     verifyLogsByType(logs, testId, softAssert);
 

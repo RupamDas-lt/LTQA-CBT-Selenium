@@ -6,6 +6,7 @@ Feature: Automation of all tunnel test cases
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test allowHost,selfSigned with <capabilities>
+    Then I verify network Log via API
 
     Examples:
       | tunnelFlags         | capabilities                                                                                                             |
@@ -17,6 +18,7 @@ Feature: Automation of all tunnel test cases
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test bypassHost,selfSigned with <capabilities>
+    Then I verify network Log via API
 
     Examples:
       | tunnelFlags          | capabilities                                                                                                              |
@@ -29,6 +31,7 @@ Feature: Automation of all tunnel test cases
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local,forceLocal,selfSigned with <capabilities>
+    Then I verify network Log via API
 
     Examples:
       | tunnelFlags | capabilities                                                                                                             |
