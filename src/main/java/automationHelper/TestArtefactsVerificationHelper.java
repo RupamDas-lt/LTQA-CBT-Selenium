@@ -188,6 +188,11 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void checkForSpecificTestVerificationDataPresentInLogs(String logs, String logsType,
     testVerificationDataKeys[] expectedDataKeys) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    if (logs == null || logs.isEmpty()) {
+      softAssert.fail(String.format("Unable to fetch %s logs from API. Received API response: %s", logsType, logs));
+      EnvSetup.SOFT_ASSERT.set(softAssert);
+      return;
+    }
     Arrays.stream(expectedDataKeys).sequential().forEach(key -> {
       Queue<String> expectedData = (Queue<String>) TEST_VERIFICATION_DATA.get().get(key);
       String dataType = key.toString();
