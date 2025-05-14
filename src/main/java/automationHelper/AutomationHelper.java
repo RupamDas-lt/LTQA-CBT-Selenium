@@ -95,6 +95,9 @@ public class AutomationHelper extends BaseClass {
       case "local":
         testLocalUrlWithTunnel();
         break;
+      case "localWithCustomDomain":
+        testLocalUrlWithCustomDomainForTunnel();
+        break;
       case "throwError":
         throwNewError();
         break;
@@ -153,6 +156,9 @@ public class AutomationHelper extends BaseClass {
         break;
       case "publicWebsitesResolutionCheckForBypassHosts":
         verifyWebsiteResolutionBasedOnFlags("bypassHosts");
+        break;
+      case "publicWebsitesResolutionCheckForDefaultFlags":
+        verifyWebsiteResolutionBasedOnFlags("default");
         break;
       case "networkLog":
       default:
@@ -904,8 +910,9 @@ public class AutomationHelper extends BaseClass {
 
   /**
    * For forceLocal flag all the websites should be resolved in tunnel client
-   * For bypassHosts=*lambda* flag all the websites should be resolved in tunnel client except domains that match *lambda* that should be resolved in tunnel server or dc based on ml_resolve_tunnel_website_in_dc flag
-   * For allowHosts=*lambda* flag all the websites should be resolved in tunnel server or dc based on ml_resolve_tunnel_website_in_dc flag except domains that match *lambda*
+   * For bypassHosts=*lambda* flag all the websites should be resolved in tunnel client except domains that match *lambda* that should be resolved in dc
+   * For allowHosts=*lambda* flag all the websites should be resolved in dc except domains that match *lambda* that should be resolved in tunnel client
+   * If none of [forceLocal, bypassHosts, allowHosts] the flags are not used then public websites are resolved in dc if ml_resolve_tunnel_website_in_dc is enabled else in tunnel client, only private websites will be resolved in tunnel client
    */
   private void verifyWebsiteResolutionBasedOnFlags(String tunnelFlagName) {
     final String flagName = "ml_resolve_tunnel_website_in_dc";
@@ -913,14 +920,14 @@ public class AutomationHelper extends BaseClass {
     switch (tunnelFlagName) {
     case "forceLocal", "bypassHosts" ->
       checkPublicWebsitesAreResolvedInExpectedLocation("tunnelClient", tunnelFlagName);
-    case "allowHosts" -> {
+    case "allowHosts" -> checkPublicWebsitesAreResolvedInExpectedLocation("dc", tunnelFlagName);
+    default -> {
       if (flagValue.equalsIgnoreCase("true")) {
         checkPublicWebsitesAreResolvedInExpectedLocation("dc", tunnelFlagName);
       } else {
-        checkPublicWebsitesAreResolvedInExpectedLocation("tunnelServer", tunnelFlagName);
+        checkPublicWebsitesAreResolvedInExpectedLocation("tunnelClient", tunnelFlagName);
       }
     }
-    default -> throw new IllegalStateException("Unexpected tunnel flag name passed: " + tunnelFlagName);
     }
   }
 
@@ -951,6 +958,23 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(LOCAL_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
       "bypassHosts flag is not working. " + LOCAL_URL + " should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.");
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void testLocalUrlWithCustomDomainForTunnel() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
+      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+      "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
+    checkLocalWebSitesAreReachable(expectedLocalUrls);
+    driverManager.getURL(LOCAL_LAMBDA_URL);
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5), String.format(
+      "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
+      LOCAL_LAMBDA_URL));
+    driverManager.getURL(LOCAL_URL);
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5), String.format(
+      "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
+      LOCAL_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }
