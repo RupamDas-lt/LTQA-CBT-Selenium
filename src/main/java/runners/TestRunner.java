@@ -61,7 +61,12 @@ public class TestRunner extends AbstractTestNGCucumberTests {
       }
       Properties prop = new Properties();
       prop.load(input);
-      prop.forEach((key, value) -> System.setProperty(key.toString(), value.toString()));
+      prop.forEach((key, value) -> {
+        /// If we are passing any property from CLI, then we will not override it
+        if (System.getProperty(key.toString(), "").isEmpty()) {
+          System.setProperty(key.toString(), value.toString());
+        }
+      });
     } catch (IOException ex) {
       System.err.println("Unable to set reportportal properties: " + ex);
     }
