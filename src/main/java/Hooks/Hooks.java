@@ -34,7 +34,6 @@ public class Hooks extends BaseClass {
   private String clientTestStatus = "passed";
   private String clientTestErrorMessage = "";
   private String errorMessage = "";
-  private String scenarioName;
   private String testStatus = "passed";
   private int beforeScenarioCount = 0;
   private int afterScenarioCount = 0;
@@ -175,8 +174,9 @@ public class Hooks extends BaseClass {
     apiHelper.updateSessionDetailsViaAPI(testId, updatedPayload);
   }
 
-  private void updateTestReport() {
-    TEST_REPORT.get().put("scenarioName", scenarioName);
+  private void updateTestReport(Scenario scenario) {
+    TEST_REPORT.get().put("scenarioName", scenario.getName());
+    TEST_REPORT.get().put("scenarioId", scenario.getId());
     TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());
     TEST_REPORT.get().put("accessKey", EnvSetup.testAccessKey.get());
     TEST_REPORT.get().put("hub", EnvSetup.testGridUrl.get());
@@ -322,7 +322,7 @@ public class Hooks extends BaseClass {
       updateLTTestStatus();
     }
 
-    updateTestReport();
+    updateTestReport(scenario);
 
     printTestDashboardAndRetinaLinks(scenario, TEST_ENV);
 
@@ -360,7 +360,6 @@ public class Hooks extends BaseClass {
 
   @After(order = 2)
   public void updateTestStatus(Scenario scenario) {
-    scenarioName = scenario.getName();
     ltLogger.info("Test report: {}", TEST_REPORT.get());
     updateScenarioStatusIfNeeded(scenario);
     assertAll();
