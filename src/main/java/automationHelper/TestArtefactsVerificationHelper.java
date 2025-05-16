@@ -237,7 +237,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
   private String verifySeleniumVersion(String logs, Map<String, Object> testCaps) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    ComparableVersion defaultSeleniumVersion = new ComparableVersion("3.13.0");
+    ComparableVersion defaultSeleniumVersion = new ComparableVersion(DEFAULT_SELENIUM_VERSION);
     ComparableVersion expectedSeleniumVersion;
     String givenSeleniumVersionString = testCaps.getOrDefault(SELENIUM_VERSION, "default").toString();
     ltLogger.info("Used Selenium Version in test caps: {}", givenSeleniumVersionString);
@@ -253,7 +253,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       expectedSeleniumVersion = givenSeleniumVersionString.equals("default") ?
         defaultSeleniumVersion :
         new ComparableVersion(givenSeleniumVersionString);
-    boolean isSeleniumFourUsed = expectedSeleniumVersion.compareTo(new ComparableVersion("4.0.0")) >= 0;
+    boolean isSeleniumFourUsed = expectedSeleniumVersion.compareTo(
+      new ComparableVersion(SELENIUM_4_VERSION_FLOOR_VALUE)) >= 0;
     ltLogger.info("Using Selenium Version: {} and selenium four used status: {}", expectedSeleniumVersion,
       isSeleniumFourUsed);
     String actualSeleniumVersionFromSeleniumLogs = extractSeleniumVersionFromSeleniumLogs(logs, isSeleniumFourUsed);
@@ -275,8 +276,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void verifyLogLevelOfSystemLogs(String logs, String seleniumVersionString, String session_id) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     ComparableVersion seleniumVersion = new ComparableVersion(seleniumVersionString);
-    ComparableVersion thresholdVersionForLegacySeleniumFourLogs = new ComparableVersion("4.28.0");
-    ComparableVersion thresholdVersionForSeleniumFour = new ComparableVersion("4.0.0");
+    ComparableVersion thresholdVersionForLegacySeleniumFourLogs = new ComparableVersion(
+      SELENIUM_4_VERSION_FLOOR_VALUE_FOR_LEGACY_LOGS);
+    ComparableVersion thresholdVersionForSeleniumFour = new ComparableVersion(SELENIUM_4_VERSION_FLOOR_VALUE);
 
     if (seleniumVersion.compareTo(thresholdVersionForSeleniumFour) < 0) {
       checkForSpecificTestVerificationDataPresentInLogs(logs, "selenium 3",
@@ -412,6 +414,14 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     int expectedCommandLogsCount, LogType logType) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String logsFromApi = fetchLogs(logType.value, apiVersion, session_id);
+
+    // Handle null response
+    if (logsFromApi == null || logsFromApi.isEmpty()) {
+      softAssert.fail(String.format("Unable to fetch %s logs from API %s. Received API response: %s", logType.value,
+        apiVersion.toString(), logsFromApi));
+      EnvSetup.SOFT_ASSERT.set(softAssert);
+      return;
+    }
 
     // Validate schema
     Set<String> schemaValidationErrors = validateSchema(logsFromApi, schemaFilePath);

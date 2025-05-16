@@ -93,7 +93,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String REMOVE_TEST_CAPS = "REMOVE_TEST_CAPS";
   public static final String REMOVE_CLIENT_TEST_CAPS = "REMOVE_CLIENT_TEST_CAPS";
   public static final String JOB_IDENTIFIER = "JOB_IDENTIFIER";
-  public static final String PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG = "PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG";
+  public static final String PUSH_LOGS_TO_REPORT_PORTAL = "PUSH_LOGS_TO_REPORT_PORTAL";
   public static final String REPEAT_TEST_ACTIONS = "REPEAT_TEST_ACTIONS";
   public static final String SEND_DATA_TO_SUMO = "SEND_DATA_TO_SUMO";
   public static final String PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD = "PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD";
@@ -300,6 +300,10 @@ public class FrameworkConstants extends BaseClass {
   };
 
   public static final Set<String> tunnelServerIPs = new HashSet<>(tunnelServerDomainToIPMap.values());
+
+  public static final String DEFAULT_SELENIUM_VERSION = "3.13.0";
+  public static final String SELENIUM_4_VERSION_FLOOR_VALUE = "4.0.0";
+  public static final String SELENIUM_4_VERSION_FLOOR_VALUE_FOR_LEGACY_LOGS = "4.28.0";
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
