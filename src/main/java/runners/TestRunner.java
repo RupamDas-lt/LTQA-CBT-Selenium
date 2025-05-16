@@ -39,18 +39,12 @@ public class TestRunner extends AbstractTestNGCucumberTests {
   @BeforeSuite
   public void beforeSuite() {
 
-    if (isReportPortalSetupRequiredWithLocalCreds())
+    if (System.getProperty(PUSH_LOGS_TO_REPORT_PORTAL, "false").equalsIgnoreCase("true")) {
       initializeReportPortalParameters();
+    }
 
     if (getProperty(TEST_PREREQUISITES, "true").equals("true"))
       setPrerequisite();
-  }
-
-  private boolean isReportPortalSetupRequiredWithLocalCreds() {
-    if (Boolean.parseBoolean(System.getProperty(PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG, "true"))) {
-      return REPORT_PORTAL_KEYS.stream().allMatch(key -> Boolean.parseBoolean(System.getProperty(key, "false")));
-    }
-    return false;
   }
 
   private void initializeReportPortalParameters() {

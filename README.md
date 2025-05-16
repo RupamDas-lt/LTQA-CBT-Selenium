@@ -81,12 +81,13 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DREMOVE_TEST_CAPS=resolution,geoLocation
 ```
 
-- **`PUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG`**: This flag can be used to push the logs of tests running on your local
-  machine to Report portal. In this scenario the rp config will be picked from
-  `src/main/resources/reportportal.properties`, so make sure this file is present.
+- **`PUSH_LOGS_TO_REPORT_PORTAL`**: Set this flag value to `true` if you want to push data to report portal. All the rp
+  config will be picked from
+  `src/main/resources/reportportal.properties`, and if you want to override any property, like: `rp.endpoint`,
+  `rp.api.key`, `rp.project`, `rp.launch`. That you can pass from CLI.
 
 ```bash
-  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DPUSH_DATA_LOGS_TO_RP_FROM_LOCAL_CONFIG=true
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DPUSH_LOGS_TO_REPORT_PORTAL=true -Drp.project=your_custom_project -Drp.launch=your_custom_launch_name
 ```
 
 - **`REPEAT_TEST_ACTIONS`**: This is used to repeat the same test actions multiple times. The same thing can also be
