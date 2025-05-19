@@ -4,16 +4,24 @@ import TestManagers.DriverManager;
 import automationHelper.AutomationAPIHelper;
 import factory.Locator;
 import factory.LocatorTypes;
+import utility.BaseClass;
 import utility.EnvSetup;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LoginPage {
-  private static final String ltLoginPageUrl = EnvSetup.TEST_ENV.contains("stage") ?
+import static utility.EnvSetup.IS_GDPR_TEST_CONFIG;
+
+public class LoginPage extends BaseClass {
+
+  private static final String baseUrl = EnvSetup.TEST_ENV.contains("stage") ?
     "https://stage-accounts.lambdatestinternal.com/login" :
     "https://accounts.lambdatest.com/login";
+
+  private final String ltLoginPageUrl = Boolean.parseBoolean(IS_GDPR_TEST_CONFIG) ?
+    getCorrespondingDashboardUrlForGDPRUser(baseUrl) :
+    baseUrl;
 
   private static Map<String, String> loginCookies;
   private static final Lock lock = new ReentrantLock();  // Lock to control access

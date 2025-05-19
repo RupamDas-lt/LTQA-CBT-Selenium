@@ -239,7 +239,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     ComparableVersion defaultSeleniumVersion = new ComparableVersion(DEFAULT_SELENIUM_VERSION);
     ComparableVersion expectedSeleniumVersion;
-    String givenSeleniumVersionString = testCaps.getOrDefault(SELENIUM_VERSION, "default").toString();
+    String givenSeleniumVersionString = testCaps.getOrDefault(SELENIUM_VERSION,
+        testCaps.getOrDefault(SELENIUM_CDP, "false").equals("true") ? SELENIUM_4_VERSION_FLOOR_VALUE : "default")
+      .toString();
     ltLogger.info("Used Selenium Version in test caps: {}", givenSeleniumVersionString);
     if (givenSeleniumVersionString.contains("latest")) {
       String browserName = testCaps.get(BROWSER_NAME).toString();

@@ -6,6 +6,8 @@ import com.mysql.cj.util.StringUtils;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -13,6 +15,7 @@ import static utility.FrameworkConstants.*;
 public class AutomationSetupDefinitions {
   AutomationHelper automationHelper = new AutomationHelper();
   ClientAutomationHelper clientAutomationHelper = new ClientAutomationHelper();
+  private final Logger ltLogger = LogManager.getLogger(AutomationSetupDefinitions.class);
 
   @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
   public void startSessionAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
@@ -33,6 +36,13 @@ public class AutomationSetupDefinitions {
     testEmail.set(getPropertyOrDefault(CUSTOM_USER_EMAIL, USER_EMAIL));
     testPassword.set(getPropertyOrDefault(CUSTOM_USER_PASS, USER_PASS));
     testGridUrl.set(getPropertyOrDefault(CUSTOM_GRID_URL, GRID_URL));
+    clientTestUserName.set(getPropertyOrDefault(CUSTOM_CLIENT_USER_NAME, CLIENT_ENV_USER_NAME));
+    clientTestAccessKey.set(getPropertyOrDefault(CUSTOM_CLIENT_USER_KEY, CLIENT_ENV_ACCESS_KEY));
+    clientTestGridUrl.set(getPropertyOrDefault(CUSTOM_CLIENT_GRID_URL, CLIENT_GRID_URL));
+    ltLogger.info(
+      "User details are set to :-\n Test User Name: {}\n Test Access Key: {}\n Test Email: {}\n Test Password: {}\n Test Grid URL: {}\n Client Test User Name: {}\n Client Test Access Key: {}\n Client Test Grid URL: {}",
+      testUserName.get(), testAccessKey.get(), testEmail.get(), testPassword.get(), testGridUrl.get(),
+      clientTestUserName.get(), clientTestAccessKey.get(), clientTestGridUrl.get());
   }
 
   private String getPropertyOrDefault(String property, String defaultValue) {

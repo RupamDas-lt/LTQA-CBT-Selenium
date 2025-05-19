@@ -86,6 +86,9 @@ public class FrameworkConstants extends BaseClass {
   public static final String CUSTOM_USER_EMAIL = "CUSTOM_USER_EMAIL";
   public static final String CUSTOM_USER_PASS = "CUSTOM_USER_PASS";
   public static final String CUSTOM_GRID_URL = "CUSTOM_GRID_URL";
+  public static final String CUSTOM_CLIENT_USER_NAME = "CUSTOM_CLIENT_USER_NAME";
+  public static final String CUSTOM_CLIENT_USER_KEY = "CUSTOM_CLIENT_USER_KEY";
+  public static final String CUSTOM_CLIENT_GRID_URL = "CUSTOM_CLIENT_GRID_URL";
   public static final String CUSTOM_TUNNEL_FLAGS = "CUSTOM_TUNNEL_FLAGS";
   public static final String TEST_PREREQUISITES = "TEST_PREREQUISITES";
   public static final String CUSTOM_TEST_CAPS = "CUSTOM_TEST_CAPS";

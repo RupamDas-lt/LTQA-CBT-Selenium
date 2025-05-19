@@ -150,6 +150,7 @@ public class AutomationAPIHelper extends ApiManager {
 
   public void fetchAllGeoLocationsFromCapsGeneratorAndStoreInJsonFile() {
     String geoLocationFetchAPI = constructAPIUrl(EnvSetup.API_URL_BASE, GEOLOCATIONS_API_ENDPOINT);
+    geoLocationFetchAPI = handleCapabilityGeneratorAPIsForGDPRUser(geoLocationFetchAPI);
     ltLogger.info("API for GEO location fetch: {}", geoLocationFetchAPI);
     fetchDataAndWriteResponseToFile(geoLocationFetchAPI, GEOLOCATION_DATA_PATH);
   }
@@ -167,6 +168,7 @@ public class AutomationAPIHelper extends ApiManager {
     String seleniumVersionFetchUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SELENIUM_VERSIONS_API_ENDPOINT).replace(
         "<BROWSER_NAME>", browserName).replace("<TEMPLATE>", osTemplateNameToKeywordMap.getOrDefault(template, template))
       .replace("<BROWSER_VERSION>", actualBrowserVersion).replace("<BROWSER_VERSION_ID>", browserVersionId);
+    seleniumVersionFetchUrl = handleCapabilityGeneratorAPIsForGDPRUser(seleniumVersionFetchUrl);
     ltLogger.info("URI to fetch Selenium Versions from capability generator api: {}", seleniumVersionFetchUrl);
     String response = getRequestAsString(seleniumVersionFetchUrl);
     SeleniumVersionsDTO seleniumVersionsDTO = convertJsonStringToPojo(
@@ -194,6 +196,7 @@ public class AutomationAPIHelper extends ApiManager {
 
     String browserVersionFetchUrl = constructAPIUrl(EnvSetup.API_URL_BASE, BROWSER_VERSIONS_API_ENDPOINT).replace(
       "<BROWSER_NAME>", browserName).replace("<TEMPLATE>", osTemplateNameToKeywordMap.getOrDefault(template, template));
+    browserVersionFetchUrl = handleCapabilityGeneratorAPIsForGDPRUser(browserVersionFetchUrl);
     ltLogger.info("API for browser version fetch: {}", browserVersionFetchUrl);
 
     fetchDataAndWriteResponseToFile(browserVersionFetchUrl, filePath);
