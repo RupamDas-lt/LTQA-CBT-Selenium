@@ -20,10 +20,14 @@ public class EnvSetup {
   public static final String ACCESS_KEY = config.get("test_env_key");
   public static final String USER_EMAIL = config.get("test_env_email");
   public static final String USER_PASS = config.get("test_env_pass");
+  public static final String CLIENT_ENV_USER_NAME = config.get("client_env_username");
+  public static final String CLIENT_ENV_ACCESS_KEY = config.get("client_env_key");
   public static final String GRID_URL = config.get("test_env_hub_url");
+  public static final String CLIENT_GRID_URL = config.get("client_env_hub_url");
   public static final String API_URL_BASE = config.get("test_env_api_url");
   public static final String TEST_DASHBOARD_URL_BASE = config.get("test_dashboard_url");
   public static final String TEST_RETINA_URL_BASE = config.get("test_retina_url");
+  public static final String IS_GDPR_TEST_CONFIG = config.getOrDefault("is_gdpr", "false");
 
   // Test user configs
   public static final ThreadLocal<String> testUserName = new ThreadLocal<>();
@@ -31,6 +35,9 @@ public class EnvSetup {
   public static final ThreadLocal<String> testEmail = new ThreadLocal<>();
   public static final ThreadLocal<String> testPassword = new ThreadLocal<>();
   public static final ThreadLocal<String> testGridUrl = new ThreadLocal<>();
+  public static final ThreadLocal<String> clientTestUserName = new ThreadLocal<>();
+  public static final ThreadLocal<String> clientTestAccessKey = new ThreadLocal<>();
+  public static final ThreadLocal<String> clientTestGridUrl = new ThreadLocal<>();
 
   // Capabilities and Drivers
   public static final ThreadLocal<WebDriver> testDriver = new ThreadLocal<WebDriver>();

@@ -136,14 +136,17 @@ public class DriverManager extends BaseClass {
     }
   }
 
-  private String getGridUrl() {
+  private String getGridUrl(String purpose) {
+    if (purpose.equals("client")) {
+      return HTTPS + clientTestUserName.get() + ":" + clientTestAccessKey.get() + "@" + clientTestGridUrl.get() + "/wd/hub";
+    }
     return HTTPS + testUserName.get() + ":" + testAccessKey.get() + "@" + testGridUrl.get() + "/wd/hub";
   }
 
   private void createRemoteTestDriver(String purpose) {
     ThreadLocal<String> sessionId = purpose.equals("client") ? CLIENT_SESSION_ID : TEST_SESSION_ID;
     String sessionIdKey = purpose.equals("client") ? SESSION_ID_CLIENT : SESSION_ID;
-    gridUrl = getGridUrl();
+    gridUrl = getGridUrl(purpose);
     ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
     try {
       ClientConfig clientConfig = ClientConfig.defaultConfig().connectionTimeout(Duration.ofMinutes(20))

@@ -584,4 +584,29 @@ public class BaseClass {
     }
   }
 
+  public String getCorrespondingDashboardUrlForGDPRUser(String url) {
+    if (url == null || !url.startsWith("https://")) {
+      // Return as is if null or doesn't start with https://
+      return url;
+    }
+
+    String prefix = "https://";
+    String rest = url.substring(prefix.length());
+
+    if (rest.startsWith("stage-")) {
+      return prefix + "stage-eu-" + rest.substring("stage-".length());
+    } else {
+      return prefix + "eu-" + rest;
+    }
+  }
+
+  public String handleCapabilityGeneratorAPIsForGDPRUser(String url) {
+    if (StringUtils.isNullOrEmpty(url)) {
+      return url;
+    }
+    if (EnvSetup.IS_GDPR_TEST_CONFIG.equalsIgnoreCase("true"))
+      return url.replace("-eu", "");
+    return url;
+  }
+
 }
