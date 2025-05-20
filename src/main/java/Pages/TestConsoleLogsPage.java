@@ -71,13 +71,25 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
     return logMessages;
   }
 
-  public void verifyConsoleLogsFromUI() {
+  public void verifyConsoleLogsFromUI(int... customRetryCount) {
+    int retryCount = customRetryCount != null && customRetryCount.length > 0 ? customRetryCount[0] : 2;
     if (consoleLogsNotFoundMessageDisplayed()) {
       softAssert.fail("Console logs not found in UI");
       return;
     }
     List<String> expectedConsoleLogs = constructExpectedConsoleLogMessage();
-    String consoleLogsPresentInDashboard = driver.getText(consoleLogsRowsContainer, 5);
+    String consoleLogsPresentInDashboard = "";
+    for (int i = 1; i < retryCount; i++) {
+      ltLogger.info("Trying to extract console logs from UI. Attempt: {}", i);
+      try {
+        consoleLogsPresentInDashboard = driver.getText(consoleLogsRowsContainer, 5);
+        break;
+      } catch (Exception e) {
+        ltLogger.error("Failed to extract console logs from dashboard. Error: {}", e.getMessage());
+        driver.refreshPage();
+        waitForTime(5);
+      }
+    }
     List<String> notFoundConsoleLogs = new ArrayList<>();
     for (String consoleLog : expectedConsoleLogs) {
       ltLogger.info("Searching for console log: {}", consoleLog);
