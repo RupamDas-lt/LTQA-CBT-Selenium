@@ -92,7 +92,7 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify performance report Log via API
     Then I stop client test session
 
-    @virginia_smoke
+    @virginia_smoke @ui_verification_smoke_EU
     Examples:
       | capabilities                                                                                                                  |
       | browserName=chrome,platform=win11,version=.*,performance=true,resolution=.*,network=true,visual=true,tunnel=true,console=true |
@@ -112,10 +112,10 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify test video from UI
     Then I stop client test session
 
-    @ohio_smoke
+    @ohio_smoke @ui_verification_smoke_AP
     Examples:
-      | capabilities                                                                                                                  |
-      | browserName=edge,platform=win11,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
+      | capabilities                                                                                                                    |
+      | browserName=chrome,platform=win11,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
 
   @win11_regression_7
   Scenario Outline: User is able to run multiple sessions on for win11 machine with different browsers and latest and random versions

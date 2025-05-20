@@ -111,9 +111,13 @@ Feature: Automation of sequoia machine with different browsers.
     Then I stop client test session
 
     Examples:
-      | capabilities                                                                                                                          |
-      | browserName=edge,platform=sequoia,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true       |
-      | browserName=safari,platform=sequoia,version=latest,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
+      | capabilities                                                                                                                    |
+      | browserName=edge,platform=sequoia,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
+
+    @ui_verification_smoke_US
+    Examples:
+      | capabilities                                                                                                                      |
+      | browserName=chrome,platform=sequoia,version=.*,resolution=.*,network=true,visual=true,network.har=true,terminal=true,console=true |
 
   @sequoia_regression_7
   Scenario Outline: User is able to run multiple sessions on for sequoia machine with different browsers and latest and random versions

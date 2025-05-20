@@ -92,7 +92,7 @@ Feature: Automation of windows10 machine with different browsers.
     Then I verify performance report Log via API
     Then I stop client test session
 
-    @ireland_smoke
+    @ireland_smoke @ui_verification_smoke_US @ui_verification_smoke_AP
     Examples:
       | capabilities                                                                                                                  |
       | browserName=chrome,platform=win10,version=.*,performance=true,resolution=.*,network=true,visual=true,tunnel=true,console=true |
