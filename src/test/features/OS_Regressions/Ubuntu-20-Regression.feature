@@ -37,8 +37,8 @@ Feature: Automation of ubuntu-20 machine with different browsers.
 
     @virginia_smoke_new
     Examples:
-      | capabilities                                                                                                                                      |
-      | browserName=chrome,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true,geoLocation=.* |
+      | capabilities                                                                                                                       |
+      | browserName=chrome,platform=ubuntu,version=.*,resolution=.*,timezone=.*,visual=true,network=false,network.http2=false,console=true |
 
 
   @ubuntu_regression_3 @tunnel_verification @martian_verification
