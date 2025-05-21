@@ -10,9 +10,9 @@ Feature: Automation of all tunnel test cases
     Then I verify network Log via API
 
     Examples:
-      | tunnelFlags         | capabilities                                                                                                             |
-      | allowHosts=*lambda* | browserName=chrome,platform=win10,version=latest,tunnel=true,network=false,name=Tunnel_With_AllowHosts_And_Network_False |
-      | allowHosts=*lambda* | browserName=chrome,platform=win10,version=latest,tunnel=true,network=true,name=Tunnel_With_AllowHosts_And_Network_True   |
+      | tunnelFlags         | capabilities                                                                                                               |
+      | allowHosts=*lambda* | browserName=chrome,platform=ventura,version=latest,tunnel=true,network=false,name=Tunnel_With_AllowHosts_And_Network_False |
+      | allowHosts=*lambda* | browserName=chrome,platform=sequoia,version=latest,tunnel=true,network=true,name=Tunnel_With_AllowHosts_And_Network_True   |
 
   @tunnel_regression_2
   Scenario Outline: User is able to check bypassHosts flag for tunnel
@@ -23,9 +23,9 @@ Feature: Automation of all tunnel test cases
     Then I verify network Log via API
 
     Examples:
-      | tunnelFlags          | capabilities                                                                                                              |
-      | bypassHosts=*lambda* | browserName=chrome,platform=win10,version=latest,tunnel=true,network=false,name=Tunnel_With_BypassHosts_And_Network_False |
-      | bypassHosts=*lambda* | browserName=chrome,platform=win10,version=latest,tunnel=true,network=true,name=Tunnel_With_BypassHosts_And_Network_True   |
+      | tunnelFlags          | capabilities                                                                                                                |
+      | bypassHosts=*lambda* | browserName=chrome,platform=ventura,version=latest,tunnel=true,network=false,name=Tunnel_With_BypassHosts_And_Network_False |
+      | bypassHosts=*lambda* | browserName=chrome,platform=sonoma,version=latest,tunnel=true,network=true,name=Tunnel_With_BypassHosts_And_Network_True    |
 
 
   @tunnel_regression_3
@@ -37,9 +37,9 @@ Feature: Automation of all tunnel test cases
     Then I verify network Log via API
 
     Examples:
-      | tunnelFlags | capabilities                                                                                                             |
-      | forceLocal  | browserName=chrome,platform=win10,version=latest,tunnel=true,network=false,name=Tunnel_With_ForceLocal_And_Network_False |
-      | forceLocal  | browserName=chrome,platform=win10,version=latest,tunnel=true,network=true,name=Tunnel_With_ForceLocal_And_Network_True   |
+      | tunnelFlags | capabilities                                                                                                              |
+      | forceLocal  | browserName=chrome,platform=sonoma,version=latest,tunnel=true,network=false,name=Tunnel_With_ForceLocal_And_Network_False |
+      | forceLocal  | browserName=chrome,platform=sequoia,version=latest,tunnel=true,network=true,name=Tunnel_With_ForceLocal_And_Network_True  |
 
   @tunnel_regression_4
   Scenario Outline: User is able to check if public website is resolved in expected place based on ml_resolve_tunnel_website_in_dc flag
@@ -50,6 +50,6 @@ Feature: Automation of all tunnel test cases
     Then I verify network Log via API
 
     Examples:
-      | capabilities                                                                                                                |
-      | browserName=chrome,platform=win10,version=latest,tunnel=true,network=false,name=Tunnel_With_Default_Flags_And_Network_False |
-      | browserName=chrome,platform=win10,version=latest,tunnel=true,network=true,name=Tunnel_With_Default_Flags_And_Network_True   |
+      | capabilities                                                                                                                  |
+      | browserName=chrome,platform=ventura,version=latest,tunnel=true,network=false,name=Tunnel_With_Default_Flags_And_Network_False |
+      | browserName=chrome,platform=sequoia,version=latest,tunnel=true,network=true,name=Tunnel_With_Default_Flags_And_Network_True   |
