@@ -57,7 +57,7 @@ public class TestSystemLogsPage extends LTDashboardCommonActions {
   }
 
   public void openAndVerifySystemLogsInNewTab() {
-    String errorMessage = openLogsInNewTabAndVerify("selenium", systemLogRowLocator, 2);
+    String errorMessage = openLogsInNewTabAndVerify("selenium", systemLogRowLocator, 5);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
   }
 
