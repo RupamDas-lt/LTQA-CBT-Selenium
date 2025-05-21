@@ -9,6 +9,11 @@ stage:
   test_retina_url: "stage-retina.lambdatestinternal.com"
   client_env_username: "<USER_NAME>"
   client_env_key: "<ACCESS_KEY>"
+  client_env_hub_url: "hub.lambdatest.com"
+  client_env_api_url: "api.lambdatest.com"
+  client_dashboard_url: "automation.lambdatest.com"
+  client_retina_url: "retina.lambdatest.com"
+  is_gdpr: "<true|false>"
   org_id: "<ORG_ID>"
 
 prod:
@@ -22,4 +27,9 @@ prod:
   test_retina_url: "retina.lambdatest.com"
   client_env_username: "<USER_NAME>"
   client_env_key: "<ACCESS_KEY>"
+  client_env_hub_url: "hub.lambdatest.com"
+  client_env_api_url: "api.lambdatest.com"
+  client_dashboard_url: "automation.lambdatest.com"
+  client_retina_url: "retina.lambdatest.com"
+  is_gdpr: "<true|false>"
   org_id: "<ORG_ID>"

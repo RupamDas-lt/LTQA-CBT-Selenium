@@ -35,36 +35,59 @@ public class AutomationAPIHelper extends ApiManager {
 
   private final Logger ltLogger = LogManager.getLogger(AutomationAPIHelper.class);
 
-  public void updateSessionDetailsViaAPI(String session_id, HashMap<String, String> sessionDetails) {
-    String sessionAPIUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id);
+  private record APIConfig(String apiBase, String userName, String accessKey) {
+  }
+
+  private APIConfig getAPIConfigsBasedOnSessionType(boolean... isClientTest) {
+    boolean isClient = isClientTest.length > 0 && isClientTest[0];
+    ltLogger.info("Using API Configs for {} session", isClient ? "Client" : "Test");
+    return new APIConfig(isClient ? CLIENT_API_URL_BASE : API_URL_BASE,
+      isClient ? clientTestUserName.get() : testUserName.get(),
+      isClient ? clientTestAccessKey.get() : testAccessKey.get());
+  }
+
+  public void updateSessionDetailsViaAPI(String session_id, HashMap<String, String> sessionDetails,
+    boolean... isClientTest) {
+    APIConfig apiConfig = getAPIConfigsBasedOnSessionType(isClientTest);
+    String sessionAPIUrl = constructAPIUrl(apiConfig.apiBase(), SESSIONS_API_ENDPOINT, session_id);
     ltLogger.info("Update Session Details: {}", sessionDetails);
-    Response response = patchRequestWithBasicAuth(sessionAPIUrl, EnvSetup.testUserName.get(),
-      EnvSetup.testAccessKey.get(), sessionDetails);
+    Response response = patchRequestWithBasicAuth(sessionAPIUrl, apiConfig.userName(), apiConfig.accessKey(),
+      sessionDetails);
     ltLogger.info("Update Session Details Response Body: {}", response.getBody().asString());
     ltLogger.info("Update Session Details Response Code: {}", response.getStatusCode());
   }
 
-  public String getSpecificSessionDetailsViaAPI(String session_id, String requiredDetail) {
+  public String getSpecificSessionDetailsViaAPI(String sessionId, String requiredDetail, boolean... isClientTest) {
+    // Initial setup
+    APIConfig apiConfig = getAPIConfigsBasedOnSessionType(isClientTest);
+
     final int maxRetries = 10;
     final int retryDelaySecs = 5;
-    int attempt = 0;
     Exception lastException = null;
 
-    while (attempt < maxRetries) {
-      attempt++;
+    Field field;
+    try {
+      field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
+      field.setAccessible(true);
+    } catch (NoSuchFieldException e) {
+      throw new IllegalArgumentException("Invalid field requested: " + requiredDetail, e);
+    }
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        String sessionAPIUrl = constructAPIUrl(EnvSetup.API_URL_BASE, SESSIONS_API_ENDPOINT, session_id);
-        String sessionResponse = getRequestWithBasicAuthAsString(sessionAPIUrl, EnvSetup.testUserName.get(),
-          EnvSetup.testAccessKey.get());
+        String sessionAPIUrl = constructAPIUrl(apiConfig.apiBase(), SESSIONS_API_ENDPOINT, sessionId);
+        String sessionResponse = getRequestWithBasicAuthAsString(sessionAPIUrl, apiConfig.userName(),
+          apiConfig.accessKey());
 
         GetSessionResponseDTO getSessionResponseDTO = convertJsonStringToPojo(sessionResponse,
           new TypeToken<GetSessionResponseDTO>() {
           });
 
-        GetSessionResponseDTO.Data data = getSessionResponseDTO.getData();
-        Field field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
-        field.setAccessible(true);
-        return field.get(data).toString();
+        Object value = field.get(getSessionResponseDTO.getData());
+        if (value != null) {
+          return value.toString();
+        }
+        throw new RuntimeException("Field '" + requiredDetail + "' value is null");
 
       } catch (Exception e) {
         lastException = e;
@@ -77,10 +100,10 @@ public class AutomationAPIHelper extends ApiManager {
       }
     }
 
-    ltLogger.error("Failed to get session details {} after {} attempts", requiredDetail, maxRetries);
-    throw new RuntimeException(
-      "Unable to extract " + requiredDetail + " detail from Session details api response after " + maxRetries + " attempts",
-      lastException);
+    String errorMessage = String.format(
+      "Unable to extract %s detail from Session details api response after %d attempts", requiredDetail, maxRetries);
+    ltLogger.error(errorMessage);
+    throw new RuntimeException(errorMessage, lastException);
   }
 
   public String getSpecificBuildDetailsViaAPI(String build_id, String requiredDetail) {
@@ -103,9 +126,9 @@ public class AutomationAPIHelper extends ApiManager {
     }
   }
 
-  public String getStatusOfSessionViaAPI(String session_id) {
+  public String getStatusOfSessionViaAPI(String session_id, boolean... isClientTest) {
     final String keyForSessionStatus = "status_ind";
-    String status = getSpecificSessionDetailsViaAPI(session_id, keyForSessionStatus);
+    String status = getSpecificSessionDetailsViaAPI(session_id, keyForSessionStatus, isClientTest);
     ltLogger.info("Status of session: {} is: {}", session_id, status);
     return status;
   }
