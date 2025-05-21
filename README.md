@@ -185,5 +185,7 @@ _source
 | where message="New_Framework_Testing-2"
 ```
 
+- Add label `recreate-stage` to the PR to recreate the stage branch from main after your PR gets merged.
+
 ---
 
