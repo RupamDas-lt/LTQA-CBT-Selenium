@@ -25,8 +25,11 @@ public class EnvSetup {
   public static final String GRID_URL = config.get("test_env_hub_url");
   public static final String CLIENT_GRID_URL = config.get("client_env_hub_url");
   public static final String API_URL_BASE = config.get("test_env_api_url");
+  public static final String CLIENT_API_URL_BASE = config.get("client_env_api_url");
   public static final String TEST_DASHBOARD_URL_BASE = config.get("test_dashboard_url");
+  public static final String CLIENT_DASHBOARD_URL_BASE = config.get("client_dashboard_url");
   public static final String TEST_RETINA_URL_BASE = config.get("test_retina_url");
+  public static final String CLIENT_RETINA_URL_BASE = config.get("client_retina_url");
   public static final String IS_GDPR_TEST_CONFIG = config.getOrDefault("is_gdpr", "false");
 
   // Test user configs

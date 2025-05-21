@@ -162,7 +162,7 @@ public class Hooks extends BaseClass {
     TEST_REPORT.get().put("failed_step_error", stepErrorMessage);
   }
 
-  private void setTestStatus(String testId, String testStatus, String remarks) {
+  private void setTestStatus(String testId, String testStatus, String remarks, boolean... isClient) {
     HashMap<String, String> updatedPayload = new HashMap<>();
     updatedPayload.put("status_ind", testStatus);
 
@@ -171,7 +171,7 @@ public class Hooks extends BaseClass {
       updatedPayload.put("reason", formattedErrorMessage);
     }
 
-    apiHelper.updateSessionDetailsViaAPI(testId, updatedPayload);
+    apiHelper.updateSessionDetailsViaAPI(testId, updatedPayload, isClient);
   }
 
   private void updateTestReport(Scenario scenario) {
@@ -210,9 +210,9 @@ public class Hooks extends BaseClass {
 
     if (EnvSetup.IS_UI_VERIFICATION_ENABLED.get()) {
       String clientSessionId = EnvSetup.CLIENT_SESSION_ID.get();
-      String clientDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, endPoint,
+      String clientDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.CLIENT_DASHBOARD_URL_BASE, endPoint,
         clientSessionId);
-      String clientRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=",
+      String clientRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.CLIENT_RETINA_URL_BASE, "/search/?query=",
         clientSessionId);
 
       stringBuilder.append("Client test dashboard URL: ").append(clientDashboardUrl).append("\n")
@@ -295,9 +295,9 @@ public class Hooks extends BaseClass {
     }
 
     if (!StringUtils.isNullOrEmpty(CLIENT_SESSION_ID.get()) && COMPLETED.equalsIgnoreCase(
-      apiHelper.getStatusOfSessionViaAPI(CLIENT_SESSION_ID.get()))) {
+      apiHelper.getStatusOfSessionViaAPI(CLIENT_SESSION_ID.get(), true))) {
       ltLogger.warn("Client test status: {}, Client Test Error message: {}", clientTestStatus, clientTestErrorMessage);
-      setTestStatus(CLIENT_SESSION_ID.get(), clientTestStatus, clientTestErrorMessage);
+      setTestStatus(CLIENT_SESSION_ID.get(), clientTestStatus, clientTestErrorMessage, true);
     }
   }
 
