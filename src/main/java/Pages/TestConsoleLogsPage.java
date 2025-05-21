@@ -107,7 +107,7 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
   }
 
   public void openConsoleLogsInNewTabAndVerify() {
-    String errorMessage = openLogsInNewTabAndVerify("console", consoleLogRowLocator);
+    String errorMessage = openLogsInNewTabAndVerify("console", consoleLogRowLocator, 5);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
   }
 
