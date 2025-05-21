@@ -79,7 +79,7 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
     }
     List<String> expectedConsoleLogs = constructExpectedConsoleLogMessage();
     String consoleLogsPresentInDashboard = "";
-    for (int i = 1; i < retryCount; i++) {
+    for (int i = 1; i <= retryCount; i++) {
       ltLogger.info("Trying to extract console logs from UI. Attempt: {}", i);
       try {
         consoleLogsPresentInDashboard = driver.getText(consoleLogsRowsContainer, 5);
