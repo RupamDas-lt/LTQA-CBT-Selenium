@@ -100,4 +100,8 @@ public class EnvSetup {
         String.format("ERROR: Unexpected error occurred while loading the configuration.%n%s", e));
     }
   }
+
+  // Test Report
+  public static final ThreadLocal<Map<String, Object>> ASSERTION_ERROR_TO_HASH_KEY_MAP = ThreadLocal.withInitial(
+    HashMap::new);
 }

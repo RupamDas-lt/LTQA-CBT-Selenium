@@ -7,8 +7,11 @@ import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.BaseClass;
+import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import static factory.SoftAssertionMessages.LOGS_NOT_PRESENT_IN_NEW_TAB_CLIENT_ERROR_MESSAGE;
+import static factory.SoftAssertionMessages.UNABLE_TO_VERIFY_LOGS_IN_NEW_TAB_CLIENT_ERROR_MESSAGE;
 import static utility.FrameworkConstants.HTTPS;
 
 public class LTDashboardCommonActions extends BaseClass {
@@ -60,7 +63,8 @@ public class LTDashboardCommonActions extends BaseClass {
     return LTHooks.isFileExist(driver, logFileName, 5);
   }
 
-  public String openLogsInNewTabAndVerify(String logType, Locator expectedLocatorToBePresent, int... customTimeout) {
+  public String openLogsInNewTabAndVerify(CustomSoftAssert softAssert, String logType,
+    Locator expectedLocatorToBePresent, int... customTimeout) {
     String errorMessage = "";
     int timeout = customTimeout == null || customTimeout.length == 0 ? 2 : customTimeout[0];
     ltLogger.info("Verifying {} logs in new tab", logType);
@@ -70,12 +74,12 @@ public class LTDashboardCommonActions extends BaseClass {
       driver.switchToTab(1);
     } catch (Exception e) {
       ltLogger.error("Unable to open {} logs in new tab. Error: {}", logType, e.getMessage());
-      errorMessage = String.format("Unable to open And verify %s logs in New Tab", logType);
+      errorMessage = softAssert.softAssertMessageFormat(UNABLE_TO_VERIFY_LOGS_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
       return errorMessage;
     }
     checkIfCurrentUrlContainsLogNameAsQueryParam(logType);
     if (!driver.isDisplayed(expectedLocatorToBePresent)) {
-      errorMessage = String.format("%s logs are not displayed in new tab.", logType);
+      errorMessage = softAssert.softAssertMessageFormat(LOGS_NOT_PRESENT_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
     }
     driver.closeCurrentTabAndSwitchContextToLastTab();
     return errorMessage;

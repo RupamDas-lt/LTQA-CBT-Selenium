@@ -7,6 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.CustomSoftAssert;
 
+import static factory.SoftAssertionMessages.PERFORMANCE_REPORT_NOT_GENERATED_CLIENT_ERROR_MESSAGE;
+import static factory.SoftAssertionMessages.PERFORMANCE_REPORT_NOT_PRESENT_IN_UI_CLIENT_ERROR_MESSAGE;
+
 public class TestPerformanceReportPage extends LTDashboardCommonActions {
 
   private final Logger ltLogger = LogManager.getLogger(TestPerformanceReportPage.class);
@@ -41,11 +44,12 @@ public class TestPerformanceReportPage extends LTDashboardCommonActions {
 
   public void isPerformanceReportDisplayed() {
     if (driver.isDisplayed(performanceReportNotGeneratedMessage)) {
-      softAssert.fail("Test performance report is not generated.");
+      softAssert.fail(softAssert.softAssertMessageFormat(PERFORMANCE_REPORT_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
       return;
     }
     driver.click(performanceJsonReportOptionTab);
-    softAssert.assertTrue(driver.isDisplayed(performanceReport), "Test performance report is not displayed in the UI.");
+    softAssert.assertTrue(driver.isDisplayed(performanceReport),
+      softAssert.softAssertMessageFormat(PERFORMANCE_REPORT_NOT_PRESENT_IN_UI_CLIENT_ERROR_MESSAGE));
   }
 
 }

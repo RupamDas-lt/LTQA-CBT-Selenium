@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
+import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 
 public class TestCommandLogsPage extends LTDashboardCommonActions {
@@ -59,7 +60,8 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
   private void verifyCommandsCount() {
     String commandCountHeading = driver.getText(commandLogsCountHeading);
     int commandCount = (int) extractNumberFromString(commandCountHeading);
-    softAssert.assertTrue(commandCount > 0, "Command count should be greater than 0. Current count is " + commandCount);
+    softAssert.assertTrue(commandCount > 0,
+      softAssert.softAssertMessageFormat(COMMAND_LOGS_COUNT_INVALID_CLIENT_ERROR_MESSAGE, commandCount));
     ltLogger.info("command count: {}", commandCount);
   }
 
@@ -77,13 +79,15 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
       ltLogger.info("{} is not displayed by default. Trying scrolling to top.", firstCommandName);
       driver.click(scrollToTopButton);
     }
-    softAssert.assertTrue(firstCommandDisplayed, String.format("%s is not displayed", firstCommandName));
+    softAssert.assertTrue(firstCommandDisplayed,
+      softAssert.softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, firstCommandName));
     if (driver.isDisplayed(scrollToBottomButton)) {
       ltLogger.info("Scrolling to bottom.");
       driver.click(scrollToBottomButton);
     }
     lastCommandDisplayed = driver.isDisplayed(lastCommandLocator, 20);
-    softAssert.assertTrue(lastCommandDisplayed, String.format("%s is not displayed", lastCommandName));
+    softAssert.assertTrue(lastCommandDisplayed,
+      softAssert.softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, lastCommandName));
     return lastCommandDisplayed && firstCommandDisplayed;
   }
 
@@ -98,7 +102,8 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
     if (urls.isEmpty() && locators.isEmpty()) {
       ltLogger.info("Verification data is invalid - both URLs and locators are empty");
-      softAssert.fail("Verification data for Command logs are invalid");
+      softAssert.fail(
+        softAssert.softAssertMessageFormat(VERIFICATION_DATA_FOR_COMMAND_LOGS_NOT_VALID_CLIENT_ERROR_MESSAGE));
       return;
     }
 
@@ -150,9 +155,9 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
   private void assertAllItemsFound(List<String> notFoundUrls, List<String> notFoundLocators) {
     softAssert.assertTrue(notFoundUrls.isEmpty(),
-      "Some URLs are not found in command logs. Missing URLs: " + notFoundUrls);
+      softAssert.softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_1, notFoundUrls));
     softAssert.assertTrue(notFoundLocators.isEmpty(),
-      "Some Locators are not found in command logs. Missing locators: " + notFoundLocators);
+      softAssert.softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_2, notFoundLocators));
   }
 
   public void verifyCommandLogs() {
@@ -161,7 +166,8 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
     if (firstAndLastCommandsArePresent) {
       verifyAllExpectedCommandsArePresentInTheUI();
     } else {
-      softAssert.fail("First and last commands were not displayed in the UI.");
+      softAssert.fail(
+        softAssert.softAssertMessageFormat(FIRST_AND_LAST_COMMANDS_MISSING_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE));
     }
   }
 

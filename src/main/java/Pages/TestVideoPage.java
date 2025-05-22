@@ -3,10 +3,13 @@ package Pages;
 import TestManagers.DriverManager;
 import factory.Locator;
 import factory.LocatorTypes;
+import factory.SoftAssertionMessages;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.CustomSoftAssert;
 import utility.FrameworkConstants;
+
+import static factory.SoftAssertionMessages.*;
 
 public class TestVideoPage extends LTDashboardCommonActions {
 
@@ -43,10 +46,10 @@ public class TestVideoPage extends LTDashboardCommonActions {
     }
 
     if (!isVideoPresent) {
-      String errorMessage = driver.isDisplayed(videoNotPresentMessage, 10) ?
-        "Video verification failed from UI. Video is generated." :
-        "Video verification is not valid. Please check from UI and review the script.";
-      softAssert.fail(errorMessage);
+      SoftAssertionMessages errorMessage = driver.isDisplayed(videoNotPresentMessage, 10) ?
+        VIDEO_NOT_GENERATED_CLIENT_ERROR_MESSAGE :
+        VIDEO_VERIFICATION_FAILED_CLIENT_ERROR_MESSAGE;
+      softAssert.fail(softAssert.softAssertMessageFormat(errorMessage));
     }
 
     return isVideoPresent;
@@ -57,7 +60,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
       driver.executeScriptAndFetchValue(FrameworkConstants.jsToGetVideoDurationFromDOM).toString());
     ltLogger.info("Video duration: {}", videoDuration);
     if (videoDuration < 10) {
-      softAssert.fail("Video duration is less than 10 seconds. Duration: " + videoDuration);
+      softAssert.fail(softAssert.softAssertMessageFormat(VIDEO_DURATION_MISMATCH_CLIENT_ERROR_MESSAGE, videoDuration));
       return;
     }
     driver.click(playVideoButton);
@@ -68,7 +71,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
     ltLogger.info("Video currentTimeStamp after clicking on video play button and waiting for 10 secs : {}",
       videoCurrentTimeStamp);
     softAssert.assertTrue(videoCurrentTimeStamp > 5,
-      "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: " + videoCurrentTimeStamp);
+      softAssert.softAssertMessageFormat(VIDEO_NOT_PLAYABLE_CLIENT_ERROR_MESSAGE, videoCurrentTimeStamp));
     if (driver.isDisplayed(pauseVideoButton, 2)) {
       driver.click(pauseVideoButton);
       ltLogger.info("Video paused");

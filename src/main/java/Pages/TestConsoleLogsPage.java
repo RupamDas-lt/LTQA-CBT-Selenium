@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static factory.SoftAssertionMessages.*;
 import static utility.FrameworkConstants.consoleLogs;
 
 public class TestConsoleLogsPage extends LTDashboardCommonActions {
@@ -74,7 +75,7 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
   public void verifyConsoleLogsFromUI(int... customRetryCount) {
     int retryCount = customRetryCount != null && customRetryCount.length > 0 ? customRetryCount[0] : 2;
     if (consoleLogsNotFoundMessageDisplayed()) {
-      softAssert.fail("Console logs not found in UI");
+      softAssert.fail(softAssert.softAssertMessageFormat(CONSOLE_LOGS_NOT_FOUND_CLIENT_ERROR_MESSAGE));
       return;
     }
     List<String> expectedConsoleLogs = constructExpectedConsoleLogMessage();
@@ -98,16 +99,17 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
     }
     ltLogger.info("Missing console logs: {}", notFoundConsoleLogs);
     softAssert.assertTrue(notFoundConsoleLogs.isEmpty(),
-      "Some console logs are missing. Missing console logs: " + notFoundConsoleLogs);
+      softAssert.softAssertMessageFormat(SOME_CONSOLE_LOGS_ARE_MISSING_CLIENT_ERROR_MESSAGE, notFoundConsoleLogs));
   }
 
   public void downloadConsoleLogsFromUI(String expectedFileName) {
     boolean consoleLogsFileDownloadStatus = downloadLogFile(expectedFileName, "Console");
-    softAssert.assertTrue(consoleLogsFileDownloadStatus, "Unable to download console log file from UI");
+    softAssert.assertTrue(consoleLogsFileDownloadStatus,
+      softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_CONSOLE_LOGS_CLIENT_ERROR_MESSAGE));
   }
 
   public void openConsoleLogsInNewTabAndVerify() {
-    String errorMessage = openLogsInNewTabAndVerify("console", consoleLogRowLocator, 5);
+    String errorMessage = openLogsInNewTabAndVerify(softAssert, "console", consoleLogRowLocator, 5);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
   }
 
@@ -115,7 +117,8 @@ public class TestConsoleLogsPage extends LTDashboardCommonActions {
     final String expectedErrorMessage = "Console Logs are not supported on the selected Browser";
     String message = driver.getText(consoleLogsNotSupportedMessageContainer, 2);
     softAssert.assertTrue(message.contains(expectedErrorMessage),
-      "Error message of not supported browser for console logs is incorrect. Actual Message: " + message + ", Expected Message: " + expectedErrorMessage);
+      softAssert.softAssertMessageFormat(CONSOLE_LOGS_NOT_SUPPORTED_ERROR_MESSAGE_NOT_PRESENT_CLIENT_ERROR_MESSAGE,
+        message, expectedErrorMessage));
   }
 
 }
