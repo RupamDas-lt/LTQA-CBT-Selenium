@@ -18,10 +18,12 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -607,6 +609,25 @@ public class BaseClass {
     if (EnvSetup.IS_GDPR_TEST_CONFIG.equalsIgnoreCase("true"))
       return url.replace("-eu", "");
     return url;
+  }
+
+  public static String stringToSha256Hex(String input) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+      StringBuilder hexString = new StringBuilder(2 * hashBytes.length);
+
+      for (byte b : hashBytes) {
+        String hex = Integer.toHexString(0xff & b);
+        if (hex.length() == 1)
+          hexString.append('0');
+        hexString.append(hex);
+      }
+
+      return hexString.toString();
+    } catch (Exception e) {
+      throw new RuntimeException("Error computing SHA-256 hash", e);
+    }
   }
 
 }

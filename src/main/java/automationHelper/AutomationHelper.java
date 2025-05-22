@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 import static utility.UrlsAndLocators.*;
@@ -184,7 +185,8 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(BASIC_AUTH);
     String pageHeading = driverManager.getText(basicAuthHeading);
-    softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed");
+    softAssert.assertTrue(pageHeading.equals("Basic Auth"),
+      softAssert.softAssertMessageFormat(BASIC_AUTH_FAILED_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
 
   }
@@ -203,7 +205,8 @@ public class AutomationHelper extends BaseClass {
     LTHooks.performKeyboardEvent(driverManager, LAMBDA_KEYBOARD_ENTER);
     waitForTime(5);
     String pageHeading = driverManager.getText(basicAuthHeading);
-    softAssert.assertTrue(pageHeading.equals("Basic Auth"), "Basic Authentication Failed using keyboard events.");
+    softAssert.assertTrue(pageHeading.equals("Basic Auth"),
+      softAssert.softAssertMessageFormat(BASIC_AUTH_USING_KEYBOARD_EVENT_FAILED_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -248,7 +251,7 @@ public class AutomationHelper extends BaseClass {
       ltLogger.info("SelfSigned fallback website text: {}", selfsignedText);
     }
     softAssert.assertTrue(validSelfSignedValues.contains(Objects.requireNonNull(selfsignedText).trim()),
-      "Self-signed site not open. There might be a certificate issue or website didn't open.");
+      softAssert.softAssertMessageFormat(SELF_SIGNED_CERT_ERROR_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -260,7 +263,7 @@ public class AutomationHelper extends BaseClass {
     String expectedTimeZone = EnvSetup.TEST_CAPS_MAP.get().getOrDefault("timezone", "").toString();
     if (!expectedTimeZone.isEmpty())
       softAssert.assertTrue(testTimeZone.equals(expectedTimeZone),
-        "Timezone is not set correctly. Current timezone is: " + testTimeZone + " expected: " + expectedTimeZone);
+        softAssert.softAssertMessageFormat(TIMEZONE_FAILURE_MESSAGE, testTimeZone, expectedTimeZone));
     else
       System.err.println("Timezone validation is skipped as it is not passed in the test caps.");
   }
@@ -277,9 +280,9 @@ public class AutomationHelper extends BaseClass {
       driverManager.sendKeys(herokuLoginPageLoginButton, Keys.ENTER);
       String afterLoginPageHeading = driverManager.getText(herokuAfterLoginPageHeading, 5);
       softAssert.assertTrue(afterLoginPageHeading.contains("You logged into a secure area"),
-        "Heroku app web page keyboard log in failed, Expected: You logged into a secure area but Received: " + afterLoginPageHeading);
+        softAssert.softAssertMessageFormat(LOGIN_USING_KEYBOARD_EVENT_FAILURE_MESSAGE, afterLoginPageHeading));
     } else {
-      softAssert.fail("Unable to open Heroku Login Page");
+      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_HEROKU_APP_LOGIN_PAGE_MESSAGE));
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -392,10 +395,10 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("Browser version: {}", browserVersion);
 
     softAssert.assertTrue(browserName.contains(actualBrowserName) || actualBrowserName.contains(browserName),
-      String.format("Browser name doesn't match. Expected: %s, Actual: %s", actualBrowserName, browserName));
+      softAssert.softAssertMessageFormat(BROWSER_NAME_ERROR_MESSAGE, actualBrowserName, browserName));
 
     softAssert.assertTrue(browserVersion.contains(actualBrowserVersion),
-      String.format("Browser version doesn't match. Expected: %s, Actual: %s", actualBrowserVersion, browserVersion));
+      softAssert.softAssertMessageFormat(BROWSER_VERSION_ERROR_MESSAGE, actualBrowserVersion, browserVersion));
 
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -424,7 +427,7 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.switchToTab(1);
     softAssert.assertTrue(driverManager.getCurrentURL().contains("chrome-extension"),
-      "Extension not working, or might be tab not switched");
+      softAssert.softAssertMessageFormat(EXTENSION_NOT_WORKING_ERROR_MESSAGE));
     driverManager.switchToTab(0);
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -440,7 +443,7 @@ public class AutomationHelper extends BaseClass {
     driverManager.executeScript("document.getElementById(\"" + todoAddButton.value() + "\").click();");
     String actualText = driverManager.getText(todoNewEnteredText, 5);
     softAssert.assertTrue(actualText.contains(sampleText),
-      "Entered text doesn't match. Expected: " + sampleText + " Actual: " + actualText);
+      softAssert.softAssertMessageFormat(BASE_TEST_ERROR_MESSAGE, sampleText, actualText));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -450,7 +453,8 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(FILE_UPLOAD_URL);
     driverManager.sendKeys(chooseFileButton, SAMPLE_TXT_FILE_PATH);
     driverManager.click(uploadFileButton);
-    softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5), "Unable to upload file");
+    softAssert.assertTrue(driverManager.isDisplayed(uploadedFileHeading, 5),
+      softAssert.softAssertMessageFormat(UPLOAD_FILE_ERROR_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -467,7 +471,7 @@ public class AutomationHelper extends BaseClass {
     String expectedCountryName = TEST_VERIFICATION_DATA.get().get(testVerificationDataKeys.GEO_LOCATION).toString();
     softAssert.assertTrue(
       expectedCountryName.contains(actualCountryName) || actualCountryName.contains(expectedCountryName),
-      "GeoLocation didn't match. Expected: " + expectedCountryName + " Actual: " + actualCountryName);
+      softAssert.softAssertMessageFormat(GEOLOCATION_ERROR_MESSAGE, expectedCountryName, actualCountryName));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -475,13 +479,13 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(LT_LOGIN_URL);
     softAssert.assertTrue(driverManager.isDisplayed(ltLoginPageEmailInput, 5),
-      "LT login page is not displayed, cache is not cleared in the machine.");
+      softAssert.softAssertMessageFormat(LOGIN_CACHE_CHECK_FAILED_ERROR_MESSAGE));
     if (!driverManager.isDisplayed(ltLoginPageEmailInput)) {
       driverManager.sendKeys(ltLoginPageEmailInput, USER_EMAIL);
       driverManager.sendKeys(ltLoginPagePasswordInput, USER_PASS);
       driverManager.click(ltLoginPageSubmitButton);
       softAssert.assertTrue(driverManager.isDisplayed(ltLoginSuccessVerification, 20),
-        "Failed to login to LT website, cache verification will not be valid for next sessions.");
+        softAssert.softAssertMessageFormat(LOGIN_CACHE_NOT_SET_FAILED_ERROR_MESSAGE));
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
@@ -497,32 +501,37 @@ public class AutomationHelper extends BaseClass {
       "Please start http server on port 8000 to start verifying tunnel. Expected status code: 200, original status code: " + httpServerStatus);
     driverManager.getURL(LOCAL_URL);
     boolean localUrlStatus = driverManager.isDisplayed(localUrlHeading, 10);
-    softAssert.assertTrue(localUrlStatus, "Local Url Not Displayed");
+    softAssert.assertTrue(localUrlStatus,
+      softAssert.softAssertMessageFormat(LOCAL_URL_CHECK_FAILED_WITH_TUNNEL_ERROR_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   private void runABTestIHA(CustomSoftAssert softAssert) {
     driverManager.getURL(INTERNET_HEROKU_APP_ABTEST);
     String abTestHeading = driverManager.getText(abtestHeadingIHA);
-    softAssert.assertTrue(abTestHeading.equals("A/B Test Variation 1"), "A/B Test Variation failed.");
+    softAssert.assertTrue(abTestHeading.equals("A/B Test Variation 1"),
+      softAssert.softAssertMessageFormat(AB_IHA_TEST_FAILED_ERROR_MESSAGE));
   }
 
   private void addOrRemoveElementIHA(CustomSoftAssert softAssert) {
     driverManager.getURL(INTERNET_HEROKU_APP_ADD_REMOVE_ELEMENT_URL);
     driverManager.click(addElementButtonIHA);
-    softAssert.assertTrue(driverManager.isDisplayed(deleteElementButtonIHA, 5), "Add element test verification failed");
+    softAssert.assertTrue(driverManager.isDisplayed(deleteElementButtonIHA, 5),
+      softAssert.softAssertMessageFormat(ADD_ELEMENT_IHA_TEST_FAILED_ERROR_MESSAGE));
   }
 
   private void testBrokenImagesIHA(CustomSoftAssert softAssert) {
     driverManager.getURL(INTERNET_HEROKU_APP_BROKEN_IMAGES_URL);
     List<WebElement> elements = driverManager.findElements(brokenImagesIHA);
-    softAssert.assertFalse(elements.isEmpty(), "Broken Images are not displayed");
+    softAssert.assertFalse(elements.isEmpty(),
+      softAssert.softAssertMessageFormat(BROKEN_IMAGES_IHA_TEST_FAILED_ERROR_MESSAGE));
   }
 
   private void checkBoxIHA(CustomSoftAssert softAssert) {
     driverManager.getURL(INTERNET_HEROKU_APP_CHECK_BOXES_URL);
     driverManager.click(checkboxesIHA);
-    softAssert.assertTrue(driverManager.isSelected(checkboxesIHA, 5), "Checkboxes are not selected");
+    softAssert.assertTrue(driverManager.isSelected(checkboxesIHA, 5),
+      softAssert.softAssertMessageFormat(CHECKBOXES_IHA_TEST_FAILED_ERROR_MESSAGE));
   }
 
   private void dynamicContentIHA(CustomSoftAssert softAssert) {
@@ -532,23 +541,23 @@ public class AutomationHelper extends BaseClass {
     driverManager.refreshPage();
     String s2 = driverManager.getText(staticParagraphIHA);
     softAssert.assertTrue(s1.equals(s2),
-      "Dynamic Content test failed as static messages are not same after page refresh");
+      softAssert.softAssertMessageFormat(DYNAMIC_CONTENT_IHA_TEST_FAILED_ERROR_MESSAGE));
   }
 
   private void dynamicControlsIHA(CustomSoftAssert softAssert) {
     driverManager.getURL(INTERNET_HEROKU_APP_DYNAMIC_CONTROLS_URL);
     driverManager.click(checkBoxSwapButtonIHA);
     softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's gone!"),
-      "First swap failed.");
+      softAssert.softAssertMessageFormat(DYNAMIC_CONTROLS_IHA_TEST_FAILED_ERROR_MESSAGE_1));
     driverManager.click(checkBoxSwapButtonIHA);
     softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's back!"),
-      "Second swap failed.");
+      softAssert.softAssertMessageFormat(DYNAMIC_CONTROLS_IHA_TEST_FAILED_ERROR_MESSAGE_2));
     driverManager.click(textBoxEnableButtonIHA);
     softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's enabled!"),
-      "Text box enable failed.");
+      softAssert.softAssertMessageFormat(DYNAMIC_CONTROLS_IHA_TEST_FAILED_ERROR_MESSAGE_3));
     driverManager.click(textBoxEnableButtonIHA);
     softAssert.assertTrue(driverManager.getText(messageInDynamicControlsPageIHA, 10).equals("It's disabled!"),
-      "Text box disable failed.");
+      softAssert.softAssertMessageFormat(DYNAMIC_CONTROLS_IHA_TEST_FAILED_ERROR_MESSAGE_4));
   }
 
   private void loginFormFillUpIHA(CustomSoftAssert softAssert) {
@@ -557,10 +566,11 @@ public class AutomationHelper extends BaseClass {
     driverManager.sendKeys(passwordInputTHA, "SuperSecretPassword!");
     driverManager.click(loginButtonTHA);
     softAssert.assertTrue(driverManager.getText(loginSuccessHeaderTHA).contains("Welcome to the Secure Area"),
-      "Form login is not successful");
+      softAssert.softAssertMessageFormat(FORM_LOGIN_IHA_TEST_FAILED_ERROR_MESSAGE));
     if (driverManager.isSelected(loginSuccessHeaderTHA)) {
       driverManager.click(logoutButtonTHA);
-      softAssert.assertTrue(driverManager.getText(loginPageHeadingTHA).contains("Login Page"), "Form logout failed.");
+      softAssert.assertTrue(driverManager.getText(loginPageHeadingTHA).contains("Login Page"),
+        softAssert.softAssertMessageFormat(FORM_LOGOUT_IHA_TEST_FAILED_ERROR_MESSAGE));
     }
   }
 
@@ -663,7 +673,8 @@ public class AutomationHelper extends BaseClass {
   public void uploadSampleTerminalLogs() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String status = apiHelper.uploadTerminalLogs(EnvSetup.TEST_SESSION_ID.get());
-    softAssert.assertTrue(status.equals("success"), "Failed to upload terminal logs");
+    softAssert.assertTrue(status.equals("success"),
+      softAssert.softAssertMessageFormat(UPLOAD_SAMPLE_TERMINAL_LOGS_FAILED_ERROR_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -786,7 +797,7 @@ public class AutomationHelper extends BaseClass {
     String status = response.jsonPath().get("status").toString();
     String message = response.jsonPath().get("message").toString();
     softAssert.assertTrue(status.equalsIgnoreCase("success"),
-      "Unable to stop session with test stop api. Status: " + status + " Message: " + message);
+      softAssert.softAssertMessageFormat(STOP_TEST_SESSION_VIA_API_ERROR_MESSAGE, status, message));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -839,7 +850,7 @@ public class AutomationHelper extends BaseClass {
     String buildId = apiHelper.getBuildIdFromSessionId(EnvSetup.TEST_SESSION_ID.get());
     String buildStatus = apiHelper.getStatusOfBuildViaAPI(buildId);
     softAssert.assertTrue(STOPPED.equalsIgnoreCase(buildStatus),
-      "Build status doesn't match. Expected: " + buildStatus + ", Actual: " + buildStatus_ind);
+      softAssert.softAssertMessageFormat(BUILD_STATUS_MISMATCH_ERROR_MESSAGE, buildStatus, buildStatus_ind));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -848,9 +859,9 @@ public class AutomationHelper extends BaseClass {
     Map<String, String> runningTunnelNameToTunnelIDMap = apiHelper.getAllRunningTunnels();
     switch (expectedTunnelStatus) {
     case RUNNING -> softAssert.assertTrue(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
-      "There is no running tunnel with name: " + tunnelName);
+      softAssert.softAssertMessageFormat(TUNNEL_NOT_IN_RUNNING_STATE_ERROR_MESSAGE, tunnelName));
     case STOPPED -> softAssert.assertFalse(runningTunnelNameToTunnelIDMap.containsKey(tunnelName),
-      "The tunnel with name: " + tunnelName + " is in running state. But expected state is: " + expectedTunnelStatus);
+      softAssert.softAssertMessageFormat(TUNNEL_NOT_STOPPED_ERROR_MESSAGE, tunnelName, expectedTunnelStatus));
     default -> throw new IllegalStateException("Unexpected value: " + expectedTunnelStatus);
     }
     String currentTunnelId = runningTunnelNameToTunnelIDMap.get(tunnelName);
@@ -862,7 +873,7 @@ public class AutomationHelper extends BaseClass {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String status = apiHelper.stopTunnel(tunnelID);
     softAssert.assertTrue(status.equalsIgnoreCase("success"),
-      "Stop tunnel failed with tunnel id: " + tunnelID + ", Status: " + status);
+      softAssert.softAssertMessageFormat(STOP_RUNNING_TUNNEL_FAILED_ERROR_MESSAGE, tunnelID, status));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -902,9 +913,9 @@ public class AutomationHelper extends BaseClass {
     } else {
       locationWherePublicWebsiteResolved = "dc";
     }
-    softAssert.assertTrue(locationWherePublicWebsiteResolved.equals(expectedLocation), String.format(
-      "Public websites are not resolved in expected location for tunnel flag %s. Expected: %s, Actual: %s, Fetched IP: %s, Fetched location: %s",
-      tunnelFlagName, expectedLocation, locationWherePublicWebsiteResolved, ipAndLocation[0], ipAndLocation[1]));
+    softAssert.assertTrue(locationWherePublicWebsiteResolved.equals(expectedLocation),
+      softAssert.softAssertMessageFormat(PUBLIC_WEBSITES_NOT_RESOLVED_IN_EXPECTED_PLACE_ERROR_MESSAGE, tunnelFlagName,
+        expectedLocation, locationWherePublicWebsiteResolved, ipAndLocation[0], ipAndLocation[1]));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -939,10 +950,10 @@ public class AutomationHelper extends BaseClass {
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
-      "allowHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel client as allowHosts='*lambda*' flag is used, but unable to open it.");
+      softAssert.softAssertMessageFormat(ALLOW_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_1, LOCAL_LAMBDA_URL));
     driverManager.getURL(LOCAL_URL);
     softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
-      "allowHosts flag is not working. " + LOCAL_URL + " should be resolved in the DC or Tunnel Server not in Tunnel Client");
+      softAssert.softAssertMessageFormat(ALLOW_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -954,10 +965,10 @@ public class AutomationHelper extends BaseClass {
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
     softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
-      "bypassHosts flag is not working. " + LOCAL_LAMBDA_URL + " should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened.");
+      softAssert.softAssertMessageFormat(BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_1, LOCAL_LAMBDA_URL));
     driverManager.getURL(LOCAL_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
-      "bypassHosts flag is not working. " + LOCAL_URL + " should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.");
+      softAssert.softAssertMessageFormat(BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
@@ -968,13 +979,11 @@ public class AutomationHelper extends BaseClass {
       "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
-    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5), String.format(
-      "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
-      LOCAL_LAMBDA_URL));
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
+      softAssert.softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_LAMBDA_URL));
     driverManager.getURL(LOCAL_URL);
-    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5), String.format(
-      "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
-      LOCAL_URL));
+    softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
+      softAssert.softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }

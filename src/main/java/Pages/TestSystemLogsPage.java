@@ -7,6 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.CustomSoftAssert;
 
+import static factory.SoftAssertionMessages.*;
+
 public class TestSystemLogsPage extends LTDashboardCommonActions {
 
   private final Logger ltLogger = LogManager.getLogger(TestSystemLogsPage.class);
@@ -53,22 +55,24 @@ public class TestSystemLogsPage extends LTDashboardCommonActions {
 
   public void downloadSystemLogsFromUI(String expectedFileName) {
     boolean isSystemLogsDownloaded = downloadLogFile(expectedFileName, "Selenium");
-    softAssert.assertTrue(isSystemLogsDownloaded, "Unable to download system logs from UI");
+    softAssert.assertTrue(isSystemLogsDownloaded,
+      softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_SYSTEM_LOGS_CLIENT_ERROR_MESSAGE));
   }
 
   public void openAndVerifySystemLogsInNewTab() {
-    String errorMessage = openLogsInNewTabAndVerify("selenium", systemLogRowLocator, 5);
+    String errorMessage = openLogsInNewTabAndVerify(softAssert, "selenium", systemLogRowLocator, 5);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
   }
 
   public void verifySystemLogs() {
     if (seleniumLogsNotFoundMessageDisplayed()) {
       ltLogger.info("System Logs are found");
-      softAssert.fail("System logs are not generated.");
+      softAssert.fail(softAssert.softAssertMessageFormat(SYSTEM_LOGS_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
       return;
     }
     String systemLogs = extractSystemLogs();
     softAssert.assertTrue(systemLogs.length() > expectedMinimumSizeOfSystemLogs,
-      String.format("System logs size is lesser than expected %s.", expectedMinimumSizeOfSystemLogs));
+      softAssert.softAssertMessageFormat(SYSTEM_LOGS_SIZE_IS_LESSER_CLIENT_ERROR_MESSAGE,
+        expectedMinimumSizeOfSystemLogs));
   }
 }

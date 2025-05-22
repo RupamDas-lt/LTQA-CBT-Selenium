@@ -350,6 +350,7 @@ public class Hooks extends BaseClass {
     put("TEST_TUNNEL_ID", TEST_TUNNEL_ID);
     put("BUILD_ID", BUILD_ID);
     put("TUNNEL_START_COMMAND", TUNNEL_START_COMMAND);
+    put("ASSERTION_ERROR_TO_HASH_KEY_MAP", ASSERTION_ERROR_TO_HASH_KEY_MAP);
   }};
 
   private void resetTestData() {

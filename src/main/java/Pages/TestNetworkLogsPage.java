@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
+import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.TEST_VERIFICATION_DATA;
 
 public class TestNetworkLogsPage extends LTDashboardCommonActions {
@@ -53,14 +54,15 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
 
     if (urls.isEmpty()) {
       ltLogger.info("Verification data is invalid - URLs are empty");
-      softAssert.fail("Verification data for Network logs are invalid");
+      softAssert.fail(
+        softAssert.softAssertMessageFormat(NETWORK_LOGS_VERIFICATION_DATA_NOT_VALID_CLIENT_ERROR_MESSAGE));
       return;
     }
 
     List<String> notFoundUrls = searchForItemsAndCollectMissing(urls);
 
     softAssert.assertTrue(notFoundUrls.isEmpty(),
-      "Some URLs are not found in Network logs. Missing URLs: " + notFoundUrls);
+      softAssert.softAssertMessageFormat(URLS_NOT_PRESENT_IN_NETWORK_LOGS_CLIENT_ERROR_MESSAGE, notFoundUrls));
   }
 
   private List<String> searchForItemsAndCollectMissing(Collection<String> items) {
@@ -102,11 +104,12 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
 
   public void downloadNetworkLogsFromUI(String expectedFileName) {
     boolean isNetworkLogsDownloaded = downloadLogFile(expectedFileName, "Network", 10);
-    softAssert.assertTrue(isNetworkLogsDownloaded, "Unable to download network logs from UI");
+    softAssert.assertTrue(isNetworkLogsDownloaded,
+      softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_NETWORK_LOGS_CLIENT_ERROR_MESSAGE));
   }
 
   public void openNetworkLogsInNewTabAndVerify() {
-    String errorMessage = openLogsInNewTabAndVerify("network", networkLogsRows, 5);
+    String errorMessage = openLogsInNewTabAndVerify(softAssert, "network", networkLogsRows, 5);
     softAssert.assertTrue(errorMessage.isEmpty(), errorMessage);
   }
 }
