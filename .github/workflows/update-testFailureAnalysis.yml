@@ -8,6 +8,8 @@ on:
       - synchronize   # runs on new commits pushed to PR
       - opened
       - reopened
+      - labeled
+      - unlabeled
 
 jobs:
   update-json:
