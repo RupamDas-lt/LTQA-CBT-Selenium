@@ -1,0 +1,65 @@
+name: Update Test Failure Analysis JSON file
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize   # runs on new commits pushed to PR
+      - opened
+      - reopened
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'change-report-database') }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false
+
+      - name: Check changed files
+        id: files
+        run: |
+          echo "::group::Changed files"
+          git fetch origin main
+          git diff --name-only origin/main > changed_files.txt
+          cat changed_files.txt
+          echo "::endgroup::"
+          echo "::set-output name=changed_files::$(cat changed_files.txt)"
+
+      - name: Run condition check
+        id: check_change
+        run: |
+          changed_files="${{ steps.files.outputs.changed_files }}"
+          echo "Files changed since main:"
+          echo "$changed_files"
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessages.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysis.json"; then
+              echo "true" > update_needed.txt
+            else
+              echo "false" > update_needed.txt
+            fi
+          else
+            echo "false" > update_needed.txt
+          fi
+          cat update_needed.txt
+          echo "::set-output name=update_needed::$(cat update_needed.txt)"
+
+      - name: Run update if needed
+        if: steps.check_change.outputs.update_needed == 'true'
+        run: |
+          echo "Running maven command to update JSON"
+          mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/main/java/reportingHelper/dataset/testFailureAnalysis.json
+          git commit -m "chore: update testFailureAnalysis.json from SoftAssertionMessages.java changes" || echo "No changes to commit"
+          git push origin HEAD:${{ github.head_ref }}
+
+      - name: Notify no update needed
+        if: steps.check_change.outputs.update_needed == 'false'
+        run: echo "No update to testFailureAnalysis.json needed."
+
