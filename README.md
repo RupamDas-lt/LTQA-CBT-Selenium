@@ -2,6 +2,26 @@
 
 A Selenium-based test automation framework using Cucumber for BDD testing.
 
+## Contribution Guidelines
+
+1. **PR Approval:**  
+   Your pull request must have at least one approval from a code owner —
+   either [@RupamDas-lt](https://github.com/RupamDas-lt) or [@rahulmishra-lt](https://github.com/rahulmishra-lt) —
+   before merging into the `main` branch.
+
+2. **Mandatory Compile Check:**  
+   Do **not** bypass the checks. Ensure the compile action passes successfully before merging your PR.
+
+3. **Recreate Stage Branch:**  
+   To trigger recreation of the `stage` branch after merging into `main`, add the label: `recreate-stage` to your PR.
+
+4. **SoftAssertionMessages Changes:**  
+   If your PR modifies the file `src/main/java/factory/SoftAssertionMessages.java`, add the label:
+   `change-report-database`.
+    - This label triggers an automated update of the `testFailureAnalysis.json` file via GitHub Actions.
+    - **Do not edit `testFailureAnalysis.json` manually.** Wait for the automated commit, then update any inner details
+      if needed in a subsequent commit.
+
 ## Prerequisites
 
 1. Install all dependencies by running:
@@ -185,7 +205,21 @@ _source
 | where message="New_Framework_Testing-2"
 ```
 
-- Add label `recreate-stage` to the PR to recreate the stage branch from main after your PR gets merged.
+- If you are making any changes to the `src/main/java/factory/SoftAssertionMessages.java` and also add to add
+  corresponding changes to the `src/main/java/reportingHelper/dataset/testFailureAnalysis.json` then just run the
+  following command. But this will not change anything for existing keys:
+
+```bash
+  mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -Dexec.args="$*"
+```
+
+- If you are changing anything major and want to restructure the whole
+  `src/main/java/reportingHelper/dataset/testFailureAnalysis.json` then just run the same command with flag
+  `-DREWRITE_EXISTING_DATA=true`
+
+```bash
+  mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -Dexec.args="$*" -DREWRITE_EXISTING_DATA=true
+```
 
 ---
 
