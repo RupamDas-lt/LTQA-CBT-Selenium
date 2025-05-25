@@ -225,7 +225,7 @@
     "message": "Unable to fetch lighthouse reports. Status: %s, Message: %s",
     "category": "test-artefacts-api-verification-failures",
     "priority": "p1",
-    "isKnown": "false"
+    "isKnown": "true"
   },
   "8941afda4d8385f327f507afd1195dc040638b8b821c332f4a50271f10789375": {
     "message": "Video verification is not valid. Please check from UI and review the script.",
