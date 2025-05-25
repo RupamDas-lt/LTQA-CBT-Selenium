@@ -377,6 +377,13 @@ public class Hooks extends BaseClass {
     payload.put("test_env", TEST_ENV);
     payload.put("caps", TEST_CAPS_MAP.get());
     payload.put("attempt", System.getProperty(TEST_ATTEMPT, "first"));
+    payload.put("message", "LTQA-CBT-Selenium-Test-Failure-Reports");
+
+    String customDataFromEnvVar = System.getProperty(PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD, "");
+    if (!StringUtils.isNullOrEmpty(customDataFromEnvVar)) {
+      HashMap<String, Object> customDataMapFromCLI = getHashMapFromString(customDataFromEnvVar);
+      payload.put("custom_data_from_cli", customDataMapFromCLI);
+    }
     return payload;
   }
 
@@ -389,8 +396,10 @@ public class Hooks extends BaseClass {
       TEST_REPORT.get().put("test_failure_report", testFailureReport);
       ltLogger.info("Test failure report: {}", testFailureReport);
       // Push each failure data separately to Sumo Logic, remove this if dashboard can be prepared from the entire report
-      for (Map<String, String> map : testFailureReport) {
-        apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
+      if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
+        for (Map<String, String> map : testFailureReport) {
+          apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
+        }
       }
     } else {
       ltLogger.info("No test failure report to push.");
