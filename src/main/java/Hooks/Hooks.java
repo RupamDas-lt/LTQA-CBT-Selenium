@@ -9,6 +9,7 @@ import io.cucumber.java.Scenario;
 import io.cucumber.plugin.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import reportingHelper.TestFailureReportManager;
 import utility.BaseClass;
 import utility.EnvSetup;
 
@@ -351,6 +352,7 @@ public class Hooks extends BaseClass {
     put("BUILD_ID", BUILD_ID);
     put("TUNNEL_START_COMMAND", TUNNEL_START_COMMAND);
     put("ASSERTION_ERROR_TO_HASH_KEY_MAP", ASSERTION_ERROR_TO_HASH_KEY_MAP);
+    put("FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP", FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP);
   }};
 
   private void resetTestData() {
@@ -366,5 +368,18 @@ public class Hooks extends BaseClass {
     assertAll();
     assertAllClient();
     throwErrorBasedOnAssertions();
+  }
+
+  @After(order = 3)
+  public void pushTestFailureReportToTestReport() {
+    ltLogger.info("Test error message to hashkey map: {}", EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
+    if (!EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().isEmpty()) {
+      List<Map<String, String>> testFailureReport = TestFailureReportManager.getTestFailureReport(
+        EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
+      TEST_REPORT.get().put("test_failure_report", testFailureReport);
+      ltLogger.info("Test failure report: {}", testFailureReport);
+    } else {
+      ltLogger.info("No test failure report to push.");
+    }
   }
 }

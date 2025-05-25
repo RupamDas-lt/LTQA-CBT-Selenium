@@ -102,6 +102,8 @@ public class EnvSetup {
   }
 
   // Test Report
-  public static final ThreadLocal<Map<String, Object>> ASSERTION_ERROR_TO_HASH_KEY_MAP = ThreadLocal.withInitial(
+  public static final ThreadLocal<Map<String, Map<String, String>>> ASSERTION_ERROR_TO_HASH_KEY_MAP = ThreadLocal.withInitial(
+    HashMap::new);
+  public static final ThreadLocal<Map<String, String>> FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP = ThreadLocal.withInitial(
     HashMap::new);
 }
