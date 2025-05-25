@@ -177,7 +177,6 @@ public class Hooks extends BaseClass {
 
   private void updateTestReport(Scenario scenario) {
     TEST_REPORT.get().put("test_env", TEST_ENV);
-    ;
     TEST_REPORT.get().put("scenarioName", scenario.getName());
     TEST_REPORT.get().put("scenarioHashCode", scenario.hashCode());
     TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());
