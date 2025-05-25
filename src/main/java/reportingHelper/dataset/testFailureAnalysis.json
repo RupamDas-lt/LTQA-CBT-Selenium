@@ -19,9 +19,9 @@
   },
   "d268c749b65e73f87e5ece43b61987e66f979bd0071139b533b91ee5dfd5f49e": {
     "message": "%s is not present in the %s logs.",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "c772d3a5587f8bd1206b22dff16f46ba163a8d378887c83d4e3ca9d0fccb117e": {
     "message": "Unable to open Heroku Login Page",
@@ -31,21 +31,21 @@
   },
   "00134a74b782555af58c0f1980929ca84dea32063e7e183bb6b5c8dbd5d426df": {
     "message": "Unable to download Lighthouse report (HTML). Status: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "true"
   },
   "4503d4fa9705b509105c9c3640d7703ae1b21ec6229027b94eb553c59b8ac6d7": {
     "message": "Selenium logs does not contain %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "7e162494cc230e20e44c466b74d7aee6fb07d478460df64574ccf61f062a0e52": {
     "message": "Expected log: %s is missing from the console logs fetched from API version: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "c830c81b79047bf534a8c4894ac7de1557623e6c12fddcce721d96d2c7078c2b": {
     "message": "%s is not displayed",
@@ -85,9 +85,9 @@
   },
   "fd49f5d747382afbbf78d1f1c2d645d8977651b7bf345dde59a58c20480d2eae": {
     "message": "Actual video width is not greater than expected width. Expected: %s, Actual: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "false"
   },
   "8c2345fe7f7880b57a52cd531b6f2a49eaaa33216b4a5e989f602f5771070de0": {
     "message": "Timezone is not set correctly. Current timezone is: %s expected: %s",
@@ -103,9 +103,9 @@
   },
   "d916b0822ae71717d04c919e4d0a5f446a148f04eb6ce8f90b965118a643c56a": {
     "message": "Info level logs are missing for Selenium version %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "d4b4351eb7c8ba5cfa208453c5d3254c98a8c20c7e1b653f7aa7636ab5310ec7": {
     "message": "Unable to download system logs from UI",
@@ -115,9 +115,9 @@
   },
   "fd6b225d0d74a4593c576bd37c97f7376d8a74caee5afec2e1e949815cc6c26a": {
     "message": "Unable to extract video urls from API response. Status: %s Message: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "bbd67ed39c69df29adb70a0f8b44e70e4d2af88d12fd9a7cdf25db4c2f72f614": {
     "message": "Unable to upload file",
@@ -145,21 +145,21 @@
   },
   "57fd22f3353687e56cb9be73134e7fcdba3d2df26f45b44612efbd86abb78d87": {
     "message": "Unable to fetch %s logs from API %s. Received API response: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "800bbc3fb055fa5afb13c12000b8d1be6abb57d618ccb769baac324895fa6a8b": {
     "message": "Actual video height is not greater than expected height. Expected: %s, Actual: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "false"
   },
   "9fdd79efa1a92aa499b0aa89ce0ffcb4b9721657a0965c579d5d74621243a0d3": {
     "message": "Expected port number is not present in the Selenium logs. Expected port number is: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "3a442d3ae53137ba4d90a435338e94aa6799ee8f4a8d70bf1ef16f475fffdbba": {
     "message": "Basic Authentication Failed using keyboard events.",
@@ -187,15 +187,15 @@
   },
   "c921acd05ebebc7e89f7d75db64785546022f76f48f52e884579b7643a1eeb54": {
     "message": "Schema validation failed for %s logs from %s. Errors: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "93a0c6b5f8a77779b9363972da20990247144473a356706e4edd31dfc9c69977": {
     "message": "Mismatch found in %s. Expected URL: %s but got URL: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "9126b1f7b7dfa9dca01bc1ef9dc2d75fa9ccd80f0b1d20b2f61c3af78f9c3e26": {
     "message": "LT login page is not displayed, cache is not cleared in the machine.",
@@ -223,9 +223,9 @@
   },
   "335ce9b655c79c800289481d86a18bfc1e5bbc7fc8f1b1d41713298ab374f372": {
     "message": "Unable to fetch lighthouse reports. Status: %s, Message: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "false"
   },
   "8941afda4d8385f327f507afd1195dc040638b8b821c332f4a50271f10789375": {
     "message": "Video verification is not valid. Please check from UI and review the script.",
@@ -247,15 +247,15 @@
   },
   "4a8fc190b9e244578d2f783f6c09ff038a7d272ead5fcc9ccf37c1fa421c853b": {
     "message": "Session creation log with correct session ID missing. Expected logs: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "dbeb4e076915c2f5a61603cd6a5ebb1c81a3351b94dd226dcc7ef5aca5d09646": {
     "message": "Test video duration is greater than the expected video duration [1min + test execution time]. Expected duration: %s, Actual: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "false"
   },
   "2389f34de9a0b9b5b0418016159ac2497e6ff4b474e7c58dbed541cd230a2642": {
     "message": "Checkboxes are not selected",
@@ -301,9 +301,9 @@
   },
   "6fd360de9c7ca5271b4961ed750a3ac8b16a14ebefa622ad495415770927c431": {
     "message": "Expected port number is %s for Selenium Driver. But used port is %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p2",
+    "isKnown": "false"
   },
   "9b01b43bcc7a1a354f154ebc23169f64b6d56e0d62352fd1884265b3c96f29d2": {
     "message": "allowHosts flag is not working. %s should be resolved in tunnel client as allowHosts='*lambda*' flag is used, but unable to open it.",
@@ -313,9 +313,9 @@
   },
   "8fb38729a026a9e2ab88fd044c4743641ece0da86ae65b03f7bebc6b99980c06": {
     "message": "Expected Selenium version is %s but found %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "977335c33ec922c1a2bbc8768d9ff5bb4e91b87e57bdd728cc7273a696cd0d32": {
     "message": "There is no running tunnel with name: %s",
@@ -325,9 +325,9 @@
   },
   "1c80355f98a43afc268bf0fcdddeff540439db7d36debfbf7815589ca3c77786": {
     "message": "With webdriver mode, expected port number is %s. But used port is %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p2",
+    "isKnown": "false"
   },
   "61775d99a672e9ceb38c7378aa1ac6f5688f10aa90440b78f7c365cebd9c7999": {
     "message": "Unable to stop session with test stop api. Status: %s , Message: %s",
@@ -349,9 +349,9 @@
   },
   "af7007685c49d9c3ee5cc1a2b0ae09b2464e74402ea34c7cb7de37dbed067149": {
     "message": "Unable to retrieve artefacts API download URL from API V2. Message: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "a542f09da7abcb2b726f95bb5f70178bd39beb73b675bf3e621564db11359439": {
     "message": "Test performance report is not displayed in the UI.",
@@ -403,9 +403,9 @@
   },
   "d6142287bb4ac780ab1dc8f550aa033d077cac4cfc4463ebd182eff819a54189": {
     "message": "Unable to verify port number. Received API response: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p2",
+    "isKnown": "false"
   },
   "73db7d8c13e43fc3f08b071b785f2de06e904b67c1d0248129087b2883009d6b": {
     "message": "Stop tunnel failed with tunnel id: %s, Status: %s",
@@ -421,9 +421,9 @@
   },
   "45065dec0828d561de901462d3ca405b37c47940b02ec5314775844671e2cd15": {
     "message": "Unable to download Lighthouse report (JSON). Status: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "true"
   },
   "b78fae2c6654fb2191a4a53dd903b8df26da0f9e76e108c10da090a22d9ddcad": {
     "message": "Text box disable failed.",
@@ -433,9 +433,9 @@
   },
   "171bc63a530a7f4dc8e47b4a1c2333ed889ae934ea0b1406cd926f7a830c0893": {
     "message": "Selenium %s logs are incomplete.",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "14995d87a2ccf8c2383e09afa9d60383279a9048b0e12528ac08d4c91de49e3d": {
     "message": "Unable to open system logs tab",
@@ -463,9 +463,9 @@
   },
   "91b1ec6951afb8574ea6db883ff905f1853822b89ce73c2179090274799f4ac3": {
     "message": "Debug level logs are missing for Selenium version %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p2",
+    "isKnown": "false"
   },
   "c0c3953ae1f17ab234be3fccdc14f9d88994658eb5ce36f7cc2b81b5ccf8c567": {
     "message": "Self-signed site not open. There might be a certificate issue or website didn't open.",
@@ -487,9 +487,9 @@
   },
   "6728f08e3b2b00bff2f9b9bab9d2738736b2a7a95a9b4356c55b4212578494ba": {
     "message": "Expected terminal logs data is empty, please upload terminal logs before verifying terminal logs",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures-script-side-issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "c352c04d82a5dd0c280c09fcfa373c63adcb7d686120b0141a7a6ac83adbec2a": {
     "message": "Local Url Not Displayed",
@@ -499,9 +499,9 @@
   },
   "de152c143d830a5f239e51948e604af375c600f3d1299bd396c5c0cb6f3e6ae7": {
     "message": "Video share url is not valid. Url: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "9595de00048aae4d2fa756c34b18e68fdbbafaa9745a1427fa53e842c1718026": {
     "message": "A/B Test Variation failed.",
@@ -511,9 +511,9 @@
   },
   "82369dd0a6d2985d4cbd2845feb730e1be3ac8d697c66e5764f76d87499248dc": {
     "message": "Unable to download video file for the session with name: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "c9c5f32cab73731cb085de1569eca08d5128d79040b49420d9ccc5dd1120492a": {
     "message": "Unable to open And verify %s logs in New Tab",
@@ -535,9 +535,9 @@
   },
   "3b5a7d47f49a0e493cba8cff93127a23ac4d21b1be1699a61194df8778a11969": {
     "message": "Expected logs to verify console logs are missing.",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "bb8476af2b3a95d5e01c3be48c0511a27ed62a32c34c1d831fedd7a197d57f77": {
     "message": "Unable to open network logs tab",
@@ -547,27 +547,27 @@
   },
   "37f2970e61be473f499c27995142402b2f90007904547e7ed218724de5958b6d": {
     "message": "Terminal logs data doesn't match for the logs data fetched from API version: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "87edc7d2fb29d9d7c44bd448d6540546af4e23b8345dd75ef2ed46b50498eaaf": {
     "message": "Unable to fetch %s logs from API. Received API response: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "f3aff4d04d7b6bee5d20b476c16c5bf26c8ac098be8a1100084908fbd3b47319": {
     "message": "Expected session log missing or incorrect session ID: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "f6649225e78b8eac6fb9d9727b51a0290af71ea3df1d44b475e56a45f1e34a13": {
     "message": "Distributor session creation log with correct session ID missing. Expected logs: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "a354982334ef570c550eb034772e75b1d560f45c07433173ef033cb5f0449b0b": {
     "message": "Entered text doesn't match. Expected: %s Actual: %s",
@@ -583,15 +583,15 @@
   },
   "9a0266d6f1085736a378150545537073ca0524bace5f200dde366af363f1b280": {
     "message": "Extracted video metadata is null. Possible cause: Downloaded video file is corrupted.",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "7f0478fa94757c250ba7dd96868819ff7701bce39786e37359d8a1998859b851": {
     "message": "Expected log 'Started Selenium Standalone' missing for Selenium %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p1",
+    "isKnown": "false"
   },
   "b63e06efb03827a1ccf56ba267fedc1ceb70da3cedbda38af8618405b0f9c84c": {
     "message": "Unable to download network logs from UI",
@@ -613,14 +613,14 @@
   },
   "4ac0c58e70bba72595157306071bc83052aca2999b08a10b19066fda98968ff3": {
     "message": "Number of urls present in the %s logs are not same. Expected: %s, Actual: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   },
   "0a5b0aef544eeaa1ac69c5d1e9fd4b811a3a395b54758e34aa831a30becbeac4": {
     "message": "%s logs count fetched from %s doesn't match. Expected: %s, Actual: %s",
-    "category": "artefacts|api|ui|performance|security|accessibility",
-    "priority": "p0|p1|p2|p3|p4",
-    "isKnown": "true|false"
+    "category": "test-artefacts-api-verification-failures",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }
