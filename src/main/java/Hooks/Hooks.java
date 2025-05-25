@@ -370,6 +370,16 @@ public class Hooks extends BaseClass {
     throwErrorBasedOnAssertions();
   }
 
+  private HashMap<String, Object> getTestErrorDataPayload(Map<String, String> errorData) {
+    HashMap<String, Object> payload = new HashMap<>(errorData);
+    payload.put("test_session_id", TEST_SESSION_ID.get());
+    payload.put("client_test_session_id", CLIENT_SESSION_ID.get());
+    payload.put("test_env", TEST_ENV);
+    payload.put("caps", TEST_CAPS_MAP.get());
+    payload.put("attempt", System.getProperty(TEST_ATTEMPT, "first"));
+    return payload;
+  }
+
   @After(order = 3)
   public void pushTestFailureReportToTestReport() {
     ltLogger.info("Test error message to hashkey map: {}", EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
@@ -378,6 +388,10 @@ public class Hooks extends BaseClass {
         EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
       TEST_REPORT.get().put("test_failure_report", testFailureReport);
       ltLogger.info("Test failure report: {}", testFailureReport);
+      // Push each failure data separately to Sumo Logic, remove this if dashboard can be prepared from the entire report
+      for (Map<String, String> map : testFailureReport) {
+        apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
+      }
     } else {
       ltLogger.info("No test failure report to push.");
     }
