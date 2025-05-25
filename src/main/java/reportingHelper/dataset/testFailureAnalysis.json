@@ -7,7 +7,7 @@
   },
   "a183881b3d0173e3127605bd291f0ade305b17850f5f5cb60fab1294ced063dc": {
     "message": "System logs size is lesser than expected %s.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -49,19 +49,19 @@
   },
   "c830c81b79047bf534a8c4894ac7de1557623e6c12fddcce721d96d2c7078c2b": {
     "message": "%s is not displayed",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "704a6ff0bf9e382b71062af79e260351f1cae0b1afb17003cb959d8120f4d325": {
     "message": "Unable to open performance report tab. Please check if you have passed capability performance true or UI is breaking.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "4d4bd53d2ec03d61cc24b040935d23d645f89332c38f9208188f4e1cea3aee7f": {
     "message": "Some URLs are not found in command logs. Missing URLs: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -79,7 +79,7 @@
   },
   "8590c9c9a19e7e9239a791c717021c78ec04c42cfa82986294bb0519e07c80fe": {
     "message": "Unable to open console logs tab",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -109,7 +109,7 @@
   },
   "d4b4351eb7c8ba5cfa208453c5d3254c98a8c20c7e1b653f7aa7636ab5310ec7": {
     "message": "Unable to download system logs from UI",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -127,7 +127,7 @@
   },
   "ae1a1e193964cca53421b426ac4e97f8471caba6a3b219ab42e15be479879e29": {
     "message": "Video verification failed from UI. Video is generated.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -139,7 +139,7 @@
   },
   "82e15e54993a993e5d36c4fbee07300485411c356df0803b210133f9b5026133": {
     "message": "User is not logged in",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -241,7 +241,7 @@
   },
   "df24992742be91de64efd6f04c8b1b9d52a24036ad5e1e5ece85185fb698e3f6": {
     "message": "Some Locators are not found in command logs. Missing locators: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -265,19 +265,19 @@
   },
   "74f37fd1bd56e42614bdc2138ced1d07ff840e18a5f8db17a60a0d823ea64b22": {
     "message": "Console logs not found in UI",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "9474721300536753d85998b72e2fe935c9e6079ed823dd2cffb3bc601d739207": {
     "message": "Unable to open command logs tab",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "8d84624e0d023ab0da3cbafe5d3feaa3d7088aa01981ac83b63efb768b7622f1": {
     "message": "System logs are not generated.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -295,7 +295,7 @@
   },
   "5b95e7e684ae17206cfbc7e8e76ab07b5c03ac74580bf0d8ec3df3baee0c1c6a": {
     "message": "Some URLs are not found in Network logs. Missing URLs: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -337,7 +337,7 @@
   },
   "97ff618ad35996114d8e75c8e85be15fcea2b81103060425c7ee5ee7ab5c94c4": {
     "message": "Error message of not supported browser for console logs is incorrect. Actual Message: %s, Expected Message: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p3",
     "isKnown": "false"
   },
@@ -355,13 +355,13 @@
   },
   "a542f09da7abcb2b726f95bb5f70178bd39beb73b675bf3e621564db11359439": {
     "message": "Test performance report is not displayed in the UI.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
   "7b8a61e0f55b06adfb6f4bd06fac52104c80e999b3578fc3575dc5f8a6d8df26": {
     "message": "Test performance report is not generated.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
@@ -373,7 +373,7 @@
   },
   "45197ecf37853fd2f3003db168f12501c54a6ddd3503be24e8744352ffb4114b": {
     "message": "Command count should be greater than 0. Current count is %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -391,13 +391,13 @@
   },
   "83d01e365bcb765c6adac55836e5b7d7492f5f7caed4025ff72110aa8e9a6b77": {
     "message": "Video duration is less than 10 seconds. Duration: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "9a59b5a15340d64a1afed3bf0182dc95482774fccd539f2851da6555770861ef": {
     "message": "Unable to download console log file from UI",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -439,19 +439,19 @@
   },
   "14995d87a2ccf8c2383e09afa9d60383279a9048b0e12528ac08d4c91de49e3d": {
     "message": "Unable to open system logs tab",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
   "55eae8de22e5ed4a81fdff1ed345a7ca338134d4b75530b0c04348be87b79d59": {
     "message": "First and last commands were not displayed in the UI.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
   "3d9f8cbbd87a9c3f916955669668446f11a28928c176cdc85699f9a47887a250": {
     "message": "%s logs are not displayed in new tab.",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
@@ -517,7 +517,7 @@
   },
   "c9c5f32cab73731cb085de1569eca08d5128d79040b49420d9ccc5dd1120492a": {
     "message": "Unable to open And verify %s logs in New Tab",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
@@ -529,7 +529,7 @@
   },
   "248a06bf8c41b4521487619472cd1cabfe8ccb0337dd898a3d55d8a4932f6cb0": {
     "message": "Some console logs are missing. Missing console logs: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -541,7 +541,7 @@
   },
   "bb8476af2b3a95d5e01c3be48c0511a27ed62a32c34c1d831fedd7a197d57f77": {
     "message": "Unable to open network logs tab",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p2",
     "isKnown": "false"
   },
@@ -577,7 +577,7 @@
   },
   "b898e61139d7c014ef0d33e0e97b5e6e17aa82955249aadbef475ff06a72ce24": {
     "message": "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
@@ -595,7 +595,7 @@
   },
   "b63e06efb03827a1ccf56ba267fedc1ceb70da3cedbda38af8618405b0f9c84c": {
     "message": "Unable to download network logs from UI",
-    "category": "test-artefacts-ui",
+    "category": "test-artefacts-ui-verification-failures",
     "priority": "p0",
     "isKnown": "false"
   },
