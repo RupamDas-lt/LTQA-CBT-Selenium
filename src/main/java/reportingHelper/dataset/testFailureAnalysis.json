@@ -716,12 +716,14 @@
   "4ac0c58e70bba72595157306071bc83052aca2999b08a10b19066fda98968ff3": {
     "message": "Number of urls present in the %s logs are not same. Expected: %s, Actual: %s",
     "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
     "priority": "p0",
     "isKnown": "false"
   },
   "0a5b0aef544eeaa1ac69c5d1e9fd4b811a3a395b54758e34aa831a30becbeac4": {
     "message": "%s logs count fetched from %s doesn't match. Expected: %s, Actual: %s",
     "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
     "priority": "p0",
     "isKnown": "false"
   }
