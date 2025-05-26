@@ -41,6 +41,7 @@ public class AddNewDataToJson extends BaseClass {
       ObjectNode contentNode = mapper.createObjectNode();
       contentNode.put("message", messageValue);
       contentNode.put("category", "artefacts|api|ui|performance|security|accessibility");
+      contentNode.put("sub_category", "custom_sub_category_value");
       contentNode.put("priority", "p0|p1|p2|p3|p4");
       contentNode.put("isKnown", "true|false");
 
