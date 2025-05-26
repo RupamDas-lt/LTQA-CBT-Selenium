@@ -28,7 +28,8 @@ public class TestFailureReportManager extends BaseClass {
     return Holder.TEST_FAILURE_DATA;
   }
 
-  public record TestFailureReportData(String failureMessage, String category, String priority, String isKnown) {
+  public record TestFailureReportData(String failureMessage, String category, String subCategory, String priority,
+                                      String isKnown) {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public Map<String, String> toMap() {
@@ -50,13 +51,16 @@ public class TestFailureReportManager extends BaseClass {
       String hashKey = entry.getValue();
       JsonNode failureData = getTestFailureAnalysisData().get(hashKey);
       if (failureData == null) {
-        testFailureReportDataList.add(new TestFailureReportData(entry.getKey(), "Unknown", "p0", "false").toMap());
+        testFailureReportDataList.add(
+          new TestFailureReportData(entry.getKey(), "Unknown", "Unknown", "p0", "false").toMap());
       } else {
         String failureMessage = entry.getKey();
         String category = failureData.get("category").asText();
+        String subCategory = failureData.get("sub_category").asText();
         String priority = failureData.get("priority").asText();
         String isKnown = failureData.get("isKnown").asText();
-        testFailureReportDataList.add(new TestFailureReportData(failureMessage, category, priority, isKnown).toMap());
+        testFailureReportDataList.add(
+          new TestFailureReportData(failureMessage, category, subCategory, priority, isKnown).toMap());
       }
     }
     return testFailureReportDataList;
