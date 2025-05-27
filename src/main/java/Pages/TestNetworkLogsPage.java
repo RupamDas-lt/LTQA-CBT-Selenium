@@ -54,15 +54,14 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
 
     if (urls.isEmpty()) {
       ltLogger.info("Verification data is invalid - URLs are empty");
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(NETWORK_LOGS_VERIFICATION_DATA_NOT_VALID_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(NETWORK_LOGS_VERIFICATION_DATA_NOT_VALID_CLIENT_ERROR_MESSAGE));
       return;
     }
 
     List<String> notFoundUrls = searchForItemsAndCollectMissing(urls);
 
     softAssert.assertTrue(notFoundUrls.isEmpty(),
-      softAssert.softAssertMessageFormat(URLS_NOT_PRESENT_IN_NETWORK_LOGS_CLIENT_ERROR_MESSAGE, notFoundUrls));
+      softAssertMessageFormat(URLS_NOT_PRESENT_IN_NETWORK_LOGS_CLIENT_ERROR_MESSAGE, notFoundUrls));
   }
 
   private List<String> searchForItemsAndCollectMissing(Collection<String> items) {
@@ -105,7 +104,7 @@ public class TestNetworkLogsPage extends LTDashboardCommonActions {
   public void downloadNetworkLogsFromUI(String expectedFileName) {
     boolean isNetworkLogsDownloaded = downloadLogFile(expectedFileName, "Network", 10);
     softAssert.assertTrue(isNetworkLogsDownloaded,
-      softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_NETWORK_LOGS_CLIENT_ERROR_MESSAGE));
+      softAssertMessageFormat(UNABLE_TO_DOWNLOAD_NETWORK_LOGS_CLIENT_ERROR_MESSAGE));
   }
 
   public void openNetworkLogsInNewTabAndVerify() {

@@ -6,8 +6,8 @@ import TestManagers.DriverManager;
 import com.mysql.cj.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.testng.Assert;
 import utility.BaseClass;
+import utility.CustomAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
@@ -54,7 +54,7 @@ public class ClientAutomationHelper extends BaseClass {
         loginPage.clickSubmitButton();
       }
       clientSoftAssert.assertTrue(loginPage.verifyUserIsLoggedIn(),
-        clientSoftAssert.softAssertMessageFormat(USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE));
+        softAssertMessageFormat(USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE));
     }
     EnvSetup.CLIENT_SOFT_ASSERT.set(clientSoftAssert);
     LTHooks.endStepContext(driverManager, "login");
@@ -63,7 +63,8 @@ public class ClientAutomationHelper extends BaseClass {
   public void navigateToDashboardOfSpecificTest(String testId) {
     LTHooks.startStepContext(driverManager, "Navigate to Test home page");
     LTDashboardCommonActions testHomePage = new LTDashboardCommonActions(testId, driverManager);
-    Assert.assertTrue(testHomePage.navigateToHomePageOfSpecificTest(), "Unable to open test home page");
+    CustomAssert.assertTrue(testHomePage.navigateToHomePageOfSpecificTest(),
+      softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_LT_HOME_PAGE));
   }
 
   private String constructNetworkLogsFileName(Map<String, Object> capabilities) {
@@ -160,7 +161,7 @@ public class ClientAutomationHelper extends BaseClass {
       verifyPerformanceReport(testId, softAssert);
       break;
     default:
-      softAssert.fail(softAssert.softAssertMessageFormat(UNSUPPORTED_LOGS_TYPE_CLIENT_ERROR_MESSAGE, logName));
+      softAssert.fail(softAssertMessageFormat(UNSUPPORTED_LOGS_TYPE_CLIENT_ERROR_MESSAGE, logName));
       break;
     }
   }
@@ -168,7 +169,7 @@ public class ClientAutomationHelper extends BaseClass {
   private void verifyCommandLogs(String testId, CustomSoftAssert softAssert) {
     TestCommandLogsPage commandLogsPage = new TestCommandLogsPage(testId, driverManager, softAssert);
     if (!commandLogsPage.openCommandLogsTab()) {
-      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_COMMAND_LOGS_TAB_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_COMMAND_LOGS_TAB_CLIENT_ERROR_MESSAGE));
       return;
     }
     commandLogsPage.verifyCommandLogs();
@@ -177,7 +178,7 @@ public class ClientAutomationHelper extends BaseClass {
   private void verifyNetworkLogs(String testId, CustomSoftAssert softAssert) {
     TestNetworkLogsPage networkLogsPage = new TestNetworkLogsPage(testId, driverManager, softAssert);
     if (!networkLogsPage.openNetworkLogsTab()) {
-      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_NETWORK_LOGS_TAB_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_NETWORK_LOGS_TAB_CLIENT_ERROR_MESSAGE));
       return;
     }
     networkLogsPage.verifyAllExpectedNetworkCallsArePresentInTheUI();
@@ -189,7 +190,7 @@ public class ClientAutomationHelper extends BaseClass {
   private void verifySystemLogs(String testId, CustomSoftAssert softAssert) {
     TestSystemLogsPage systemLogsPage = new TestSystemLogsPage(testId, driverManager, softAssert);
     if (!systemLogsPage.openSystemLogsTab()) {
-      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_SYSTEM_LOGS_TAB_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_SYSTEM_LOGS_TAB_CLIENT_ERROR_MESSAGE));
       return;
     }
     systemLogsPage.verifySystemLogs();
@@ -202,7 +203,7 @@ public class ClientAutomationHelper extends BaseClass {
   private void verifyConsoleLogs(String testId, CustomSoftAssert softAssert) {
     TestConsoleLogsPage consoleLogsPage = new TestConsoleLogsPage(testId, driverManager, softAssert);
     if (!consoleLogsPage.openConsoleLogsTab()) {
-      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_CONSOLE_LOGS_TAB_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_CONSOLE_LOGS_TAB_CLIENT_ERROR_MESSAGE));
       return;
     }
     if (!isLogValidForCurrentTestConfig("console")) {
@@ -228,7 +229,7 @@ public class ClientAutomationHelper extends BaseClass {
     }
     TestPerformanceReportPage performanceReportPage = new TestPerformanceReportPage(testId, driverManager, softAssert);
     if (!performanceReportPage.openPerformanceReportTab()) {
-      softAssert.fail(softAssert.softAssertMessageFormat(UNABLE_TO_OPEN_PERFORMANCE_REPORT_TAB_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_PERFORMANCE_REPORT_TAB_CLIENT_ERROR_MESSAGE));
       return;
     }
     performanceReportPage.isPerformanceReportDisplayed();

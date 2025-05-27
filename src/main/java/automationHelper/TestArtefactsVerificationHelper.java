@@ -112,7 +112,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     boolean isDownloadSuccess = isApiV2DownloadSuccessful(status, message);
     softAssert.assertTrue(isDownloadSuccess,
-      softAssert.softAssertMessageFormat(UNABLE_TO_GET_LOGS_DOWNLOAD_URL_FROM_API_V2_ERROR_MESSAGE, message));
+      softAssertMessageFormat(UNABLE_TO_GET_LOGS_DOWNLOAD_URL_FROM_API_V2_ERROR_MESSAGE, message));
 
     if (isDownloadSuccess) {
       String logsDownloadUrl = artefactsApiV2ResponseDTO.getUrl();
@@ -131,8 +131,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
   private void verifyPortNumber(String sessionId, String logs, boolean isWebDriverEnabled, String browserName) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     if (logs == null || logs.isEmpty()) {
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(UNABLE_TO_VERIFY_PORT_NUMBER_FROM_SYSTEM_LOGS_ERROR_MESSAGE, logs));
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_VERIFY_PORT_NUMBER_FROM_SYSTEM_LOGS_ERROR_MESSAGE, logs));
       return;
     }
 
@@ -148,18 +147,17 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     if (portNumber != null) {
       String expectedMessage = isWebDriverEnabled ?
-        softAssert.softAssertMessageFormat(WEBDRIVER_MODE_PORT_MISMATCH_ERROR_IN_SYSTEM_LOGS_ERROR_MESSAGE,
-          PORT_WEBDRIVER, portNumber) :
-        softAssert.softAssertMessageFormat(SELENIUM_MODE_PORT_MISMATCH_ERROR_IN_SYSTEM_LOGS_ERROR_MESSAGE,
-          PORT_SELENIUM, portNumber);
+        softAssertMessageFormat(WEBDRIVER_MODE_PORT_MISMATCH_ERROR_IN_SYSTEM_LOGS_ERROR_MESSAGE, PORT_WEBDRIVER,
+          portNumber) :
+        softAssertMessageFormat(SELENIUM_MODE_PORT_MISMATCH_ERROR_IN_SYSTEM_LOGS_ERROR_MESSAGE, PORT_SELENIUM,
+          portNumber);
 
       softAssert.assertEquals(portNumber, expectedPortNumber, expectedMessage);
 
       ltLogger.info("Used Port: {} for session: {}", portNumber, sessionId);
     } else {
       softAssert.assertTrue(logs.contains(expectedPortNumber),
-        softAssert.softAssertMessageFormat(EXPECTED_PORT_NUMBER_NOT_FOUND_IN_SYSTEM_LOGS_ERROR_MESSAGE,
-          expectedPortNumber));
+        softAssertMessageFormat(EXPECTED_PORT_NUMBER_NOT_FOUND_IN_SYSTEM_LOGS_ERROR_MESSAGE, expectedPortNumber));
       ltLogger.error("Port number not found in the Selenium logs or Debug level logs are missing.");
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -193,8 +191,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     testVerificationDataKeys[] expectedDataKeys) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     if (logs == null || logs.isEmpty()) {
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(RECEIVED_LOGS_FROM_API_IS_NULL_OR_EMPTY_ERROR_MESSAGE, logsType, logs));
+      softAssert.fail(softAssertMessageFormat(RECEIVED_LOGS_FROM_API_IS_NULL_OR_EMPTY_ERROR_MESSAGE, logsType, logs));
       EnvSetup.SOFT_ASSERT.set(softAssert);
       return;
     }
@@ -207,8 +204,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
           expectedValue = removeBasicAuthHeadersFromUrl(expectedValue);
         boolean isPresent = logs.contains(expectedValue);
         softAssert.assertTrue(isPresent,
-          softAssert.softAssertMessageFormat(EXPECTED_DATA_IS_NOT_PRESENT_IN_LOGS_API_RESPONSE_ERROR_MESSAGE,
-            expectedValue, logsType));
+          softAssertMessageFormat(EXPECTED_DATA_IS_NOT_PRESENT_IN_LOGS_API_RESPONSE_ERROR_MESSAGE, expectedValue,
+            logsType));
         ltLogger.info("{} '{}' {} present in the {} logs.", dataType, expectedValue, isPresent ? "is" : "is not",
           logsType);
       });
@@ -270,7 +267,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     if (!actualSeleniumVersionFromSeleniumLogs.isEmpty()) {
       ComparableVersion actualSeleniumVersion = new ComparableVersion(actualSeleniumVersionFromSeleniumLogs);
       softAssert.assertTrue(expectedSeleniumVersion.equals(actualSeleniumVersion),
-        softAssert.softAssertMessageFormat(SELENIUM_VERSION_MISMATCH_ERROR_MESSAGE, expectedSeleniumVersion,
+        softAssertMessageFormat(SELENIUM_VERSION_MISMATCH_ERROR_MESSAGE, expectedSeleniumVersion,
           actualSeleniumVersion));
     } else {
       ltLogger.info("Unable to extract selenium version from Selenium Logs");
@@ -278,7 +275,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
         seleniumFourExpectedLogLine :
         seleniumThreeExpectedLogLine) + expectedSeleniumVersion;
       softAssert.assertTrue(logs.contains(expectedLogs),
-        softAssert.softAssertMessageFormat(SELENIUM_VERSION_MISMATCH_FALLBACK_ERROR_MESSAGE, expectedLogs));
+        softAssertMessageFormat(SELENIUM_VERSION_MISMATCH_FALLBACK_ERROR_MESSAGE, expectedLogs));
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
     return actualSeleniumVersionFromSeleniumLogs;
@@ -309,11 +306,11 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     final String INFO = LOG_LEVEL + "INFO\"";
     final String DEBUG = LOG_LEVEL + "DEBUG\"";
     softAssert.assertTrue(logs.contains(INFO),
-      softAssert.softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_1, seleniumVersionString));
+      softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_1, seleniumVersionString));
     softAssert.assertTrue(logs.contains(DEBUG),
-      softAssert.softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_2, seleniumVersionString));
+      softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_2, seleniumVersionString));
     softAssert.assertTrue(logs.contains("DELETE /wd/hub/session/" + session_id),
-      softAssert.softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_3, seleniumVersionString));
+      softAssertMessageFormat(LEGACY_SELENIUM_4_LOGS_ERROR_MESSAGE_3, seleniumVersionString));
     ltLogger.info("Debug level Selenium logs have been checked for selenium version: {}", seleniumVersionString);
   }
 
@@ -326,18 +323,18 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       "Releasing slot for session id ", "Stopping session " };
     String expectedLogString = STARTED_SELENIUM + seleniumVersionString;
     softAssert.assertTrue(logs.contains(expectedLogString),
-      softAssert.softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_1, seleniumVersionString));
+      softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_1, seleniumVersionString));
     expectedLogString = SESSION_CREATED_NODE + session_id;
     softAssert.assertTrue(logs.contains(expectedLogString),
-      softAssert.softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_2, expectedLogString));
+      softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_2, expectedLogString));
     expectedLogString = SESSION_CREATED_DISTRIBUTOR + session_id;
     softAssert.assertTrue(logs.contains(expectedLogString),
-      softAssert.softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_3, expectedLogString));
+      softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_3, expectedLogString));
 
     for (String expectedLog : SESSION_DELETION_LOGS) {
       expectedLogString = expectedLog + session_id;
       softAssert.assertTrue(logs.contains(expectedLogString),
-        softAssert.softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_4, expectedLogString));
+        softAssertMessageFormat(NEW_SELENIUM_4_LOGS_ERROR_MESSAGE_4, expectedLogString));
     }
   }
 
@@ -390,14 +387,13 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     ltLogger.info("Verifying expected urls from {} to {} for log source {}", fetchedData, expectedDataClone,
       logsSource);
     softAssert.assertTrue(fetchedData.size() == expectedDataClone.size(),
-      softAssert.softAssertMessageFormat(CHECK_EXPECTED_URLS_PRESENT_ERROR_MESSAGE_1, logsSource,
-        expectedDataClone.size(), fetchedData.size()));
+      softAssertMessageFormat(CHECK_EXPECTED_URLS_PRESENT_ERROR_MESSAGE_1, logsSource, expectedDataClone.size(),
+        fetchedData.size()));
     while (!expectedDataClone.isEmpty() && !fetchedData.isEmpty() && fetchedData.size() == expectedDataClone.size()) {
       String actualUrl = fetchedData.remove();
       String expectedUrl = expectedDataClone.remove();
       softAssert.assertTrue(expectedUrl.equals(actualUrl),
-        softAssert.softAssertMessageFormat(CHECK_EXPECTED_URLS_PRESENT_ERROR_MESSAGE_2, logsSource, expectedUrl,
-          actualUrl));
+        softAssertMessageFormat(CHECK_EXPECTED_URLS_PRESENT_ERROR_MESSAGE_2, logsSource, expectedUrl, actualUrl));
     }
   }
 
@@ -430,9 +426,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     // Handle null response
     if (logsFromApi == null || logsFromApi.isEmpty()) {
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(RECEIVED_NULL_COMMAND_LOGS_IN_API_RESPONSE_ERROR_MESSAGE, logType.value,
-          apiVersion.toString(), logsFromApi));
+      softAssert.fail(softAssertMessageFormat(RECEIVED_NULL_COMMAND_LOGS_IN_API_RESPONSE_ERROR_MESSAGE, logType.value,
+        apiVersion.toString(), logsFromApi));
       EnvSetup.SOFT_ASSERT.set(softAssert);
       return;
     }
@@ -440,7 +435,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     // Validate schema
     Set<String> schemaValidationErrors = validateSchema(logsFromApi, schemaFilePath);
     softAssert.assertTrue(schemaValidationErrors.isEmpty(),
-      softAssert.softAssertMessageFormat(SCHEMA_VALIDATION_FAILURE_FOR_LOGS_API_RESPONSE_ERROR_MESSAGE, logType.value,
+      softAssertMessageFormat(SCHEMA_VALIDATION_FAILURE_FOR_LOGS_API_RESPONSE_ERROR_MESSAGE, logType.value,
         apiVersion.toString(), schemaValidationErrors));
 
     // Parse logs JSON
@@ -451,8 +446,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     // Verify logs count
     softAssert.assertTrue(commandsArray.size() == expectedCommandLogsCount,
-      softAssert.softAssertMessageFormat(LOGS_COUNT_MISMATCH_ERROR_MESSAGE, logType.value, apiVersion,
-        expectedCommandLogsCount, commandsArray.size()));
+      softAssertMessageFormat(LOGS_COUNT_MISMATCH_ERROR_MESSAGE, logType.value, apiVersion, expectedCommandLogsCount,
+        commandsArray.size()));
 
     // Specific verifications based on log type
     if (logType == LogType.EXCEPTION) {
@@ -478,7 +473,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     ArrayList<String> expectedConsoleLogs = (ArrayList<String>) TEST_VERIFICATION_DATA.get()
       .get(testVerificationDataKeys.CONSOLE_LOG);
     softAssert.assertFalse(expectedConsoleLogs == null || expectedConsoleLogs.isEmpty(),
-      softAssert.softAssertMessageFormat(EXPECTED_CONSOLE_LOGS_DATA_NOT_AVAILABLE_ERROR_MESSAGE));
+      softAssertMessageFormat(EXPECTED_CONSOLE_LOGS_DATA_NOT_AVAILABLE_ERROR_MESSAGE));
     if (expectedConsoleLogs == null || expectedConsoleLogs.isEmpty()) {
       return;
     }
@@ -490,8 +485,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       for (String expectedConsoleLog : expectedConsoleLogs) {
         ltLogger.info("Checking console log {}", expectedConsoleLog);
         softAssert.assertTrue(logs.contains(expectedConsoleLog),
-          softAssert.softAssertMessageFormat(EXPECTED_CONSOLE_LOGS_ARE_NOT_AVAILABLE_ERROR_MESSAGE, expectedConsoleLog,
-            version));
+          softAssertMessageFormat(EXPECTED_CONSOLE_LOGS_ARE_NOT_AVAILABLE_ERROR_MESSAGE, expectedConsoleLog, version));
       }
     }
 
@@ -503,13 +497,13 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     String expectedData = TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.TERMINAL_LOG, "")
       .toString();
     softAssert.assertFalse(StringUtils.isNullOrEmpty(expectedData),
-      softAssert.softAssertMessageFormat(TERMINAL_LOGS_NOT_UPLOADED_ERROR_MESSAGE));
+      softAssertMessageFormat(TERMINAL_LOGS_NOT_UPLOADED_ERROR_MESSAGE));
     if (!StringUtils.isNullOrEmpty(expectedData)) {
       for (ArtefactAPIVersions artefactAPIVersion : ArtefactAPIVersions.values()) {
         String version = artefactAPIVersion.equals(ArtefactAPIVersions.API_V1) ? "v1" : "v2";
         String logs = fetchLogs(LogType.TERMINAL.value, artefactAPIVersion, session_id);
         softAssert.assertTrue(logs.contains(expectedData),
-          softAssert.softAssertMessageFormat(TERMINAL_LOGS_DATA_MISMATCH_ERROR_MESSAGE, version));
+          softAssertMessageFormat(TERMINAL_LOGS_DATA_MISMATCH_ERROR_MESSAGE, version));
       }
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -539,7 +533,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     String status = fetchVideoAPIResponseDTO.getStatus();
     String message = fetchVideoAPIResponseDTO.getMessage();
     softAssert.assertTrue(status.equals("success"),
-      softAssert.softAssertMessageFormat(UNABLE_TO_EXTRACT_VIDEO_URLS_ERROR_MESSAGE, status, message));
+      softAssertMessageFormat(UNABLE_TO_EXTRACT_VIDEO_URLS_ERROR_MESSAGE, status, message));
     if (status.equals("success")) {
       String shareableVideoUrl = fetchVideoAPIResponseDTO.getView_video_url();
       String videoDownloadUrl = fetchVideoAPIResponseDTO.getUrl();
@@ -556,7 +550,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
 
     // Check if the video file is valid
     if (videoMetaData == null) {
-      softAssert.fail(softAssert.softAssertMessageFormat(VIDEO_NOT_GENERATED_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(VIDEO_NOT_GENERATED_ERROR_MESSAGE));
       return;
     }
 
@@ -586,9 +580,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       String actualHeight = actualDimensions[1];
 
       softAssert.assertTrue(Integer.parseInt(actualWidth) >= Integer.parseInt(expectedWidth),
-        softAssert.softAssertMessageFormat(VIDEO_RESOLUTION_MISMATCH_ERROR_MESSAGE_1, expectedWidth, actualWidth));
+        softAssertMessageFormat(VIDEO_RESOLUTION_MISMATCH_ERROR_MESSAGE_1, expectedWidth, actualWidth));
       softAssert.assertTrue(Integer.parseInt(actualHeight) >= Integer.parseInt(expectedHeight),
-        softAssert.softAssertMessageFormat(VIDEO_RESOLUTION_MISMATCH_ERROR_MESSAGE_2, expectedHeight, actualHeight));
+        softAssertMessageFormat(VIDEO_RESOLUTION_MISMATCH_ERROR_MESSAGE_2, expectedHeight, actualHeight));
     }
   }
 
@@ -604,8 +598,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       expectedVideoDurationLimit);
 
     softAssert.assertTrue(actualVideoDuration < expectedVideoDurationLimit,
-      softAssert.softAssertMessageFormat(VIDEO_DURATION_MISMATCH_ERROR_MESSAGE, expectedVideoDurationLimit,
-        actualVideoDuration));
+      softAssertMessageFormat(VIDEO_DURATION_MISMATCH_ERROR_MESSAGE, expectedVideoDurationLimit, actualVideoDuration));
   }
 
   public void verifyTestVideo(String session_id) {
@@ -618,13 +611,13 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       String videoFileName = TEST_SESSION_ID.get() + "_" + System.currentTimeMillis() + ".mp4";
       boolean isVideoDownloadSuccess = downloadFile(videoDownloadUrl, videoFileName, TEST_LOGS_DOWNLOAD_DIRECTORY);
       softAssert.assertTrue(isVideoDownloadSuccess,
-        softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_VIDEO_ERROR_MESSAGE, videoFileName));
+        softAssertMessageFormat(UNABLE_TO_DOWNLOAD_VIDEO_ERROR_MESSAGE, videoFileName));
       if (isVideoDownloadSuccess) {
         String completeFilePath = TEST_LOGS_DOWNLOAD_DIRECTORY + videoFileName;
         verifyVideoMetaData(completeFilePath, testCaps, softAssert);
         int statusCodeOfShareVideoUrl = getRequest(videoShareUrl).statusCode();
         softAssert.assertTrue(statusCodeOfShareVideoUrl == 200,
-          softAssert.softAssertMessageFormat(VIDEO_SHARE_URL_NOT_VALID_ERROR_MESSAGE, videoShareUrl));
+          softAssertMessageFormat(VIDEO_SHARE_URL_NOT_VALID_ERROR_MESSAGE, videoShareUrl));
       }
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -641,7 +634,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     String status = lighthouseReportDTO.getStatus();
     String message = lighthouseReportDTO.getMessage();
     softAssert.assertTrue(lighthouseReportDTO.getStatus().equalsIgnoreCase("success"),
-      softAssert.softAssertMessageFormat(UNABLE_TO_FETCH_LIGHTHOUSE_REPORT_ERROR_MESSAGE, status, message));
+      softAssertMessageFormat(UNABLE_TO_FETCH_LIGHTHOUSE_REPORT_ERROR_MESSAGE, status, message));
     if (status.equalsIgnoreCase("success")) {
       String jsonReport = lighthouseReportDTO.getData().getJson_report();
       String htmlReport = lighthouseReportDTO.getData().getHtml_report();
@@ -650,11 +643,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       ltLogger.info("JSON report status: {} and HTML report status: {}", jsonReportFetchStatusCode,
         htmlReportFetchStatusCode);
       softAssert.assertTrue(jsonReportFetchStatusCode == 200,
-        softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_JSON_LIGHTHOUSE_REPORT_ERROR_MESSAGE,
-          jsonReportFetchStatusCode));
+        softAssertMessageFormat(UNABLE_TO_DOWNLOAD_JSON_LIGHTHOUSE_REPORT_ERROR_MESSAGE, jsonReportFetchStatusCode));
       softAssert.assertTrue(htmlReportFetchStatusCode == 200,
-        softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_HTML_LIGHTHOUSE_REPORT_ERROR_MESSAGE,
-          htmlReportFetchStatusCode));
+        softAssertMessageFormat(UNABLE_TO_DOWNLOAD_HTML_LIGHTHOUSE_REPORT_ERROR_MESSAGE, htmlReportFetchStatusCode));
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }

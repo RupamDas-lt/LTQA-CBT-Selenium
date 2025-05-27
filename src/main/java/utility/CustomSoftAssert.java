@@ -1,54 +1,26 @@
 package utility;
 
-import factory.SoftAssertionMessages;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.asserts.IAssert;
 import org.testng.asserts.SoftAssert;
 
-import java.util.Map;
-
 public class CustomSoftAssert extends SoftAssert {
-  private final Logger ltLogger = LogManager.getLogger(CustomSoftAssert.class);
-  private static final String KEY = "key";
-  private static final String MESSAGE_TEMPLATE = "message_template";
-
-  public String softAssertMessageFormat(SoftAssertionMessages messageWithPlaceHolders, Object... args) {
-    String hashKey = BaseClass.stringToSha256Hex(messageWithPlaceHolders.getValue());
-    String message = String.format(messageWithPlaceHolders.getValue(), args);
-    EnvSetup.ASSERTION_ERROR_TO_HASH_KEY_MAP.get()
-      .put(message, Map.of(KEY, hashKey, MESSAGE_TEMPLATE, messageWithPlaceHolders.getValue()));
-    return message;
-  }
-
-  private void pushCustomFailureDataToThreadLocal(String message) {
-    Map<String, String> hashKeyToMessageTemplateMap = EnvSetup.ASSERTION_ERROR_TO_HASH_KEY_MAP.get()
-      .getOrDefault(message, null);
-    if (hashKeyToMessageTemplateMap == null) {
-      ltLogger.error("No hash key found for the message: {}", message);
-      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(message, "NA");
-    } else {
-      ltLogger.info("Hash key found for the message: {}. Map: {}", message, hashKeyToMessageTemplateMap);
-      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(message, hashKeyToMessageTemplateMap.get(KEY));
-    }
-  }
 
   public void fail(final String message) {
-    pushCustomFailureDataToThreadLocal(message);
+    new BaseClass().pushCustomFailureDataToThreadLocal(message);
     super.fail(message);
   }
 
   private void customAssertTrue(boolean condition, String message) {
     if (!condition) {
-      pushCustomFailureDataToThreadLocal(message);
+      new BaseClass().pushCustomFailureDataToThreadLocal(message);
     }
     Assert.assertTrue(condition, message);
   }
 
   private void customAssertFalse(boolean condition, String message) {
     if (condition) {
-      pushCustomFailureDataToThreadLocal(message);
+      new BaseClass().pushCustomFailureDataToThreadLocal(message);
     }
     Assert.assertFalse(condition, message);
   }
@@ -66,7 +38,7 @@ public class CustomSoftAssert extends SoftAssert {
   private void customAssertEquals(Object actual, Object expected, String message) {
     boolean equal = areEqualImpl(actual, expected);
     if (!equal) {
-      pushCustomFailureDataToThreadLocal(message);
+      new BaseClass().pushCustomFailureDataToThreadLocal(message);
     }
     Assert.assertEquals(actual, expected, message);
   }

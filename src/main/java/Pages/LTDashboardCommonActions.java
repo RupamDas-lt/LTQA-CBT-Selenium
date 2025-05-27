@@ -74,12 +74,12 @@ public class LTDashboardCommonActions extends BaseClass {
       driver.switchToTab(1);
     } catch (Exception e) {
       ltLogger.error("Unable to open {} logs in new tab. Error: {}", logType, e.getMessage());
-      errorMessage = softAssert.softAssertMessageFormat(UNABLE_TO_VERIFY_LOGS_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
+      errorMessage = softAssertMessageFormat(UNABLE_TO_VERIFY_LOGS_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
       return errorMessage;
     }
     checkIfCurrentUrlContainsLogNameAsQueryParam(logType);
     if (!driver.isDisplayed(expectedLocatorToBePresent)) {
-      errorMessage = softAssert.softAssertMessageFormat(LOGS_NOT_PRESENT_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
+      errorMessage = softAssertMessageFormat(LOGS_NOT_PRESENT_IN_NEW_TAB_CLIENT_ERROR_MESSAGE, logType);
     }
     driver.closeCurrentTabAndSwitchContextToLastTab();
     return errorMessage;

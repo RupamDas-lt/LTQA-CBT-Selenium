@@ -49,7 +49,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
       SoftAssertionMessages errorMessage = driver.isDisplayed(videoNotPresentMessage, 10) ?
         VIDEO_NOT_GENERATED_CLIENT_ERROR_MESSAGE :
         VIDEO_VERIFICATION_FAILED_CLIENT_ERROR_MESSAGE;
-      softAssert.fail(softAssert.softAssertMessageFormat(errorMessage));
+      softAssert.fail(softAssertMessageFormat(errorMessage));
     }
 
     return isVideoPresent;
@@ -60,7 +60,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
       driver.executeScriptAndFetchValue(FrameworkConstants.jsToGetVideoDurationFromDOM).toString());
     ltLogger.info("Video duration: {}", videoDuration);
     if (videoDuration < 10) {
-      softAssert.fail(softAssert.softAssertMessageFormat(VIDEO_DURATION_MISMATCH_CLIENT_ERROR_MESSAGE, videoDuration));
+      softAssert.fail(softAssertMessageFormat(VIDEO_DURATION_MISMATCH_CLIENT_ERROR_MESSAGE, videoDuration));
       return;
     }
     driver.click(playVideoButton);
@@ -71,7 +71,7 @@ public class TestVideoPage extends LTDashboardCommonActions {
     ltLogger.info("Video currentTimeStamp after clicking on video play button and waiting for 10 secs : {}",
       videoCurrentTimeStamp);
     softAssert.assertTrue(videoCurrentTimeStamp > 5,
-      softAssert.softAssertMessageFormat(VIDEO_NOT_PLAYABLE_CLIENT_ERROR_MESSAGE, videoCurrentTimeStamp));
+      softAssertMessageFormat(VIDEO_NOT_PLAYABLE_CLIENT_ERROR_MESSAGE, videoCurrentTimeStamp));
     if (driver.isDisplayed(pauseVideoButton, 2)) {
       driver.click(pauseVideoButton);
       ltLogger.info("Video paused");

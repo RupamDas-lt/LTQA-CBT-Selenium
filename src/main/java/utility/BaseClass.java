@@ -9,6 +9,7 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import factory.SoftAssertionMessages;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -627,6 +628,29 @@ public class BaseClass {
       return hexString.toString();
     } catch (Exception e) {
       throw new RuntimeException("Error computing SHA-256 hash", e);
+    }
+  }
+
+  public static String softAssertMessageFormat(SoftAssertionMessages messageWithPlaceHolders, Object... args) {
+    final String KEY = "key";
+    final String MESSAGE_TEMPLATE = "message_template";
+    String hashKey = BaseClass.stringToSha256Hex(messageWithPlaceHolders.getValue());
+    String message = String.format(messageWithPlaceHolders.getValue(), args);
+    EnvSetup.ASSERTION_ERROR_TO_HASH_KEY_MAP.get()
+      .put(message, Map.of(KEY, hashKey, MESSAGE_TEMPLATE, messageWithPlaceHolders.getValue()));
+    return message;
+  }
+
+  public void pushCustomFailureDataToThreadLocal(String message) {
+    final String KEY = "key";
+    Map<String, String> hashKeyToMessageTemplateMap = EnvSetup.ASSERTION_ERROR_TO_HASH_KEY_MAP.get()
+      .getOrDefault(message, null);
+    if (hashKeyToMessageTemplateMap == null) {
+      ltLogger.error("No hash key found for the message: {}", message);
+      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(message, "NA");
+    } else {
+      ltLogger.info("Hash key found for the message: {}. Map: {}", message, hashKeyToMessageTemplateMap);
+      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(message, hashKeyToMessageTemplateMap.get(KEY));
     }
   }
 
