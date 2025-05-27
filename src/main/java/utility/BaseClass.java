@@ -476,26 +476,50 @@ public class BaseClass {
     return url;
   }
 
-  private String executeFFprobeCommand(String[] command, String videoFilePath) {
+  private String executeFFprobeCommand(String[] command, String videoFilePath, int... customRetryCount) {
+    int maxRetries = customRetryCount.length > 0 ? customRetryCount[0] : 5;
     StringBuilder output = new StringBuilder();
-    try {
-      ProcessBuilder builder = new ProcessBuilder(command);
-      builder.command().add(videoFilePath); // Add video file path to the command
-      builder.redirectErrorStream(true);
-      ltLogger.info("Command: {}", String.join(" ", builder.command()));
-      Process process = builder.start();
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          output.append(line).append("\n");
-        }
-      }
-      process.waitFor();
+    Exception exception = null;
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      output.setLength(0); // clear output buffer
 
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException("Error executing FFprobe command: ", e);
+      try {
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.command().add(videoFilePath); // Add video file path to the command
+        builder.redirectErrorStream(true);
+        ltLogger.info("Command: {}", String.join(" ", builder.command()));
+        Process process = builder.start();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+          }
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode == 0) {
+          return output.toString().trim();
+        } else {
+          ltLogger.warn("FFprobe command failed with exit code {} on attempt {}", exitCode, attempt);
+        }
+
+      } catch (IOException | InterruptedException e) {
+        ltLogger.error("Error executing FFprobe command on attempt {}: {}", attempt, e.getMessage());
+        if (e instanceof InterruptedException) {
+          Thread.currentThread().interrupt();
+          break;  // exit retry loop on interrupt
+        }
+        exception = e;
+      }
+
+      // Wait before retrying, unless last attempt
+      if (attempt < maxRetries) {
+        waitForTime(2);
+      }
     }
-    return output.toString().trim();
+
+    throw new RuntimeException("Error executing FFprobe command after " + maxRetries + " attempts.", exception);
   }
 
   public Map<String, Object> extractMetaDataOfSpecificVideoFile(String videoFilePath) {
