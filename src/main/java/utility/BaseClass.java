@@ -506,10 +506,6 @@ public class BaseClass {
 
       } catch (IOException | InterruptedException e) {
         ltLogger.error("Error executing FFprobe command on attempt {}: {}", attempt, e.getMessage());
-        if (e instanceof InterruptedException) {
-          Thread.currentThread().interrupt();
-          break;  // exit retry loop on interrupt
-        }
         exception = e;
       }
 
