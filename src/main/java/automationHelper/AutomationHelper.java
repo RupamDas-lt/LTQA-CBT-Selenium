@@ -981,4 +981,5 @@ public class AutomationHelper extends BaseClass {
       softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
+
 }
