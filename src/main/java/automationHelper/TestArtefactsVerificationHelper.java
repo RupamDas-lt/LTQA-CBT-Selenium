@@ -543,7 +543,8 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     return null;
   }
 
-  private void verifyVideoMetaData(String completeFilePath, Map<String, Object> testCaps, CustomSoftAssert softAssert) {
+  private void verifyVideoMetaData(String completeFilePath, Map<String, Object> testCaps, CustomSoftAssert softAssert,
+    String testStatus) {
     // Extract video metadata
     Map<String, Object> videoMetaData = extractMetaDataOfSpecificVideoFile(completeFilePath);
     ltLogger.info("Extracted video metadata: {}", videoMetaData);
@@ -560,7 +561,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     }
 
     // Verify Duration
-    verifyDuration(videoMetaData, softAssert);
+    verifyDuration(videoMetaData, softAssert, testStatus);
   }
 
   private void verifyResolution(Map<String, Object> videoMetaData, Map<String, Object> testCaps,
@@ -586,8 +587,10 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     }
   }
 
-  private void verifyDuration(Map<String, Object> videoMetaData, CustomSoftAssert softAssert) {
-    int bufferTime = 60; // Buffer time in seconds
+  private void verifyDuration(Map<String, Object> videoMetaData, CustomSoftAssert softAssert, String testStatus) {
+    int bufferTime = testStatus.equalsIgnoreCase(IDLE_TIMEOUT_STATUS) ?
+      240 :
+      60; // Buffer time in seconds, more time incase it is idle timeout
     double testExecutionTimeInSeconds = Double.parseDouble((String) TEST_REPORT.get().get(TEST_EXECUTION_TIME));
     double expectedVideoDurationLimit = testExecutionTimeInSeconds + bufferTime;
 
@@ -614,7 +617,9 @@ public class TestArtefactsVerificationHelper extends ApiManager {
         softAssertMessageFormat(UNABLE_TO_DOWNLOAD_VIDEO_ERROR_MESSAGE, videoFileName));
       if (isVideoDownloadSuccess) {
         String completeFilePath = TEST_LOGS_DOWNLOAD_DIRECTORY + videoFileName;
-        verifyVideoMetaData(completeFilePath, testCaps, softAssert);
+        String testStatus = automationAPIHelper.getStatusOfSessionViaAPI(session_id);
+        ltLogger.info("Test status: {}", testStatus);
+        verifyVideoMetaData(completeFilePath, testCaps, softAssert, testStatus);
         int statusCodeOfShareVideoUrl = getRequest(videoShareUrl).statusCode();
         softAssert.assertTrue(statusCodeOfShareVideoUrl == 200,
           softAssertMessageFormat(VIDEO_SHARE_URL_NOT_VALID_ERROR_MESSAGE, videoShareUrl));
