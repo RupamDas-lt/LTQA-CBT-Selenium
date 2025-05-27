@@ -497,13 +497,9 @@ public class BaseClass {
           }
         }
 
-        int exitCode = process.waitFor();
-        if (exitCode == 0) {
-          return output.toString().trim();
-        } else {
-          ltLogger.warn("FFprobe command failed with exit code {} on attempt {}", exitCode, attempt);
-        }
+        process.waitFor();
 
+        return output.toString().trim();
       } catch (IOException | InterruptedException e) {
         ltLogger.error("Error executing FFprobe command on attempt {}: {}", attempt, e.getMessage());
         exception = e;
