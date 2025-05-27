@@ -161,6 +161,20 @@ public class Hooks extends BaseClass {
 
     TEST_REPORT.get().put("failed_step", failedStepName);
     TEST_REPORT.get().put("failed_step_error", stepErrorMessage);
+
+    if (!stepErrorMessage.contains("AssertionError")) {
+      pushUnexpectedErrorsToSumo(stepErrorMessage);
+    }
+  }
+
+  private void pushUnexpectedErrorsToSumo(String errorMessage) {
+    Map<String, String> map = new HashMap<>();
+    map.put("message", errorMessage);
+    map.put("category", "unknown-error");
+    map.put("sub_category", "session-creation-or-unexpected-error");
+    map.put("priority", "p0");
+    map.put("isKnown", "false");
+    apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
   }
 
   private void setTestStatus(String testId, String testStatus, String remarks, boolean... isClient) {
