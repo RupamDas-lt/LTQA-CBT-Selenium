@@ -56,7 +56,7 @@ public class TestSystemLogsPage extends LTDashboardCommonActions {
   public void downloadSystemLogsFromUI(String expectedFileName) {
     boolean isSystemLogsDownloaded = downloadLogFile(expectedFileName, "Selenium");
     softAssert.assertTrue(isSystemLogsDownloaded,
-      softAssert.softAssertMessageFormat(UNABLE_TO_DOWNLOAD_SYSTEM_LOGS_CLIENT_ERROR_MESSAGE));
+      softAssertMessageFormat(UNABLE_TO_DOWNLOAD_SYSTEM_LOGS_CLIENT_ERROR_MESSAGE));
   }
 
   public void openAndVerifySystemLogsInNewTab() {
@@ -67,12 +67,11 @@ public class TestSystemLogsPage extends LTDashboardCommonActions {
   public void verifySystemLogs() {
     if (seleniumLogsNotFoundMessageDisplayed()) {
       ltLogger.info("System Logs are found");
-      softAssert.fail(softAssert.softAssertMessageFormat(SYSTEM_LOGS_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(SYSTEM_LOGS_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
       return;
     }
     String systemLogs = extractSystemLogs();
     softAssert.assertTrue(systemLogs.length() > expectedMinimumSizeOfSystemLogs,
-      softAssert.softAssertMessageFormat(SYSTEM_LOGS_SIZE_IS_LESSER_CLIENT_ERROR_MESSAGE,
-        expectedMinimumSizeOfSystemLogs));
+      softAssertMessageFormat(SYSTEM_LOGS_SIZE_IS_LESSER_CLIENT_ERROR_MESSAGE, expectedMinimumSizeOfSystemLogs));
   }
 }

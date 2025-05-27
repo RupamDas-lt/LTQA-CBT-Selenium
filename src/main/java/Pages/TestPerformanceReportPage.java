@@ -44,12 +44,12 @@ public class TestPerformanceReportPage extends LTDashboardCommonActions {
 
   public void isPerformanceReportDisplayed() {
     if (driver.isDisplayed(performanceReportNotGeneratedMessage)) {
-      softAssert.fail(softAssert.softAssertMessageFormat(PERFORMANCE_REPORT_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(PERFORMANCE_REPORT_NOT_GENERATED_CLIENT_ERROR_MESSAGE));
       return;
     }
     driver.click(performanceJsonReportOptionTab);
     softAssert.assertTrue(driver.isDisplayed(performanceReport),
-      softAssert.softAssertMessageFormat(PERFORMANCE_REPORT_NOT_PRESENT_IN_UI_CLIENT_ERROR_MESSAGE));
+      softAssertMessageFormat(PERFORMANCE_REPORT_NOT_PRESENT_IN_UI_CLIENT_ERROR_MESSAGE));
   }
 
 }

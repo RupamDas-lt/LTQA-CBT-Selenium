@@ -114,6 +114,13 @@ import lombok.Getter;
     "Video duration is less than 10 seconds. Duration: %s"), VIDEO_NOT_PLAYABLE_CLIENT_ERROR_MESSAGE(
     "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s"),
 
+  // Hard assertion messages
+  TEST_STATUS_MISMATCH_ERROR_MESSAGE(
+    "Test status verification failed after %d attempts. Expected: %s, Actual: %s"), UNABLE_TO_STOP_TEST_ERROR_MESSAGE(
+    "Unable to initiate stop test as the test is not in Running state. Current state: %s"), UNABLE_TO_NAVIGATE_TO_LT_HOME_PAGE(
+    "Unable to open test home page"), UNABLE_TO_STOP_BUILD_ERROR_MESSAGE(
+    "Unable to initiate build stop as the build is not in Running state. Current state: %s"),
+
   ;
 
   private final String value;

@@ -61,7 +61,7 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
     String commandCountHeading = driver.getText(commandLogsCountHeading);
     int commandCount = (int) extractNumberFromString(commandCountHeading);
     softAssert.assertTrue(commandCount > 0,
-      softAssert.softAssertMessageFormat(COMMAND_LOGS_COUNT_INVALID_CLIENT_ERROR_MESSAGE, commandCount));
+      softAssertMessageFormat(COMMAND_LOGS_COUNT_INVALID_CLIENT_ERROR_MESSAGE, commandCount));
     ltLogger.info("command count: {}", commandCount);
   }
 
@@ -80,14 +80,14 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
       driver.click(scrollToTopButton);
     }
     softAssert.assertTrue(firstCommandDisplayed,
-      softAssert.softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, firstCommandName));
+      softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, firstCommandName));
     if (driver.isDisplayed(scrollToBottomButton)) {
       ltLogger.info("Scrolling to bottom.");
       driver.click(scrollToBottomButton);
     }
     lastCommandDisplayed = driver.isDisplayed(lastCommandLocator, 20);
     softAssert.assertTrue(lastCommandDisplayed,
-      softAssert.softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, lastCommandName));
+      softAssertMessageFormat(COMMAND_NOT_DISPLAYED_CLIENT_ERROR_MESSAGE, lastCommandName));
     return lastCommandDisplayed && firstCommandDisplayed;
   }
 
@@ -102,8 +102,7 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
     if (urls.isEmpty() && locators.isEmpty()) {
       ltLogger.info("Verification data is invalid - both URLs and locators are empty");
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(VERIFICATION_DATA_FOR_COMMAND_LOGS_NOT_VALID_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(VERIFICATION_DATA_FOR_COMMAND_LOGS_NOT_VALID_CLIENT_ERROR_MESSAGE));
       return;
     }
 
@@ -155,9 +154,9 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
 
   private void assertAllItemsFound(List<String> notFoundUrls, List<String> notFoundLocators) {
     softAssert.assertTrue(notFoundUrls.isEmpty(),
-      softAssert.softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_1, notFoundUrls));
+      softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_1, notFoundUrls));
     softAssert.assertTrue(notFoundLocators.isEmpty(),
-      softAssert.softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_2, notFoundLocators));
+      softAssertMessageFormat(DATA_NOT_PRESENT_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE_2, notFoundLocators));
   }
 
   public void verifyCommandLogs() {
@@ -166,8 +165,7 @@ public class TestCommandLogsPage extends LTDashboardCommonActions {
     if (firstAndLastCommandsArePresent) {
       verifyAllExpectedCommandsArePresentInTheUI();
     } else {
-      softAssert.fail(
-        softAssert.softAssertMessageFormat(FIRST_AND_LAST_COMMANDS_MISSING_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE));
+      softAssert.fail(softAssertMessageFormat(FIRST_AND_LAST_COMMANDS_MISSING_IN_COMMAND_LOGS_CLIENT_ERROR_MESSAGE));
     }
   }
 

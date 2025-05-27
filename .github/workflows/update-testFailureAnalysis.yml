@@ -25,12 +25,11 @@ jobs:
       - name: Check changed files
         id: files
         run: |
-          echo "::group::Changed files"
           git fetch origin main
           git diff --name-only origin/main > changed_files.txt
-          cat changed_files.txt
-          echo "::endgroup::"
-          echo "::set-output name=changed_files::$(cat changed_files.txt)"
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          cat changed_files.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run condition check
         id: check_change
@@ -38,17 +37,14 @@ jobs:
           changed_files="${{ steps.files.outputs.changed_files }}"
           echo "Files changed since main:"
           echo "$changed_files"
+          update_needed="false"
           if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessages.java"; then
             if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysis.json"; then
-              echo "true" > update_needed.txt
-            else
-              echo "false" > update_needed.txt
+              update_needed="true"
             fi
-          else
-            echo "false" > update_needed.txt
           fi
-          cat update_needed.txt
-          echo "::set-output name=update_needed::$(cat update_needed.txt)"
+          echo "update_needed=$update_needed" >> $GITHUB_OUTPUT
+        shell: bash
 
       - name: Run update if needed
         if: steps.check_change.outputs.update_needed == 'true'
