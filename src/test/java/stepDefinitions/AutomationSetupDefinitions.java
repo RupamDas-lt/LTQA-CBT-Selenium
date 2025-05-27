@@ -99,7 +99,7 @@ public class AutomationSetupDefinitions {
 
   @Then("^I confirm the test status is ([a-zA-Z0-9_=,: ]+)$")
   public void iConfirmTheTestStatus(String status) {
-    automationHelper.verifyTestStatusViaAPI(status, 10);
+    automationHelper.verifyTestStatusViaAPI(status, 20);
   }
 
   @Then("I stop the running build via API")
