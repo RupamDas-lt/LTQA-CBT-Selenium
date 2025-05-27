@@ -102,6 +102,9 @@ public class AutomationHelper extends BaseClass {
       case "throwError":
         throwNewError();
         break;
+      case "tryoutDifferentAssertionErrors":
+        testActionToTryoutDifferentAssertionErrors();
+        break;
       case "basicAuthentication":
         basicAuthenticationIHA();
         break;
@@ -979,6 +982,14 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(LOCAL_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
       softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_URL));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void testActionToTryoutDifferentAssertionErrors() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    softAssert.assertTrue(false, softAssertMessageFormat(BASIC_AUTH_FAILED_MESSAGE));
+    CustomAssert.assertFalse(true,
+      softAssertMessageFormat(LOGIN_USING_KEYBOARD_EVENT_FAILURE_MESSAGE, Thread.currentThread().threadId()));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }

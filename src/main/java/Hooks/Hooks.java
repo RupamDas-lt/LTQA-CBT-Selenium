@@ -162,19 +162,19 @@ public class Hooks extends BaseClass {
     TEST_REPORT.get().put("failed_step", failedStepName);
     TEST_REPORT.get().put("failed_step_error", stepErrorMessage);
 
-    if (!stepErrorMessage.contains("AssertionError")) {
-      pushUnexpectedErrorsToSumo(stepErrorMessage);
+    if (!isErrorAlreadyAddedInErrorList(stepErrorMessage)) {
+      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(stepErrorMessage, "NA");
     }
   }
 
-  private void pushUnexpectedErrorsToSumo(String errorMessage) {
-    Map<String, String> map = new HashMap<>();
-    map.put("message", errorMessage);
-    map.put("category", "unknown-error");
-    map.put("sub_category", "session-creation-or-unexpected-error");
-    map.put("priority", "p0");
-    map.put("isKnown", "false");
-    apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
+  private boolean isErrorAlreadyAddedInErrorList(String errorMessage) {
+    for (String existingError : FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().keySet()) {
+      if (errorMessage.contains(existingError)) {
+        ltLogger.info("Framework error: {}, matches with existing error: {}", errorMessage, existingError);
+        return true; // Error already exists, no need to add again
+      }
+    }
+    return false;
   }
 
   private void setTestStatus(String testId, String testStatus, String remarks, boolean... isClient) {
@@ -376,7 +376,7 @@ public class Hooks extends BaseClass {
     TEST_VERIFICATION_DATA.set(new HashMap<>());
   }
 
-  @After(order = 2)
+  @After(order = 3)
   public void updateTestStatus(Scenario scenario) {
     ltLogger.info("Test report: {}", TEST_REPORT.get());
     updateScenarioStatusIfNeeded(scenario);
@@ -385,39 +385,12 @@ public class Hooks extends BaseClass {
     throwErrorBasedOnAssertions();
   }
 
-  private HashMap<String, Object> getTestErrorDataPayload(Map<String, String> errorData) {
-    HashMap<String, Object> payload = new HashMap<>(errorData);
-    payload.put("test_session_id", TEST_SESSION_ID.get());
-    payload.put("client_test_session_id", CLIENT_SESSION_ID.get());
-    payload.put("test_env", TEST_ENV);
-    payload.put("caps", TEST_CAPS_MAP.get());
-    payload.put("attempt", System.getProperty(TEST_ATTEMPT, "first"));
-    payload.put("message", "LTQA-CBT-Selenium-Test-Failure-Reports");
-
-    String customDataFromEnvVar = System.getProperty(PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD, "");
-    if (!StringUtils.isNullOrEmpty(customDataFromEnvVar)) {
-      HashMap<String, Object> customDataMapFromCLI = getHashMapFromString(customDataFromEnvVar);
-      payload.put("custom_data_from_cli", customDataMapFromCLI);
-    }
-    return payload;
-  }
-
-  @After(order = 3)
+  @After(order = 2)
   public void pushTestFailureReportToTestReport() {
-    ltLogger.info("Test error message to hashkey map: {}", EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
-    if (!EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().isEmpty()) {
-      List<Map<String, String>> testFailureReport = TestFailureReportManager.getTestFailureReport(
+    TestFailureReportManager testFailureReportManager = new TestFailureReportManager();
+    if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
+      testFailureReportManager.publishTestFailureReportToSumoLogic(
         EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
-      TEST_REPORT.get().put("test_failure_report", testFailureReport);
-      ltLogger.info("Test failure report: {}", testFailureReport);
-      // Push each failure data separately to Sumo Logic, remove this if dashboard can be prepared from the entire report
-      if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
-        for (Map<String, String> map : testFailureReport) {
-          apiHelper.sendCustomDataToSumo(getTestErrorDataPayload(map));
-        }
-      }
-    } else {
-      ltLogger.info("No test failure report to push.");
     }
   }
 }
