@@ -23,6 +23,7 @@ public class TunnelManager extends BaseClass implements Runnable {
     "linux", "./LT_Linux/LT");
   private static final String[] TUNNEL_MODES = { "tcp", "ssh" };
   private final Logger ltLogger = LogManager.getLogger(TunnelManager.class);
+  private static final String commandToPushConsoleLogsToFile = " > logs/tunnelLogs/%s-debug-logs.log 2>&1";
 
   // Tunnel Flag Details
   private final String tunnelBinaryPath = getTunnelBinaryPath();
@@ -66,6 +67,7 @@ public class TunnelManager extends BaseClass implements Runnable {
 
     tunnelName = tunnelFlags.get("tunnelName").toString();
     TEST_TUNNEL_NAME.set(tunnelName);
+    command = String.format(command + commandToPushConsoleLogsToFile, tunnelName);
     ltLogger.info("Tunnel run command: {}", command);
     TEST_REPORT.get().put("tunnel_start_command", command);
     return command;
@@ -73,10 +75,14 @@ public class TunnelManager extends BaseClass implements Runnable {
 
   @Override
   public void run() {
-    runMacShellCommand(tunnelRunCommand);
+    runMacShellCommand(wrapCommandForShellInvocation(tunnelRunCommand));
   }
 
   public void startTunnel(String params) {
+    // Create logs directory if it doesn't exist so that tunnel debug logs can be stored
+    String tunnelLogsDirectory = "logs/tunnelLogs";
+    createDirectoryIfNotExists(tunnelLogsDirectory);
+
     tunnelRunCommand = constructTunnelRunCommand(params);
     TUNNEL_START_COMMAND.set(tunnelRunCommand);
     ltLogger.info("Tunnel started with command: {}", tunnelRunCommand);
