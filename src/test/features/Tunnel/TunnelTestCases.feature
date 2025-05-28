@@ -5,7 +5,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check allowHosts flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test allowHost,publicWebsitesResolutionCheckForAllowHosts,selfSigned with <capabilities>
+    Then I start session with driver quit to test allowHost,publicWebsitesResolutionCheckForAllowHosts,selfSigned,local with <capabilities>
     Then I stop tunnel
     Then I verify network Log via API
 
@@ -18,7 +18,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check bypassHosts flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test bypassHost,publicWebsitesResolutionCheckForBypassHosts,selfSigned with <capabilities>
+    Then I start session with driver quit to test bypassHost,publicWebsitesResolutionCheckForBypassHosts,selfSigned,local with <capabilities>
     Then I stop tunnel
     Then I verify network Log via API
 
@@ -32,7 +32,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check forceLocal flag for tunnel
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
-    Then I start session with driver quit to test local,publicWebsitesResolutionCheckForForceLocal,selfSigned with <capabilities>
+    Then I start session with driver quit to test publicWebsitesResolutionCheckForForceLocal,selfSigned,local with <capabilities>
     Then I stop tunnel
     Then I verify network Log via API
 
@@ -45,7 +45,7 @@ Feature: Automation of all tunnel test cases
   Scenario Outline: User is able to check if public website is resolved in expected place based on ml_resolve_tunnel_website_in_dc flag
     Given Setup user details
     Then I start tunnel
-    Then I start session with driver quit to test localWithCustomDomain,publicWebsitesResolutionCheckForDefaultFlags,selfSigned with <capabilities>
+    Then I start session with driver quit to test localWithCustomDomain,publicWebsitesResolutionCheckForDefaultFlags,selfSigned,local with <capabilities>
     Then I stop tunnel
     Then I verify network Log via API
 

@@ -80,10 +80,35 @@ public class BaseClass {
     return strBuilder.toString();
   }
 
-  public void runMacShellCommand(String command) {
-    String s = null;
+  public void createDirectoryIfNotExists(String directoryPath) {
+    File directory = new File(directoryPath);
+    if (!directory.exists()) {
+      boolean created = directory.mkdirs();
+      if (created) {
+        ltLogger.info("Directory created: {}", directoryPath);
+      } else {
+        ltLogger.error("Failed to create directory: {}", directoryPath);
+      }
+    } else {
+      ltLogger.info("Directory already exists: {}", directoryPath);
+    }
+  }
+
+  public String[] wrapCommandForShellInvocation(String command) {
+    String[] wrappedCommand;
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+      wrappedCommand = new String[] { "cmd.exe", "/c", command };
+    } else {
+      wrappedCommand = new String[] { "/bin/sh", "-c", command };
+    }
+    ltLogger.info("Wrapped command for shell invocation: {}", Arrays.toString(wrappedCommand));
+    return wrappedCommand;
+  }
+
+  public void runMacShellCommand(String[] cmd) {
+    String s;
     try {
-      Process p = Runtime.getRuntime().exec(command);
+      Process p = Runtime.getRuntime().exec(cmd);
       BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
       BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
       while ((s = stdInput.readLine()) != null) {
