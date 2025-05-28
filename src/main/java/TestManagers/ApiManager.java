@@ -5,7 +5,6 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.BaseClass;
@@ -14,8 +13,15 @@ import utility.EnvSetup;
 import utility.FileLockUtility;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -206,22 +212,63 @@ public abstract class ApiManager extends BaseClass {
 
   public boolean downloadFile(String uri, String desiredFileName, String filePath, int... expectedRetryCount) {
     int retryCount = expectedRetryCount.length == 0 ? 3 : expectedRetryCount[0];
-    String expectedLogFilePath = filePath + desiredFileName;
+    String expectedLogFilePath = Paths.get(filePath, desiredFileName).toString();
     boolean success = false;
-    ltLogger.info("Downloading file to : {}", expectedLogFilePath);
+
+    ltLogger.info("Downloading file to: {}", expectedLogFilePath);
+
+    // Ensure directory exists
+    try {
+      Files.createDirectories(Paths.get(filePath));
+    } catch (IOException e) {
+      ltLogger.error("Failed to create directory: {}", filePath, e);
+      return false;
+    }
+
     for (int i = 1; i <= retryCount; i++) {
       try {
         ltLogger.info("Attempt number: {} > Downloading file from uri: {}", i, uri);
-        FileUtils.copyURLToFile(new URL(uri), new File(expectedLogFilePath));
-        success = fileExists(filePath, 3, 5);
+
+        // Create URL object
+        URL url = new URL(uri);
+        URLConnection connection = url.openConnection();
+
+        // Handle basic auth if present in URL
+        if (url.getUserInfo() != null) {
+          String basicAuth = "Basic " + Base64.getEncoder().encodeToString(url.getUserInfo().getBytes());
+          connection.setRequestProperty("Authorization", basicAuth);
+        }
+
+        // Set connection timeout (30 seconds) and read timeout (60 seconds)
+        connection.setConnectTimeout(30000);
+        connection.setReadTimeout(60000);
+
+        // Download the file
+        try (InputStream in = connection.getInputStream()) {
+          Files.copy(in, Paths.get(expectedLogFilePath), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // Verify download
+        success = fileExists(expectedLogFilePath, 3, 5);
         ltLogger.info("Download status: {}", success);
+
         if (success) {
           break;
         }
-      } catch (Exception e) {
-        ltLogger.error("Unable to copy file from uri: {}", uri, e);
+      } catch (MalformedURLException e) {
+        ltLogger.error("Invalid URL format: {}", uri, e);
+        break; // No point retrying if URL is malformed
+      } catch (FileNotFoundException e) {
+        ltLogger.error("File not found at URI: {}", uri, e);
+        break; // No point retrying if resource doesn't exist
+      } catch (IOException e) {
+        ltLogger.error("Unable to copy file from uri (attempt {}): {}", i, uri, e);
+        if (i == retryCount) {
+          ltLogger.error("All download attempts failed for URI: {}", uri);
+        }
       }
     }
+
     return success;
   }
 
