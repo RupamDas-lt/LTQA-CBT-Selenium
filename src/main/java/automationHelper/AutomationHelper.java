@@ -898,8 +898,8 @@ public class AutomationHelper extends BaseClass {
     return new String[] { ip, location };
   }
 
+  /// Expected expectedLocation values tunnelClient, tunnelServer, dc
   private void checkPublicWebsitesAreResolvedInExpectedLocation(String expectedLocation, String tunnelFlagName) {
-    /// Expected expectedLocation values tunnelClient, tunnelServer, dc
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     String localMachineIp = apiHelper.getCurrentIPFromAPI();
     String[] ipAndLocation = getCurrentIPAndLocationFromUrlInTestSession();
@@ -942,46 +942,46 @@ public class AutomationHelper extends BaseClass {
 
   private void checkAllowHostFlagForTunnel() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
-      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_PRIVATE_PROXY_URL,
+      "Please update etc/hosts with value `127.0.0.1       localhost.lambdatest.com` and retry", LOCAL_LAMBDA_URL,
       "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
       softAssertMessageFormat(ALLOW_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_1, LOCAL_LAMBDA_URL));
-    driverManager.getURL(LOCAL_URL);
+    driverManager.getURL(LOCAL_PRIVATE_PROXY_URL);
     softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
-      softAssertMessageFormat(ALLOW_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_URL));
+      softAssertMessageFormat(ALLOW_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_PRIVATE_PROXY_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   private void checkBypassHostFlagForTunnel() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
-      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_PRIVATE_PROXY_URL,
+      "Please update etc/hosts with value `127.0.0.1       localhost.lambdatest.com` and retry", LOCAL_LAMBDA_URL,
       "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
     softAssert.assertFalse(driverManager.isDisplayed(localUrlHeading, 5),
       softAssertMessageFormat(BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_1, LOCAL_LAMBDA_URL));
-    driverManager.getURL(LOCAL_URL);
+    driverManager.getURL(LOCAL_PRIVATE_PROXY_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
-      softAssertMessageFormat(BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_URL));
+      softAssertMessageFormat(BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2, LOCAL_PRIVATE_PROXY_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   private void testLocalUrlWithCustomDomainForTunnel() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_URL,
-      "Please start http server on port 8000 to start verifying tunnel.", LOCAL_LAMBDA_URL,
+    final Map<String, String> expectedLocalUrls = Map.of(LOCAL_PRIVATE_PROXY_URL,
+      "Please update etc/hosts with value `127.0.0.1       localhost.lambdatest.com` and retry", LOCAL_LAMBDA_URL,
       "Please update etc/hosts with value `127.0.0.1       locallambda.com` and retry");
     checkLocalWebSitesAreReachable(expectedLocalUrls);
     driverManager.getURL(LOCAL_LAMBDA_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
       softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_LAMBDA_URL));
-    driverManager.getURL(LOCAL_URL);
+    driverManager.getURL(LOCAL_PRIVATE_PROXY_URL);
     softAssert.assertTrue(driverManager.isDisplayed(localUrlHeading, 5),
-      softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_URL));
+      softAssertMessageFormat(LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE, LOCAL_PRIVATE_PROXY_URL));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 

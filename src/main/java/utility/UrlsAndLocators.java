@@ -12,6 +12,7 @@ public class UrlsAndLocators {
 
   public static final String LOCAL_URL = "http://localhost:8000/";
   public static final String LOCAL_LAMBDA_URL = "http://locallambda.com:8000/"; // Add entry for locallambda in etc/hosts and point it to 127.0.0.1
+  public static final String LOCAL_PRIVATE_PROXY_URL = "http://privateproxy.network.com:8000/"; // Add entry for privateproxy.network in etc/hosts and point it to 127.0.0.1
   public static final String LOCAL_IOS = "http://localhost.lambdatest.com:8000/";
   public static final Locator localUrlHeading = new Locator(LocatorTypes.XPATH,
     "//h1[contains(text(),'Directory listing for')]");
