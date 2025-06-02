@@ -1,7 +1,9 @@
 package utility;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
@@ -126,6 +128,144 @@ public class BaseClass {
     } catch (Exception e) {
       ltLogger.info(e.getMessage());
     }
+  }
+
+  /**
+   * Parses a string of key-value pairs into a nested HashMap. Supports:
+   * - Flat pairs: "key1=val1,key2=val2"
+   * - Nested maps: "key={subKey=subVal}"
+   * - Arrays: "key=[item1,item2]"
+   * - Boolean values: "flag=TRUE" → true (case-insensitive)
+   * <p>
+   * Example:
+   * Input:  "key1=value1,key2={key2_1=value_2_1,key2_2=[value_2_2_1,value_2_2_2],key3=TRUE}"
+   * Output: {key1="value1", key2={key2_1="value_2_1", key2_2=["value_2_2_1","value_2_2_2"]}, key3=true}
+   * <p>
+   * Returns HashMap<String, Object> where Object = String | HashMap | ArrayList.
+   */
+  public HashMap<String, Object> getExtendedHashMapFromString(String string, String... separators) {
+    HashMap<String, Object> hashmap = new HashMap<>();
+    if (string == null || string.trim().isEmpty()) {
+      return hashmap;
+    }
+
+    try {
+      String pairSeparator = separators.length > 0 ? separators[0] : ",";
+      String keyValueSeparator = separators.length > 1 ? separators[1] : "=";
+
+      List<String> pairs = splitRespectingBrackets(string, pairSeparator);
+
+      for (String pair : pairs) {
+        int separatorPos = pair.indexOf(keyValueSeparator);
+        if (separatorPos <= 0) {
+          if (!pair.trim().isEmpty()) {
+            hashmap.put(pair.trim(), null);
+          }
+          continue;
+        }
+
+        String key = pair.substring(0, separatorPos).trim();
+        String valueStr = pair.substring(separatorPos + keyValueSeparator.length()).trim();
+
+        hashmap.put(key, parseValue(valueStr, separators));
+      }
+
+      logParsedResult(string, hashmap);
+      return hashmap;
+    } catch (Exception e) {
+      throw new RuntimeException("Exception occurred while parsing string: " + string, e);
+    }
+  }
+
+  /**
+   * Parses a string value into appropriate Java object (Boolean, Map, List, or String)
+   */
+  private Object parseValue(String valueStr, String... separators) {
+    // Handle boolean values
+    if (valueStr.equals("TRUE"))
+      return true;
+    if (valueStr.equals("FALSE"))
+      return false;
+
+    // Handle nested maps
+    if (valueStr.startsWith("{") && valueStr.endsWith("}")) {
+      return getExtendedHashMapFromString(valueStr.substring(1, valueStr.length() - 1), separators);
+    }
+
+    // Handle arrays
+    if (valueStr.startsWith("[") && valueStr.endsWith("]")) {
+      return parseArray(valueStr.substring(1, valueStr.length() - 1), separators);
+    }
+
+    // Default case: return as string
+    return valueStr;
+  }
+
+  /**
+   * Logs the parsed result in pretty-printed JSON format
+   */
+  private void logParsedResult(String input, HashMap<String, Object> result) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      ltLogger.info("Parsed extended hashmap:\nInput: {}\nOutput:\n{}", input, mapper.writeValueAsString(result));
+    } catch (JsonProcessingException e) {
+      ltLogger.warn("Failed to pretty-print hashmap", e);
+    }
+  }
+
+  private List<String> splitRespectingBrackets(String input, String separator) {
+    List<String> result = new ArrayList<>();
+    StringBuilder current = new StringBuilder();
+    Stack<Character> bracketStack = new Stack<>();
+
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+
+      if (c == '{' || c == '[') {
+        bracketStack.push(c);
+      } else if ((c == '}' && !bracketStack.isEmpty() && bracketStack.peek() == '{') || (c == ']' && !bracketStack.isEmpty() && bracketStack.peek() == '[')) {
+        bracketStack.pop();
+      }
+
+      if (c == separator.charAt(0) && bracketStack.isEmpty()) {
+        // Only split if we're not inside brackets
+        if (i + separator.length() <= input.length() && input.startsWith(separator, i)) {
+          result.add(current.toString());
+          current = new StringBuilder();
+          i += separator.length() - 1; // Skip the rest of the separator
+          continue;
+        }
+      }
+
+      current.append(c);
+    }
+
+    if (!current.isEmpty()) {
+      result.add(current.toString());
+    }
+
+    return result;
+  }
+
+  private Object parseArray(String arrayString, String... separators) {
+    List<Object> array = new ArrayList<>();
+    String elementSeparator = separators.length > 0 ? separators[0] : ",";
+
+    List<String> elements = splitRespectingBrackets(arrayString, elementSeparator);
+
+    for (String element : elements) {
+      String trimmed = element.trim();
+      if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+        array.add(getExtendedHashMapFromString(trimmed.substring(1, trimmed.length() - 1), separators));
+      } else if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        array.add(parseArray(trimmed.substring(1, trimmed.length() - 1), separators));
+      } else {
+        array.add(trimmed);
+      }
+    }
+
+    return array;
   }
 
   public HashMap<String, Object> getHashMapFromString(String string, String... separators) {

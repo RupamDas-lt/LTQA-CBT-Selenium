@@ -237,7 +237,7 @@ public class CapabilityManager extends BaseClass {
     String customCapsSource, String... removeCapsSource) {
     capsString = capabilityString;
     // Get hashmap from caps string and build caps hashmap
-    Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getHashMapFromString(capsString));
+    Map<String, Object> capabilityMap = new ConcurrentHashMap<>(getExtendedHashMapFromString(capsString));
 
     // Remove specific caps based on env value
     if (removeCapsSource != null && removeCapsSource.length > 0) {
@@ -265,7 +265,7 @@ public class CapabilityManager extends BaseClass {
   private void mergeCustomTestCaps(Map<String, Object> capabilityMap, String customCapsSource) {
     Optional.ofNullable(System.getProperty(customCapsSource)).filter(caps -> !caps.isEmpty()).ifPresent(customCaps -> {
       ltLogger.info("Applying custom test capabilities: {}", customCaps);
-      capabilityMap.putAll(getHashMapFromString(customCaps));
+      capabilityMap.putAll(getExtendedHashMapFromString(customCaps));
     });
   }
 
