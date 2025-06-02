@@ -24,6 +24,14 @@ import java.util.regex.Pattern;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
+/**
+ * This class is responsible for managing the capabilities for different cloud platforms
+ * This can take capabilities as a string and build the final capabilities object
+ * The string can contain capabilities in the format of:
+ * CAPABILITY_NAME=value,CAPABILITY_NAME2=value2,...
+ * Always use getExtendedHashMapFromString while converting the string to a map as it provides support for nested capabilities
+ * It supports both desired capabilities and first match capabilities
+ */
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
   private final String[] randomValueSupportedCaps = new String[] { "geoLocation", "resolution", "version", "timezone" };
