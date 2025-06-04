@@ -150,10 +150,10 @@ Feature: Automation of ventura machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                            |
-      | browserName=edge,platform=ventura,version=135,visual=true,network=false,loadExtension=true,console=true |
+      | capabilities                                                                                           |
+      | browserName=edge,platform=ventura,version=.*,visual=true,network=false,loadExtension=true,console=true |
 
     @ireland_smoke_new
     Examples:
-      | capabilities                                                                                             |
-      | browserName=chrome,platform=ventura,version=135,visual=true,network=true,loadExtension=true,console=true |
+      | capabilities                                                                                            |
+      | browserName=chrome,platform=ventura,version=.*,visual=true,network=true,loadExtension=true,console=true |
