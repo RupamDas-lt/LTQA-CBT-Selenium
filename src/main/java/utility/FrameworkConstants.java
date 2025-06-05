@@ -102,6 +102,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD = "PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD";
   public static final String TEST_ATTEMPT = "TEST_ATTEMPT";
   public static final String JOB_PURPOSE = "JOB_PURPOSE";
+  public static final String RESTORE_EXISTING_AUTO_HEAL_BASELINES = "RESTORE_EXISTING_AUTO_HEAL_BASELINES";
 
   // RP keys
   public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
@@ -262,7 +263,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA
   }
 
   @Getter public enum videoMetadataTypes {

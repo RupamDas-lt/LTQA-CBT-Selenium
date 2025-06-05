@@ -98,4 +98,36 @@ public class UrlsAndLocators {
   public static final String IP_INFO_IO_URL = "https://ipinfo.io/what-is-my-ip";
   public static final Locator ipInfoIOIP = new Locator(LocatorTypes.CSS, "[class*='main-content'] h1");
   public static final Locator ipInfoIOLocation = new Locator(LocatorTypes.CSS, "[class*='main-content'] h2[class*=h5]");
+
+  /// Auto heal tests urls and locators, BaseLine locators are the original which will be mocked
+  public static final String CHALLENGING_DOM_PAGE_URL = "https://the-internet.herokuapp.com/challenging_dom";
+  public static final Locator challengingDomPageHeading = new Locator(LocatorTypes.CSS, ".example>h3");
+  public static final Locator challengingDomPageWorkOption = new Locator(LocatorTypes.CSS,
+    "tbody>tr:nth-of-type(1)>td:nth-of-type(2)");
+  public static final String AUTO_HEAL_TO_DO_LIST_SAMPLE_URL = "https://rupamdas-ts.github.io/ToDoList/";
+  public static final Locator autoHealToDoListSampleHeading = new Locator(LocatorTypes.CSS, "h1");
+  public static final Locator autoHealToDoListSampleInput = new Locator(LocatorTypes.ID, "input");
+  public static final Locator autoHealToDoListSampleAddButton = new Locator(LocatorTypes.CSS, "#add-button");
+  public static final Locator autoHealToDoListSampleListItemForBaseLine = new Locator(LocatorTypes.XPATH,
+    "//*[@class='custom-class']");
+  public static final Locator autoHealToDoListSampleListItem = new Locator(LocatorTypes.XPATH,
+    "//*[@class=\"custom-class-for-test\" or @class=\"list\"]/../../..//*[@class=\"custom-class-for-test\" or @class=\"list\"]/../../..//*[@class=\"custom-class-for-test\" or @class=\"list\"]/../../..//*[@class=\"custom-class-for-test\" or @class=\"list\"]/../../..//*[@class=\"custom-class-for-test\" or @class=\"list\"]/li/li/label");
+  public static final String AUTO_HEAL_IMDB_SAMPLE_URL = "https://rupamdas-ts.github.io/IMDb-Clone/";
+  public static final Locator autoHealImdbFavButton = new Locator(LocatorTypes.ID, "favourite-button");
+  public static final Locator autoHealImdbInput = new Locator(LocatorTypes.TAG_NAME, "input");
+  public static final Locator autoHealImdbSearchResultList = new Locator(LocatorTypes.ID, "searchList");
+  public static final Locator autoHealImdbListItemBaseLine = new Locator(LocatorTypes.CSS,
+    "#searchList .custom-class-li:nth-of-type(1)");
+  public static final Locator autoHealImdbListItem = new Locator(LocatorTypes.CSS,
+    "#searchList .custom-class-for-test-li:nth-of-type(1) span");
+  public static final Locator autoHealImdbAddFavButtonBaseLine = new Locator(LocatorTypes.CSS,
+    "#searchList .custom-class-for-test-li:nth-of-type(1) .custom-class-button");
+  public static final Locator autoHealImdbAddFavButton = new Locator(LocatorTypes.CSS,
+    "#searchList .custom-class-for-test-li:nth-of-type(1) .custom-class-for-test-button");
+  public static final Locator autoHealImdbFavList = new Locator(LocatorTypes.XPATH,
+    "//h5[contains(@class,'custom-class-title')]");
+  public static final Locator autoHealImdbFavListItemBaseLine = new Locator(LocatorTypes.XPATH,
+    "(//h5[contains(@class,'custom-class-title')])[1]");
+  public static final Locator autoHealImdbFavListItem = new Locator(LocatorTypes.XPATH,
+    "(//h5[contains(@class,'custom-class-for-test-title')])[1]");
 }

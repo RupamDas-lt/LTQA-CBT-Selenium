@@ -78,7 +78,10 @@ import lombok.Getter;
     "Video share url is not valid. Url: %s"), UNABLE_TO_FETCH_LIGHTHOUSE_REPORT_ERROR_MESSAGE(
     "Unable to fetch lighthouse reports. Status: %s, Message: %s"), UNABLE_TO_DOWNLOAD_JSON_LIGHTHOUSE_REPORT_ERROR_MESSAGE(
     "Unable to download Lighthouse report (JSON). Status: %s"), UNABLE_TO_DOWNLOAD_HTML_LIGHTHOUSE_REPORT_ERROR_MESSAGE(
-    "Unable to download Lighthouse report (HTML). Status: %s"),
+    "Unable to download Lighthouse report (HTML). Status: %s"), AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE(
+    "Auto-heal is not working for %s locator"), AUTO_HEALED_LOCATOR_IS_LOCATING_SOME_OTHER_ELEMENT_THAN_EXPECTED_ERROR_MESSAGE(
+    "Auto-healed locator for %s is locating some other element than expected. Expected: %s, Actual: %s"), AUTO_HEAL_BASELINE_CAPTURE_FAILED_ERROR_MESSAGE(
+    "Base line capture failed for auto-heal test, so this action will be skipped"),
 
   //  CLIENT side error messages
   USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE(
@@ -119,7 +122,9 @@ import lombok.Getter;
     "Test status verification failed after %d attempts. Expected: %s, Actual: %s"), UNABLE_TO_STOP_TEST_ERROR_MESSAGE(
     "Unable to initiate stop test as the test is not in Running state. Current state: %s"), UNABLE_TO_NAVIGATE_TO_LT_HOME_PAGE(
     "Unable to open test home page"), UNABLE_TO_STOP_BUILD_ERROR_MESSAGE(
-    "Unable to initiate build stop as the build is not in Running state. Current state: %s"),
+    "Unable to initiate build stop as the build is not in Running state. Current state: %s"), UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE(
+    "Unable to open %s url"), UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE(
+    "Unable to set baseline for auto heal test: %s."),
 
   ;
 

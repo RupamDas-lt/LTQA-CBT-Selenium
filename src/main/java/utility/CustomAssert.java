@@ -40,4 +40,9 @@ public class CustomAssert {
     }
     Assert.assertNotEquals(actual, expected, message);
   }
+
+  public static void fail(String message) {
+    new BaseClass().pushCustomFailureDataToThreadLocal(message);
+    throw new AssertionError(message);
+  }
 }

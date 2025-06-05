@@ -11,15 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import reportingHelper.TestFailureReportManager;
 import utility.BaseClass;
-import utility.EnvSetup;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,7 +159,7 @@ public class Hooks extends BaseClass {
     TEST_REPORT.get().put("failed_step_error", stepErrorMessage);
 
     if (!isErrorAlreadyAddedInErrorList(stepErrorMessage)) {
-      EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(stepErrorMessage, "NA");
+      FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(stepErrorMessage, "NA");
     }
   }
 
@@ -193,11 +189,11 @@ public class Hooks extends BaseClass {
     TEST_REPORT.get().put("test_env", TEST_ENV);
     TEST_REPORT.get().put("scenarioName", scenario.getName());
     TEST_REPORT.get().put("scenarioHashCode", scenario.hashCode());
-    TEST_REPORT.get().put("userName", EnvSetup.testUserName.get());
-    TEST_REPORT.get().put("accessKey", EnvSetup.testAccessKey.get());
-    TEST_REPORT.get().put("hub", EnvSetup.testGridUrl.get());
+    TEST_REPORT.get().put("userName", testUserName.get());
+    TEST_REPORT.get().put("accessKey", testAccessKey.get());
+    TEST_REPORT.get().put("hub", testGridUrl.get());
     TEST_REPORT.get().put("test_status", testStatus);
-    TEST_REPORT.get().put("client_test_status", EnvSetup.IS_UI_VERIFICATION_ENABLED.get() ? clientTestStatus : "NA");
+    TEST_REPORT.get().put("client_test_status", IS_UI_VERIFICATION_ENABLED.get() ? clientTestStatus : "NA");
   }
 
   private void printTestDashboardAndRetinaLinks(Scenario scenario, String testEnv) {
@@ -212,31 +208,52 @@ public class Hooks extends BaseClass {
       default -> "/test?testID=";
     };
 
-    String testSessionId = TEST_SESSION_ID.get();
     StringBuilder stringBuilder = new StringBuilder();
 
-    String testDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_DASHBOARD_URL_BASE, endPoint, testSessionId);
-    stringBuilder.append("Dashboard URL: ").append(testDashboardUrl).append("\n");
+    // Construct test session URLs
+    constructUrlsFromSessionsQueue(TEST_SESSION_ID_QUEUE.get(), endPoint, testEnv, TEST_DASHBOARD_URL_BASE,
+      TEST_RETINA_URL_BASE, "Test", stringBuilder);
 
-    String testRetinaUrl = "NA";
-    if (!"browserstack".equalsIgnoreCase(testEnv) && !"saucelab".equalsIgnoreCase(testEnv)) {
-      testRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.TEST_RETINA_URL_BASE, "/search/?query=", testSessionId);
-      stringBuilder.append("Test Retina URL: ").append(testRetinaUrl).append("\n");
+    // Construct client session URLs if UI verification is enabled
+    if (IS_UI_VERIFICATION_ENABLED.get()) {
+      constructUrlsFromSessionsQueue(CLIENT_TEST_SESSION_ID_QUEUE.get(), endPoint, testEnv, CLIENT_DASHBOARD_URL_BASE,
+        CLIENT_RETINA_URL_BASE, "Client test", stringBuilder);
     }
 
-    if (EnvSetup.IS_UI_VERIFICATION_ENABLED.get()) {
-      String clientSessionId = EnvSetup.CLIENT_SESSION_ID.get();
-      String clientDashboardUrl = apiHelper.constructAPIUrl(EnvSetup.CLIENT_DASHBOARD_URL_BASE, endPoint,
-        clientSessionId);
-      String clientRetinaUrl = apiHelper.constructAPIUrl(EnvSetup.CLIENT_RETINA_URL_BASE, "/search/?query=",
-        clientSessionId);
-
-      stringBuilder.append("Client test dashboard URL: ").append(clientDashboardUrl).append("\n")
-        .append("Client test retina URL: ").append(clientRetinaUrl);
-    }
-
-    ltLogger.info("Test dashboard URL: {},\nTest Retina URL: {}", testDashboardUrl, testRetinaUrl);
     scenario.log(stringBuilder.toString());
+  }
+
+  private void constructUrlsFromSessionsQueue(Queue<String> queue, String endPoint, String testEnv,
+    String dashboardBase, String retinaBase, String labelPrefix, StringBuilder outBuilder) {
+    if (queue == null || queue.isEmpty())
+      return;
+
+    boolean isRetinaAllowed = !(testEnv.equalsIgnoreCase("browserstack") || testEnv.equalsIgnoreCase("saucelab"));
+    boolean doesQueueContainsOnlyOneSession = queue.size() == 1;
+
+    int index = 1;
+    while (!queue.isEmpty()) {
+      String sessionId = queue.poll();
+      String dashboardUrl = apiHelper.constructAPIUrl(dashboardBase, endPoint, sessionId);
+      outBuilder.append(labelPrefix).append(" dashboard URL");
+      if (!doesQueueContainsOnlyOneSession)
+        outBuilder.append(" of test number ").append(index);
+      outBuilder.append(": ").append(dashboardUrl).append("\n");
+
+      String retinaUrl = "NA";
+      if (isRetinaAllowed) {
+        retinaUrl = apiHelper.constructAPIUrl(retinaBase, "/search/?query=", sessionId);
+        outBuilder.append(labelPrefix).append(" retina URL");
+        if (!doesQueueContainsOnlyOneSession)
+          outBuilder.append(" of test number ").append(index);
+        outBuilder.append(": ").append(retinaUrl).append("\n");
+      }
+
+      ltLogger.info("Index: {}, {} dashboard URL: {},\n{} retina URL: {}", index, labelPrefix, dashboardUrl,
+        labelPrefix, retinaUrl);
+
+      index++;
+    }
   }
 
   private void handleAssertionError(AssertionError e, boolean isClient) {
@@ -267,7 +284,7 @@ public class Hooks extends BaseClass {
 
   private void assertAll() {
     try {
-      EnvSetup.SOFT_ASSERT.get().assertAll();
+      SOFT_ASSERT.get().assertAll();
     } catch (AssertionError e) {
       handleAssertionError(e, false);
     }
@@ -275,7 +292,7 @@ public class Hooks extends BaseClass {
 
   private void assertAllClient() {
     try {
-      EnvSetup.CLIENT_SOFT_ASSERT.get().assertAll();
+      CLIENT_SOFT_ASSERT.get().assertAll();
     } catch (AssertionError e) {
       handleAssertionError(e, true);
     }
@@ -291,13 +308,13 @@ public class Hooks extends BaseClass {
 
   private void closeAllActiveDrivers() {
     try {
-      EnvSetup.testDriver.get().quit();
+      testDriver.get().quit();
     } catch (Exception ignored) {
       // Driver quit failure can be safely ignored
     }
 
     try {
-      EnvSetup.clientDriver.get().quit();
+      clientDriver.get().quit();
     } catch (Exception ignored) {
 
     }
@@ -368,6 +385,8 @@ public class Hooks extends BaseClass {
     put("TUNNEL_START_COMMAND", TUNNEL_START_COMMAND);
     put("ASSERTION_ERROR_TO_HASH_KEY_MAP", ASSERTION_ERROR_TO_HASH_KEY_MAP);
     put("FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP", FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP);
+    put("TEST_SESSION_ID_QUEUE", TEST_SESSION_ID_QUEUE);
+    put("CLIENT_TEST_SESSION_ID_QUEUE", CLIENT_TEST_SESSION_ID_QUEUE);
   }};
 
   private void resetTestData() {
@@ -389,8 +408,7 @@ public class Hooks extends BaseClass {
   public void pushTestFailureReportToTestReport() {
     TestFailureReportManager testFailureReportManager = new TestFailureReportManager();
     if (System.getProperty(SEND_DATA_TO_SUMO, "false").equalsIgnoreCase("true")) {
-      testFailureReportManager.publishTestFailureReportToSumoLogic(
-        EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
+      testFailureReportManager.publishTestFailureReportToSumoLogic(FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get());
     }
   }
 }
