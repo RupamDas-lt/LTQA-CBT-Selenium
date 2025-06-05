@@ -143,10 +143,10 @@ Feature: Automation of ubuntu-20 machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                          |
-      | browserName=edge,platform=ubuntu,version=135,visual=true,network=true,loadExtension=true,console=true |
+      | capabilities                                                                                         |
+      | browserName=edge,platform=ubuntu,version=.*,visual=true,network=true,loadExtension=true,console=true |
 
     @london_smoke_new
     Examples:
-      | capabilities                                                                                             |
-      | browserName=chrome,platform=ubuntu,version=135,visual=true,network=false,loadExtension=true,console=true |
+      | capabilities                                                                                            |
+      | browserName=chrome,platform=ubuntu,version=.*,visual=true,network=false,loadExtension=true,console=true |

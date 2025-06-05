@@ -148,10 +148,10 @@ Feature: Automation of windows11 machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                          |
-      | browserName=edge,platform=win11,version=135,visual=true,network=false,loadExtension=true,console=true |
+      | capabilities                                                                                         |
+      | browserName=edge,platform=win11,version=.*,visual=true,network=false,loadExtension=true,console=true |
 
     @frankfurt_smoke_new
     Examples:
-      | capabilities                                                                                           |
-      | browserName=chrome,platform=win11,version=135,visual=true,network=true,loadExtension=true,console=true |
+      | capabilities                                                                                          |
+      | browserName=chrome,platform=win11,version=.*,visual=true,network=true,loadExtension=true,console=true |
