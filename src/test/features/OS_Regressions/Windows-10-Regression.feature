@@ -149,10 +149,10 @@ Feature: Automation of windows10 machine with different browsers.
 
     @virginia_smoke_new
     Examples:
-      | capabilities                                                                                           |
-      | browserName=chrome,platform=win10,version=135,visual=true,network=true,loadExtension=true,console=true |
+      | capabilities                                                                                          |
+      | browserName=chrome,platform=win10,version=.*,visual=true,network=true,loadExtension=true,console=true |
 
     @oregon_smoke_new
     Examples:
-      | capabilities                                                                                          |
-      | browserName=edge,platform=win10,version=135,visual=true,network=false,loadExtension=true,console=true |
+      | capabilities                                                                                         |
+      | browserName=edge,platform=win10,version=.*,visual=true,network=false,loadExtension=true,console=true |

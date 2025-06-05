@@ -145,6 +145,6 @@ Feature: Automation of sonoma machine with different browsers.
     Then I verify video via API
 
     Examples:
-      | capabilities                                                                                             |
-      | browserName=chrome,platform=sonoma,version=135,visual=true,network=false,loadExtension=true,console=true |
-      | browserName=edge,platform=sonoma,version=135,visual=true,network=true,loadExtension=true,console=true    |
+      | capabilities                                                                                            |
+      | browserName=chrome,platform=sonoma,version=.*,visual=true,network=false,loadExtension=true,console=true |
+      | browserName=edge,platform=sonoma,version=.*,visual=true,network=true,loadExtension=true,console=true    |
