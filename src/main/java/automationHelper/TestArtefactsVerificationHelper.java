@@ -1,5 +1,6 @@
 package automationHelper;
 
+import DTOs.Others.TestCommandPagesListApiResponseDTO;
 import DTOs.SwaggerAPIs.ArtefactsApiV2ResponseDTO;
 import DTOs.SwaggerAPIs.FetchVideoAPIResponseDTO;
 import DTOs.SwaggerAPIs.LighthouseReportDTO;
@@ -402,10 +403,64 @@ public class TestArtefactsVerificationHelper extends ApiManager {
       automationAPIHelper.getCommandCounts(session_id);
     }
     int expectedCommandLogsCount = EnvSetup.SESSION_COMMAND_LOGS_COUNT_FROM_TEST_API.get();
+    this.verifyCommandLogsPagesListAndTimeStamps(session_id, expectedCommandLogsCount);
     this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V1, COMMAND_LOGS_API_V1_SCHEMA,
       expectedCommandLogsCount, LogType.COMMAND);
     this.verifyDifferentCommandLogs(session_id, ArtefactAPIVersions.API_V2, COMMAND_LOGS_API_V2_SCHEMA,
       expectedCommandLogsCount, LogType.COMMAND);
+  }
+
+  private void verifyCommandLogsPagesListAndTimeStamps(String session_id, int expectedCommandLogsCount,
+    String... customTestType) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+
+    // Determine test type (default to "desktop")
+    String testType = (customTestType != null && customTestType.length > 0) ? customTestType[0] : "desktop";
+
+    final String flagForRequestPageSize = "requestPageSize";
+    final String testCreateTimeStampKey = "create_timestamp";
+
+    // Fetch necessary values
+    int commandsCountPerPage = Integer.parseInt(
+      automationAPIHelper.getFeatureFlagValueOfSpecificSession(session_id, flagForRequestPageSize));
+    int expectedNumberOfPages = (int) Math.ceil((double) expectedCommandLogsCount / commandsCountPerPage);
+    String testStartTimeStamp = automationAPIHelper.getSpecificSessionDetailsViaAPI(session_id, testCreateTimeStampKey);
+    String testID = automationAPIHelper.getTestIdFromSessionId(session_id);
+    String orgID = automationAPIHelper.getOrgIDFromTestId(session_id);
+    String testDate = testStartTimeStamp.split(" ")[0];
+
+    // Construct API URL to fetch command logs pages list
+    String uriToFetchCommandLogsPagesList = constructAPIUrl(EnvSetup.API_URL_BASE, COMMANDS_PAGES_LIST_API_ENDPOINT,
+      testID, String.format("/request?testDate=%s&testType=%s&orgId=%s&commandLogv2=true", testDate, testType, orgID));
+
+    ltLogger.info("Command logs pages list API URL: {}", uriToFetchCommandLogsPagesList);
+
+    String commandListApiResponseString = getRequestWithBasicAuthAsString(uriToFetchCommandLogsPagesList,
+      EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get());
+
+    if (commandListApiResponseString != null && !commandListApiResponseString.isEmpty()) {
+      TestCommandPagesListApiResponseDTO commandLogsPagesListApiResponse = convertJsonStringToPojo(
+        commandListApiResponseString, new TypeToken<TestCommandPagesListApiResponseDTO>() {
+        });
+
+      // Validate the number of pages
+      int actualPages = commandLogsPagesListApiResponse.getData().size();
+      softAssert.assertTrue(actualPages == expectedNumberOfPages,
+        softAssertMessageFormat(COMMAND_LOGS_NO_OF_PAGES_MISMATCH_ERROR_MESSAGE, expectedCommandLogsCount,
+          commandsCountPerPage, expectedNumberOfPages, actualPages));
+
+      // Validate the page start time for each log
+      commandLogsPagesListApiResponse.getData().forEach(commandLogFile -> {
+        String pageStartTime = commandLogFile.getPage_start_time();
+        softAssert.assertFalse(StringUtils.isNullOrEmpty(pageStartTime),
+          softAssertMessageFormat(COMMAND_LOGS_PAGE_START_TIME_NULL_OR_EMPTY_ERROR_MESSAGE, commandLogFile.getName()));
+      });
+    } else {
+      softAssert.fail(softAssertMessageFormat(NULL_OR_EMPTY_API_RESPONSE_ERROR_MESSAGE, uriToFetchCommandLogsPagesList,
+        commandListApiResponseString));
+    }
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
   public void exceptionCommandLogs(String session_id) {
