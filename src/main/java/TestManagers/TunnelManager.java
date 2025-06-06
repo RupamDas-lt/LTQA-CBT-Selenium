@@ -1,6 +1,8 @@
 package TestManagers;
 
+import DTOs.Others.TunnelInfoResponseDTO;
 import automationHelper.AutomationAPIHelper;
+import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +81,8 @@ public class TunnelManager extends BaseClass implements Runnable {
   }
 
   public void startTunnel(String params) {
-    // Create logs directory if it doesn't exist so that tunnel debug logs can be stored
+    // Create logs directory if it doesn't exist so that tunnel debug logs can be
+    // stored
     String tunnelLogsDirectory = "logs/tunnelLogs";
     createDirectoryIfNotExists(tunnelLogsDirectory);
 
@@ -171,6 +174,119 @@ public class TunnelManager extends BaseClass implements Runnable {
     }
     int exitCode = process.waitFor();
     ltLogger.info("Process exited with code :- {}", exitCode);
+  }
+
+  @SneakyThrows
+  public TunnelInfoResponseDTO getTunnelInfoDetails() {
+    String url = LOCAL_HOST_URL + availableOpenPort + TUNNEL_INFO_API_PATH;
+    ltLogger.info("Getting tunnel info details from API URL: {}", url);
+
+    AutomationAPIHelper apiManager = new AutomationAPIHelper();
+    int maxRetries = 5;
+    int retryDelay = 2;
+
+    for (int i = 0; i < maxRetries; i++) {
+      try {
+        String tunnelResponse = apiManager.getRequestAsString(url);
+        ltLogger.info("Tunnel info API response -> {}", tunnelResponse);
+
+        if (tunnelResponse != null && !tunnelResponse.isEmpty()) {
+          Gson gson = new Gson();
+          TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
+
+          if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
+            ltLogger.info("Tunnel info details: {}", tunnelInfo.getData());
+            return tunnelInfo;
+          }
+        }
+      } catch (Exception e) {
+        ltLogger.error("Exception occurred while getting tunnel info details -> {}", e.getMessage());
+      }
+
+      if (i < maxRetries - 1) {
+        ltLogger.info("Retrying to get tunnel info in {} seconds...", retryDelay);
+        TimeUnit.SECONDS.sleep(retryDelay);
+      }
+    }
+
+    throw new RuntimeException("Failed to get tunnel info details after " + maxRetries + " attempts");
+  }
+
+  public String getCurrentTunnelMode() {
+    try {
+      TunnelInfoResponseDTO tunnelInfo = getTunnelInfoDetails();
+      return tunnelInfo.getData().getMode();
+    } catch (Exception e) {
+      ltLogger.error("Failed to get current tunnel mode: {}", e.getMessage());
+      throw new RuntimeException("Failed to get current tunnel mode", e);
+    }
+  }
+
+  public String getCurrentSshConnectionType() {
+    try {
+      TunnelInfoResponseDTO tunnelInfo = getTunnelInfoDetails();
+      return tunnelInfo.getData().getSshConnType();
+    } catch (Exception e) {
+      ltLogger.error("Failed to get current SSH connection type: {}", e.getMessage());
+      throw new RuntimeException("Failed to get current SSH connection type", e);
+    }
+  }
+
+  public String getTunnelLocalProxyPort() {
+    try {
+      TunnelInfoResponseDTO tunnelInfo = getTunnelInfoDetails();
+      return tunnelInfo.getData().getLocalProxyPort();
+    } catch (Exception e) {
+      ltLogger.error("Failed to get tunnel local proxy port: {}", e.getMessage());
+      throw new RuntimeException("Failed to get tunnel local proxy port", e);
+    }
+  }
+
+  public boolean verifyTunnelMode(String expectedMode) {
+    try {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.info("Expected mode: {}, Current mode: {}", expectedMode, currentMode);
+      return expectedMode.equalsIgnoreCase(currentMode);
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify tunnel mode: {}", e.getMessage());
+      return false;
+    }
+  }
+
+  public boolean verifySshConnectionType(String expectedSshConnType) {
+    try {
+      String currentSshConnType = getCurrentSshConnectionType();
+      ltLogger.info("Expected SSH connection type: {}, Current SSH connection type: {}", expectedSshConnType,
+        currentSshConnType);
+      return expectedSshConnType.equalsIgnoreCase(currentSshConnType);
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify SSH connection type: {}", e.getMessage());
+      return false;
+    }
+  }
+
+  public int getCurrentTunnelPort() {
+    try {
+      TunnelInfoResponseDTO tunnelInfo = getTunnelInfoDetails();
+      String mode = tunnelInfo.getData().getMode();
+      String sshConnType = tunnelInfo.getData().getSshConnType();
+
+      if ("ssh".equalsIgnoreCase(mode)) {
+        if ("over_22".equalsIgnoreCase(sshConnType)) {
+          return 22;
+        } else if ("over_443".equalsIgnoreCase(sshConnType) || "over_ws".equalsIgnoreCase(sshConnType)) {
+          return 443;
+        }
+      } else if ("tcp".equalsIgnoreCase(mode) || "ws".equalsIgnoreCase(mode)) {
+        return 443;
+      }
+
+      ltLogger.warn("Unable to determine port for mode: {} and sshConnType: {}", mode, sshConnType);
+      return -1;
+    } catch (Exception e) {
+      ltLogger.error("Failed to get current tunnel port: {}", e.getMessage());
+      return -1;
+    }
   }
 
 }

@@ -588,7 +588,7 @@ public class AutomationHelper extends BaseClass {
 
   private void runDifferentHerokuAppTest() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    //    runABTestIHA(softAssert);
+    // runABTestIHA(softAssert);
     addOrRemoveElementIHA(softAssert);
     basicAuthenticationIHA();
     testBrokenImagesIHA(softAssert);
@@ -731,9 +731,10 @@ public class AutomationHelper extends BaseClass {
       validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
 
-    //    softAssert.assertTrue(validLogsToCheck,
-    //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
-    //        logs, Collections.emptyMap()));
+    // softAssert.assertTrue(validLogsToCheck,
+    // logs + " logs verification is skipped as required caps are not used. Required
+    // caps: " + testArtefactsToCapsMap.getOrDefault(
+    // logs, Collections.emptyMap()));
 
     if (!validLogsToCheck) {
       System.err.println(
@@ -1049,7 +1050,7 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  ///  Create baseline for long locators
+  /// Create baseline for long locators
   private void createBaseLineForAutoHealTestOfLongLocator() {
     final String todoListPageHeading = "To Do List";
     driverManager.getURL(AUTO_HEAL_TO_DO_LIST_SAMPLE_URL);
@@ -1179,5 +1180,51 @@ public class AutomationHelper extends BaseClass {
       softAssert.fail(softAssertMessageFormat(AUTO_HEAL_BASELINE_CAPTURE_FAILED_ERROR_MESSAGE));
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public boolean verifyTunnelMode(String expectedMode) {
+    if (tunnelManager == null) {
+      ltLogger.error("Tunnel manager is not initialized");
+      return false;
+    }
+    return tunnelManager.verifyTunnelMode(expectedMode);
+  }
+
+  public boolean verifySshConnectionType(String expectedSshConnType) {
+    if (tunnelManager == null) {
+      ltLogger.error("Tunnel manager is not initialized");
+      return false;
+    }
+    return tunnelManager.verifySshConnectionType(expectedSshConnType);
+  }
+
+  public int getCurrentTunnelPort() {
+    if (tunnelManager == null) {
+      ltLogger.error("Tunnel manager is not initialized");
+      return -1;
+    }
+    return tunnelManager.getCurrentTunnelPort();
+  }
+
+  public boolean verifyTunnelPort(int expectedPort) {
+    int currentPort = getCurrentTunnelPort();
+    ltLogger.info("Expected port: {}, Current port: {}", expectedPort, currentPort);
+    return expectedPort == currentPort;
+  }
+
+  public String getCurrentTunnelMode() {
+    if (tunnelManager == null) {
+      ltLogger.error("Tunnel manager is not initialized");
+      return null;
+    }
+    return tunnelManager.getCurrentTunnelMode();
+  }
+
+  public String getCurrentSshConnectionType() {
+    if (tunnelManager == null) {
+      ltLogger.error("Tunnel manager is not initialized");
+      return null;
+    }
+    return tunnelManager.getCurrentSshConnectionType();
   }
 }
