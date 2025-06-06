@@ -3,6 +3,8 @@ package automationHelper;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
+import factory.Locator;
+import factory.LocatorTypes;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
+import static utility.FrameworkConstants.testVerificationDataKeys.AUTO_HEAL_DATA;
 import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper extends BaseClass {
@@ -163,6 +166,16 @@ public class AutomationHelper extends BaseClass {
         break;
       case "publicWebsitesResolutionCheckForDefaultFlags":
         verifyWebsiteResolutionBasedOnFlags("default");
+        break;
+      case "autoHealBaseLineCapture":
+        autoHealBaseLineCapture();
+        restoreExistingBaseLinesIfNeeded();
+        break;
+      case "autoHealWithOldExistingLocators":
+        autoHealWithOldExistingLocators();
+        break;
+      case "autoHealWithNewLocators":
+        autoHealWithNewLocators();
         break;
       case "networkLog":
       default:
@@ -990,6 +1003,180 @@ public class AutomationHelper extends BaseClass {
     softAssert.assertTrue(false, softAssertMessageFormat(BASIC_AUTH_FAILED_MESSAGE));
     CustomAssert.assertFalse(true,
       softAssertMessageFormat(LOGIN_USING_KEYBOARD_EVENT_FAILURE_MESSAGE, Thread.currentThread().threadId()));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void autoHealBaseLineCapture() {
+    final String expectedHeading = "Challenging DOM";
+    String baselineCaptureSuccess = "false";
+    String customClassName = "customClassNameForWork_" + getRandomAlphaNumericString(5);
+    driverManager.getURL(CHALLENGING_DOM_PAGE_URL);
+    if (driverManager.isDisplayed(challengingDomPageHeading) && driverManager.getText(challengingDomPageHeading)
+      .equals(expectedHeading)) {
+
+      // This mocks the class attribute of the element to be auto-healed
+      driverManager.setCustomAttributeValue(challengingDomPageWorkOption, "class", customClassName);
+
+      // Verify if the class attribute is set correctly
+      if (driverManager.isDisplayed(new Locator(LocatorTypes.CLASS_NAME, customClassName))) {
+        ltLogger.info("Element attribute is mocked successfully. Custom class name {} is already set on the element",
+          customClassName);
+        baselineCaptureSuccess = "true";
+      }
+      String finalBaselineCaptureSuccess = baselineCaptureSuccess;
+
+      TEST_VERIFICATION_DATA.get().put(AUTO_HEAL_DATA, new HashMap<String, String>() {{
+        put("baselineCaptureSuccess", finalBaselineCaptureSuccess);
+        put("customClassName", customClassName);
+      }});
+
+    } else {
+      CustomAssert.fail(softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, CHALLENGING_DOM_PAGE_URL));
+    }
+  }
+
+  /**
+   * In this method we mock the original locators or baselines locators to some custom attribute values and access them.
+   * When we get 200 response for the mocked locators, then the baseline is captured successfully.
+   * Then in the auto-heal test we will try to find the same elements without the mocked attribute values so the locator should be auto-healed
+   */
+  private void restoreExistingBaseLinesIfNeeded() {
+    if (System.getProperty(RESTORE_EXISTING_AUTO_HEAL_BASELINES, "false").equalsIgnoreCase("true")) {
+      ltLogger.info("Restoring existing auto-heal baselines as per the system property");
+      createBaseLineForAutoHealTestOfLongLocator();
+      createBaseLineForAutoHealTestOfSampleIMDbWebsite();
+    }
+  }
+
+  ///  Create baseline for long locators
+  private void createBaseLineForAutoHealTestOfLongLocator() {
+    final String todoListPageHeading = "To Do List";
+    driverManager.getURL(AUTO_HEAL_TO_DO_LIST_SAMPLE_URL);
+    CustomAssert.assertTrue(driverManager.getText(autoHealToDoListSampleHeading).equals(todoListPageHeading),
+      softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, AUTO_HEAL_TO_DO_LIST_SAMPLE_URL));
+    driverManager.sendKeys(autoHealToDoListSampleInput, "Task-1");
+    driverManager.click(autoHealToDoListSampleAddButton);
+    driverManager.acceptAlert();
+    driverManager.setCustomAttributeValue(autoHealToDoListSampleListItemForBaseLine, "class", "custom-class-for-test");
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealToDoListSampleListItem),
+      softAssertMessageFormat(UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE, "auto-heal-long-locators"));
+  }
+
+  /// Create baseline for auto-heal test of sample IMDb website
+  private void createBaseLineForAutoHealTestOfSampleIMDbWebsite() {
+    driverManager.getURL(AUTO_HEAL_IMDB_SAMPLE_URL);
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealImdbFavButton, 5),
+      softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, AUTO_HEAL_IMDB_SAMPLE_URL));
+    driverManager.sendKeys(autoHealImdbInput, "Attack on Titan");
+    driverManager.waitForElementToBeVisible(autoHealImdbSearchResultList, 20);
+    driverManager.setCustomAttributeValue(autoHealImdbListItemBaseLine, "class", "custom-class-for-test-li");
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealImdbListItem),
+      softAssertMessageFormat(UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE, autoHealImdbListItem.value()));
+    driverManager.setCustomAttributeValue(autoHealImdbAddFavButtonBaseLine, "class", "custom-class-for-test-button");
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealImdbAddFavButton),
+      softAssertMessageFormat(UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE,
+        autoHealImdbAddFavButton.value()));
+    driverManager.click(autoHealImdbAddFavButton);
+    CustomAssert.assertFalse(driverManager.findElements(autoHealImdbFavList).isEmpty(),
+      softAssertMessageFormat(UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE,
+        "Unable to click on correct element, mocking failed for auto-heal imdb test"));
+    driverManager.setCustomAttributeValue(autoHealImdbFavListItemBaseLine, "class", "custom-class-for-test-title");
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealImdbFavListItem),
+      softAssertMessageFormat(UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE,
+        autoHealImdbFavListItem.value()));
+  }
+
+  private void autoHealWithOldExistingLocators() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    testAutoHealOfLongLocators(softAssert);
+    testBasicAutoHealOfSampleIMDbWebsite(softAssert);
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void testAutoHealOfLongLocators(CustomSoftAssert softAssert) {
+    final String todoListPageHeading = "To Do List";
+    driverManager.getURL(AUTO_HEAL_TO_DO_LIST_SAMPLE_URL);
+    CustomAssert.assertTrue(driverManager.getText(autoHealToDoListSampleHeading, 5).equals(todoListPageHeading),
+      softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, AUTO_HEAL_TO_DO_LIST_SAMPLE_URL));
+    driverManager.sendKeys(autoHealToDoListSampleInput, "Task-1");
+    driverManager.click(autoHealToDoListSampleAddButton);
+    driverManager.acceptAlert();
+
+    // Check if the locator is auto-healed
+    if (driverManager.isDisplayed(autoHealToDoListSampleListItem, 5)) {
+
+      // Check if auto healed locator is expected one
+      String addedItemString = driverManager.getText(autoHealToDoListSampleListItem);
+      softAssert.assertTrue(addedItemString.contains("Task-1"),
+        softAssertMessageFormat(AUTO_HEALED_LOCATOR_IS_LOCATING_SOME_OTHER_ELEMENT_THAN_EXPECTED_ERROR_MESSAGE,
+          autoHealToDoListSampleListItem.value(), "Task-1", addedItemString));
+    } else {
+      softAssert.fail(softAssertMessageFormat(AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE,
+        autoHealToDoListSampleListItem.value()));
+    }
+  }
+
+  private void testBasicAutoHealOfSampleIMDbWebsite(CustomSoftAssert softAssert) {
+    final String sampleImdbSearch = "Attack on Titan";
+    driverManager.getURL(AUTO_HEAL_IMDB_SAMPLE_URL);
+    CustomAssert.assertTrue(driverManager.isDisplayed(autoHealImdbFavButton, 5),
+      softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, AUTO_HEAL_IMDB_SAMPLE_URL));
+    driverManager.sendKeys(autoHealImdbInput, sampleImdbSearch);
+    driverManager.waitForElementToBeVisible(autoHealImdbSearchResultList, 20);
+
+    // First auto heal check
+    boolean firstAutoHealOfElementSuccess = driverManager.isDisplayed(autoHealImdbListItem, 5);
+    if (firstAutoHealOfElementSuccess) {
+      String searchResultText = driverManager.getText(autoHealImdbListItem, 5);
+      softAssert.assertTrue(searchResultText.contains(sampleImdbSearch),
+        softAssertMessageFormat(AUTO_HEALED_LOCATOR_IS_LOCATING_SOME_OTHER_ELEMENT_THAN_EXPECTED_ERROR_MESSAGE,
+          autoHealImdbListItem.value(), sampleImdbSearch, searchResultText));
+    } else {
+      softAssert.fail(
+        softAssertMessageFormat(AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE, autoHealImdbListItem.value()));
+      return;
+    }
+
+    // Second auto heal check
+    boolean secondAutoHealOfElementSuccess = driverManager.isDisplayed(autoHealImdbAddFavButton, 5);
+    if (secondAutoHealOfElementSuccess) {
+      driverManager.click(autoHealImdbAddFavButton);
+    } else {
+      softAssert.fail(
+        softAssertMessageFormat(AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE, autoHealImdbAddFavButton.value()));
+      return;
+    }
+
+    // Third auto heal check
+    String favListText = driverManager.getText(autoHealImdbFavListItem, 5);
+    softAssert.assertTrue(favListText.contains(sampleImdbSearch),
+      softAssertMessageFormat(AUTO_HEALED_LOCATOR_IS_LOCATING_SOME_OTHER_ELEMENT_THAN_EXPECTED_ERROR_MESSAGE,
+        autoHealImdbFavListItem.value(), sampleImdbSearch, favListText));
+  }
+
+  private void autoHealWithNewLocators() {
+    final String expectedHeading = "Challenging DOM";
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    HashMap<String, String> autoHealBaseLineCaptureData = (HashMap<String, String>) TEST_VERIFICATION_DATA.get()
+      .get(AUTO_HEAL_DATA);
+    if (autoHealBaseLineCaptureData.get("baselineCaptureSuccess").equalsIgnoreCase("true")) {
+      // Break the test early if baseline was not captured successfully
+
+      driverManager.getURL(CHALLENGING_DOM_PAGE_URL);
+      if (driverManager.isDisplayed(challengingDomPageHeading, 10) && driverManager.getText(challengingDomPageHeading)
+        .equals(expectedHeading)) {
+
+        String customClassName = autoHealBaseLineCaptureData.get("customClassName");
+        boolean autoHealSuccess = driverManager.isDisplayed(new Locator(LocatorTypes.CLASS_NAME, customClassName), 10);
+        softAssert.assertTrue(autoHealSuccess,
+          softAssertMessageFormat(AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE, customClassName));
+
+      } else {
+        softAssert.fail(softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, CHALLENGING_DOM_PAGE_URL));
+      }
+    } else {
+      softAssert.fail(softAssertMessageFormat(AUTO_HEAL_BASELINE_CAPTURE_FAILED_ERROR_MESSAGE));
+    }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 }

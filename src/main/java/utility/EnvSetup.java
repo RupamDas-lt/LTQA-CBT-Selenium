@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class EnvSetup {
 
@@ -73,6 +75,10 @@ public class EnvSetup {
   public static final ThreadLocal<Integer> SESSION_VISUAL_LOGS_COUNT_FROM_TEST_API = new ThreadLocal<>();
   public static final ThreadLocal<JsonNode> TEST_DETAIL_API_RESPONSE = new ThreadLocal<>();
   public static final ThreadLocal<JsonNode> TEST_FEATURE_FLAG_DETAILS = new ThreadLocal<>();
+  public static final ThreadLocal<Queue<String>> TEST_SESSION_ID_QUEUE = ThreadLocal.withInitial(
+    ConcurrentLinkedQueue::new);
+  public static final ThreadLocal<Queue<String>> CLIENT_TEST_SESSION_ID_QUEUE = ThreadLocal.withInitial(
+    ConcurrentLinkedQueue::new);
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {

@@ -146,6 +146,9 @@ public class DriverManager extends BaseClass {
   private void createRemoteTestDriver(String purpose) {
     ThreadLocal<String> sessionId = purpose.equals("client") ? CLIENT_SESSION_ID : TEST_SESSION_ID;
     String sessionIdKey = purpose.equals("client") ? SESSION_ID_CLIENT : SESSION_ID;
+    Queue<String> sessionIdQueue = purpose.equals("client") ?
+      CLIENT_TEST_SESSION_ID_QUEUE.get() :
+      TEST_SESSION_ID_QUEUE.get();
     gridUrl = getGridUrl(purpose);
     ltLogger.info("Creating remote driver with remote grid url: {}", gridUrl);
     try {
@@ -156,6 +159,7 @@ public class DriverManager extends BaseClass {
       sessionId.set(driver.getSessionId().toString());
       EnvSetup.TEST_REPORT.get().put(sessionIdKey, sessionId.get());
       ltLogger.info("Remote driver created. Test session ID: {}", sessionId.get());
+      sessionIdQueue.add(sessionId.get());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -430,5 +434,28 @@ public class DriverManager extends BaseClass {
     ltLogger.info("Getting nested element with parent locator: {} child locator: {}", parentLocator, childLocator);
     WebElement parentElement = waitForElementToBeVisible(parentLocator, timeout);
     return getNestedElement(parentElement, childLocator);
+  }
+
+  public void setCustomAttributeValue(Locator locator, String attributeName, String value) {
+    ltLogger.info("Setting custom attribute '{}' with value '{}' for element with locator: {}", attributeName, value,
+      locator);
+    String script = String.format("arguments[0].setAttribute('%s', '%s');", attributeName, value);
+    executeJavaScriptOnSpecificElement(script, waitForElementToBeVisible(locator, 5));
+    ltLogger.info("Custom attribute '{}' set to '{}' for element with locator: {}", attributeName, value, locator);
+  }
+
+  public void acceptAlert() {
+    ltLogger.info("Accepting alert if present.");
+    try {
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+      wait.until(ExpectedConditions.alertIsPresent());
+      Alert alert = driver.switchTo().alert();
+      alert.accept();
+      ltLogger.info("Alert accepted successfully.");
+    } catch (NoAlertPresentException e) {
+      ltLogger.warn("No alert present to accept.");
+    } catch (Exception e) {
+      ltLogger.error("Failed to accept alert: {}", e.getMessage());
+    }
   }
 }

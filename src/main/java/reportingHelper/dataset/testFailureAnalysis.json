@@ -754,5 +754,40 @@
     "sub_category": "test-status-mismatch-issues",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "ff7d933bbe3bfd15578acae98cdd47caa798925d76ce5a9aa499b6af94c599ca": {
+    "message": "Unable to open %s url",
+    "category": "third-party-website-issues",
+    "sub_category": "unable-to-open-url",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "88c4a942ad87c46d82f970f34b17591529f5e064c6e8175fec1415e8fded242f": {
+    "message": "Auto-heal is not working for %s locator",
+    "category": "auto-heal",
+    "sub_category": "locator-is-not-auto-healed",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "e6fc241225f95cf77b89e87e66f564853ade633d0ea1ef78735bec2e95b97f6b": {
+    "message": "Unable to set baseline for auto heal test: %s.",
+    "category": "auto-heal",
+    "sub_category": "baseline-capture-failed-for-auto-heal-test",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "26ad3a68e8a23be02b3c3b741f4b47df64e76af7a69c18b1ade6986d55bd5fc3": {
+    "message": "Auto-healed locator for %s is locating some other element than expected. Expected: %s, Actual: %s",
+    "category": "auto-heal",
+    "sub_category": "auto-healed-locator-is-not-locating-expected-element",
+    "priority": "p3",
+    "isKnown": "true"
+  },
+  "d69ad5a170f8b47524996cdf3fbf8fa8de7cb5f4591b7755736e4793b8076d5d": {
+    "message": "Base line capture failed for auto-heal test, so this action will be skipped",
+    "category": "auto-heal",
+    "sub_category": "baseline-capture-failed-for-auto-heal-test",
+    "priority": "p2",
+    "isKnown": "false"
   }
 }
