@@ -415,7 +415,7 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
 
     // Determine test type (default to "desktop")
-    String testType = (customTestType != null && customTestType.length > 0) ? customTestType[0] : "desktop";
+    String testType = (customTestType.length > 0) ? customTestType[0] : "desktop";
 
     final String flagForRequestPageSize = "requestPageSize";
     final String testCreateTimeStampKey = "create_timestamp";
