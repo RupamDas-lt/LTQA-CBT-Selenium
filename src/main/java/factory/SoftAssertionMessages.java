@@ -81,7 +81,11 @@ import lombok.Getter;
     "Unable to download Lighthouse report (HTML). Status: %s"), AUTO_HEAL_NOT_WORKING_FOR_LOCATORS_ERROR_MESSAGE(
     "Auto-heal is not working for %s locator"), AUTO_HEALED_LOCATOR_IS_LOCATING_SOME_OTHER_ELEMENT_THAN_EXPECTED_ERROR_MESSAGE(
     "Auto-healed locator for %s is locating some other element than expected. Expected: %s, Actual: %s"), AUTO_HEAL_BASELINE_CAPTURE_FAILED_ERROR_MESSAGE(
-    "Base line capture failed for auto-heal test, so this action will be skipped"),
+    "Base line capture failed for auto-heal test, so this action will be skipped"), NULL_OR_EMPTY_API_RESPONSE_ERROR_MESSAGE(
+    "Received null or empty response for %s API. Response: %s"), COMMAND_LOGS_NO_OF_PAGES_MISMATCH_ERROR_MESSAGE(
+    "Number of pages in command logs does not match. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_SIZE_MISMATCH_ERROR_MESSAGE(
+    "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_START_TIME_NULL_OR_EMPTY_ERROR_MESSAGE(
+    "Command logs page start time is null or empty for page: %s"),
 
   //  CLIENT side error messages
   USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE(

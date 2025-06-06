@@ -789,5 +789,33 @@
     "sub_category": "baseline-capture-failed-for-auto-heal-test",
     "priority": "p2",
     "isKnown": "false"
+  },
+  "3bb4e76f7ffb1cc069dab51bcfe732bd6b3d10689dcc1ffa6a35bc56f9dbd9fd": {
+    "message": "Number of pages in command logs does not match. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8387004446b4e4462ad6b9604a0276ab700d20f184dd0de703b9532c61e89837": {
+    "message": "Command logs page start time is null or empty for page: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "42de1523142c8ceb3cb8aafcf513341e55ca846109e66a1136800e52a7da37ef": {
+    "message": "Received null or empty response for %s API. Response: %s",
+    "category": "api-related-issues",
+    "sub_category": "api-response-is-null-or-empty",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4db6bbdfd69cbc4cfe25ed33ddecdb5abba394362deef048a6186e6e5fc743c5": {
+    "message": "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

@@ -742,6 +742,7 @@ public class AutomationHelper extends BaseClass {
       return;
     }
 
+    // Start validating the logs
     verifyLogsByType(logs, testId, softAssert);
 
     EnvSetup.SOFT_ASSERT.set(softAssert);

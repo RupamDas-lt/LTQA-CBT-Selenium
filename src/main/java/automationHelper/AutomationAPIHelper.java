@@ -57,8 +57,8 @@ public class AutomationAPIHelper extends ApiManager {
     ltLogger.info("Update Session Details Response Code: {}", response.getStatusCode());
   }
 
+  /// Retrieves specific session details via Sessions API from Swagger based on session ID and required detail.
   public String getSpecificSessionDetailsViaAPI(String sessionId, String requiredDetail, boolean... isClientTest) {
-    // Initial setup
     APIConfig apiConfig = getAPIConfigsBasedOnSessionType(isClientTest);
 
     final int maxRetries = 10;
@@ -336,6 +336,13 @@ public class AutomationAPIHelper extends ApiManager {
       }
     }
     return node;
+  }
+
+  public String getOrgIDFromTestId(String test_id) {
+    final String orgIdKeyInTestDetailsAPI = "org_id";
+    String orgId = fetchTestDetails(test_id).get(orgIdKeyInTestDetailsAPI).asText();
+    ltLogger.info("Retrieved Org ID: {}", orgId);
+    return orgId;
   }
 
   public String getSessionIDFromTestId(String test_id) {
