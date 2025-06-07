@@ -10,7 +10,10 @@ import utility.BaseClass;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,8 +46,7 @@ public class TunnelManager extends BaseClass implements Runnable {
     String logFilePath = "logs/tunnelLogs/" + tunnelName + ".log";
     defaultTunnelFlags = new HashMap<>(
       Map.of("key", testAccessKey.get(), "user", testUserName.get(), "tunnelName", tunnelName, "maxDataConnections",
-        "1", "verbose", "", "mode", TUNNEL_MODES[new Random().nextInt(TUNNEL_MODES.length)], "infoAPIPort",
-        availableOpenPort, "logFile", logFilePath, "mitm", ""));
+        "1", "verbose", "", "infoAPIPort", availableOpenPort, "logFile", logFilePath, "mitm", ""));
     if (TEST_ENV.contains("stage")) {
       defaultTunnelFlags.put("env", TEST_ENV);
     }
@@ -59,7 +61,15 @@ public class TunnelManager extends BaseClass implements Runnable {
   private String constructTunnelRunCommand(String params) {
     ltLogger.info("Given custom tunnel params: {}", params);
     Map<String, Object> tunnelFlags = new HashMap<>(defaultTunnelFlags);
-    tunnelFlags.putAll(getHashMapFromString(params, "--", " "));
+
+    String processedParams = params;
+    if (params != null && params.contains("omit=")) {
+      processedParams = processOmitFunctionality(params, tunnelFlags);
+    }
+
+    Map<String, Object> customFlags = getHashMapFromString(processedParams, "--", " ");
+
+    tunnelFlags.putAll(customFlags);
     tunnelFlags.putAll(getHashMapFromString(customTunnelFlagsString, "--", " "));
 
     String command = tunnelBinaryPath + " " + tunnelFlags.entrySet().stream().map(
@@ -74,6 +84,47 @@ public class TunnelManager extends BaseClass implements Runnable {
     ltLogger.info("Tunnel run command: {}", command);
     TEST_REPORT.get().put("tunnel_start_command", command);
     return command;
+  }
+
+  private String processOmitFunctionality(String params, Map<String, Object> tunnelFlags) {
+    ltLogger.info("Processing omit functionality from params: {}", params);
+
+    String[] paramParts = params.split("--");
+    StringBuilder processedParamsBuilder = new StringBuilder();
+
+    for (String part : paramParts) {
+      part = part.trim();
+      if (part.isEmpty()) {
+        continue;
+      }
+
+      if (part.startsWith("omit=")) {
+        String omitValue = part.substring(5); // Remove "omit="
+        ltLogger.info("Processing omit flags: {}", omitValue);
+
+        String[] flagsToOmit = omitValue.split("--");
+        for (String flagToOmit : flagsToOmit) {
+          flagToOmit = flagToOmit.trim();
+          if (!flagToOmit.isEmpty()) {
+            if (tunnelFlags.containsKey(flagToOmit)) {
+              ltLogger.info("Omitting flag '{}' from tunnel start command", flagToOmit);
+              tunnelFlags.remove(flagToOmit);
+            } else {
+              ltLogger.warn("Flag '{}' specified in omit but not found in default flags", flagToOmit);
+            }
+          }
+        }
+      } else {
+        if (!processedParamsBuilder.isEmpty()) {
+          processedParamsBuilder.append("--");
+        }
+        processedParamsBuilder.append(part);
+      }
+    }
+
+    String result = processedParamsBuilder.toString();
+    ltLogger.info("Processed params after omit handling: {}", result);
+    return result;
   }
 
   @Override

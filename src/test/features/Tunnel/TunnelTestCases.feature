@@ -95,37 +95,37 @@ Feature: Automation of all tunnel test cases
 
     Examples:
       | tunnelFlags | capabilities                                             |
-      | mode ssh    | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   #TODO @RahulMishra: Modify the script to omit some tunnel flags based on the requirement in this case --mode
   @tunnel_regression_8 @ssh_443_fallback
   Scenario Outline: TC-025: SSH:443 Fallback - Verify fallback when port 22 is blocked
     Given Setup user details
     And I block port 22
-    Then I start tunnel
+    Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using SSH
     Then I stop tunnel
     Then I unblock port 22
 
     Examples:
-      | capabilities                                             |
-      | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | tunnelFlags | capabilities                                             |
+      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   #TODO @RahulMishra: Modify the script to omit some tunnel flags based on the requirement in this case --mode
   @tunnel_regression_9 @tcp_443_fallback
   Scenario Outline: TC-026: TCP:443 Fallback - Verify TCP fallback
     Given Setup user details
     And I block ports 22 and SSH:443
-    Then I start tunnel
+    Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using TCP
     Then I stop tunnel
     Then I unblock all ports
 
     Examples:
-      | capabilities                                             |
-      | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | tunnelFlags | capabilities                                             |
+      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_10 @websocket_fallback
   Scenario Outline: TC-012: WebSocket Fallback - Verify WebSocket fallback
