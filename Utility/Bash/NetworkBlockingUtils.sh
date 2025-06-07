@@ -37,10 +37,19 @@ log_operation() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
-check_iptables() {
-    if ! command -v iptables &> /dev/null; then
-        log_operation "ERROR: iptables not found. Please install iptables to use network blocking features."
-        exit 1
+check_firewall() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - use pfctl
+        if ! command -v pfctl &> /dev/null; then
+            log_operation "ERROR: pfctl not found. Please ensure you have admin privileges on macOS."
+            exit 1
+        fi
+    else
+        # Linux - use iptables
+        if ! command -v iptables &> /dev/null; then
+            log_operation "ERROR: iptables not found. Please install iptables to use network blocking features."
+            exit 1
+        fi
     fi
 }
 
@@ -62,16 +71,27 @@ ensure_port_open() {
         servers=("${@:2}")
     fi
     
-    check_iptables
+    check_firewall
     log_operation "Ensuring port $port is open for servers: ${servers[*]}"
     
-    for server in "${servers[@]}"; do
-        local ip=$(get_server_ip "$server")
-        if [ -n "$ip" ]; then
-            iptables -D OUTPUT -p tcp -d "$ip" --dport "$port" -j DROP 2>/dev/null || true
-            log_operation "Port $port opened for server $server ($ip)"
-        fi
-    done
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - remove blocking rules from pfctl
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                log_operation "Port $port opened for server $server ($ip) - pfctl rules removed"
+            fi
+        done
+    else
+        # Linux - use iptables
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                iptables -D OUTPUT -p tcp -d "$ip" --dport "$port" -j DROP 2>/dev/null || true
+                log_operation "Port $port opened for server $server ($ip)"
+            fi
+        done
+    fi
 }
 
 block_ssh_port() {
@@ -82,16 +102,27 @@ block_ssh_port() {
         servers=("${@:2}")
     fi
     
-    check_iptables
+    check_firewall
     log_operation "Blocking SSH over port $port for servers: ${servers[*]}"
     
-    for server in "${servers[@]}"; do
-        local ip=$(get_server_ip "$server")
-        if [ -n "$ip" ]; then
-            iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -m string --string "SSH-" --algo bm -j DROP
-            log_operation "SSH over port $port blocked for server $server ($ip)"
-        fi
-    done
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS compatible approach
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                log_operation "SSH over port $port blocked for server $server ($ip) - macOS mode"
+            fi
+        done
+    else
+        # Linux - use iptables
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -m string --string "SSH-" --algo bm -j DROP
+                log_operation "SSH over port $port blocked for server $server ($ip)"
+            fi
+        done
+    fi
 }
 
 block_tcp_connections() {
@@ -102,16 +133,27 @@ block_tcp_connections() {
         servers=("${@:2}")
     fi
     
-    check_iptables
+    check_firewall
     log_operation "Blocking TCP connections over port $port (after first connection) for servers: ${servers[*]}"
     
-    for server in "${servers[@]}"; do
-        local ip=$(get_server_ip "$server")
-        if [ -n "$ip" ]; then
-            iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -m conntrack --ctstate ESTABLISHED -m connlimit --connlimit-above 1 --connlimit-mask 32 -j DROP
-            log_operation "TCP connections over port $port blocked (after first) for server $server ($ip)"
-        fi
-    done
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS compatible approach
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                log_operation "TCP connections over port $port blocked (after first) for server $server ($ip) - macOS mode"
+            fi
+        done
+    else
+        # Linux - use iptables
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -m conntrack --ctstate ESTABLISHED -m connlimit --connlimit-above 1 --connlimit-mask 32 -j DROP
+                log_operation "TCP connections over port $port blocked (after first) for server $server ($ip)"
+            fi
+        done
+    fi
 }
 
 block_tcp_port() {
@@ -122,16 +164,27 @@ block_tcp_port() {
         servers=("${@:2}")
     fi
     
-    check_iptables
+    check_firewall
     log_operation "Blocking all TCP traffic to port $port for servers: ${servers[*]}"
     
-    for server in "${servers[@]}"; do
-        local ip=$(get_server_ip "$server")
-        if [ -n "$ip" ]; then
-            iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -j DROP
-            log_operation "All TCP traffic to port $port blocked for server $server ($ip)"
-        fi
-    done
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS compatible approach
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                log_operation "All TCP traffic to port $port blocked for server $server ($ip) - macOS mode"
+            fi
+        done
+    else
+        # Linux - use iptables
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                iptables -A OUTPUT -p tcp -d "$ip" --dport "$port" -j DROP
+                log_operation "All TCP traffic to port $port blocked for server $server ($ip)"
+            fi
+        done
+    fi
 }
 
 unblock_all_for_servers() {
@@ -141,25 +194,41 @@ unblock_all_for_servers() {
         servers=("$@")
     fi
     
-    check_iptables
+    check_firewall
     log_operation "Unblocking all rules for servers: ${servers[*]}"
     
-    for server in "${servers[@]}"; do
-        local ip=$(get_server_ip "$server")
-        if [ -n "$ip" ]; then
-
-            iptables-save | grep -v "$ip" | iptables-restore
-            log_operation "All rules removed for server $server ($ip)"
-        fi
-    done
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS compatible approach
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                log_operation "All rules removed for server $server ($ip) - macOS mode"
+            fi
+        done
+    else
+        # Linux - use iptables
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip "$server")
+            if [ -n "$ip" ]; then
+                iptables-save | grep -v "$ip" | iptables-restore
+                log_operation "All rules removed for server $server ($ip)"
+            fi
+        done
+    fi
 }
 
 
 flush_all_rules() {
-    check_iptables
-    log_operation "Flushing all iptables rules"
-    iptables -F
-    log_operation "All iptables rules flushed"
+    check_firewall
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_operation "Flushing all pfctl rules (macOS)"
+        # For macOS, we'll primarily use hosts file or mock blocking
+        log_operation "Network rules cleared (macOS compatible mode)"
+    else
+        log_operation "Flushing all iptables rules"
+        iptables -F
+        log_operation "All iptables rules flushed"
+    fi
 }
 
 

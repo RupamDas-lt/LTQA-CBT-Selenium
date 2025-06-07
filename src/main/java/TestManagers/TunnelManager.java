@@ -69,6 +69,7 @@ public class TunnelManager extends BaseClass implements Runnable {
 
     tunnelName = tunnelFlags.get("tunnelName").toString();
     TEST_TUNNEL_NAME.set(tunnelName);
+    TEST_TUNNEL_INFO_API_PORT.set(availableOpenPort);
     command = String.format(command + commandToPushConsoleLogsToFile, tunnelName);
     ltLogger.info("Tunnel run command: {}", command);
     TEST_REPORT.get().put("tunnel_start_command", command);
@@ -180,6 +181,7 @@ public class TunnelManager extends BaseClass implements Runnable {
   public TunnelInfoResponseDTO getTunnelInfoDetails() {
     String url = LOCAL_HOST_URL + availableOpenPort + TUNNEL_INFO_API_PATH;
     ltLogger.info("Getting tunnel info details from API URL: {}", url);
+    ltLogger.debug("API URL: {}", url);
 
     AutomationAPIHelper apiManager = new AutomationAPIHelper();
     int maxRetries = 5;
@@ -191,13 +193,36 @@ public class TunnelManager extends BaseClass implements Runnable {
         ltLogger.info("Tunnel info API response -> {}", tunnelResponse);
 
         if (tunnelResponse != null && !tunnelResponse.isEmpty()) {
-          Gson gson = new Gson();
-          TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
+          try {
+            Gson gson = new Gson();
+            TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
+            ltLogger.debug("Status: {}", tunnelInfo.getStatus());
+            ltLogger.debug("Data object: {}", (tunnelInfo.getData() != null ? "Present" : "NULL"));
 
-          if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
-            ltLogger.info("Tunnel info details: {}", tunnelInfo.getData());
-            return tunnelInfo;
+            if (tunnelInfo.getData() != null) {
+              ltLogger.debug("Mode: {}", tunnelInfo.getData().getMode());
+              ltLogger.debug("SSH Connection Type: {}", tunnelInfo.getData().getSshConnType());
+              ltLogger.debug("Local Proxy Port: {}", tunnelInfo.getData().getLocalProxyPort());
+              ltLogger.debug("Tunnel Name: {}", tunnelInfo.getData().getTunnelName());
+              ltLogger.debug("Environment: {}", tunnelInfo.getData().getEnvironment());
+              ltLogger.debug("Version: {}", tunnelInfo.getData().getVersion());
+              ltLogger.debug("ID: {}", tunnelInfo.getData().getId());
+            }
+
+            if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
+              ltLogger.info("Tunnel info retrieved successfully: Mode={}, SshConnType={}, Port={}",
+                tunnelInfo.getData().getMode(), tunnelInfo.getData().getSshConnType(),
+                tunnelInfo.getData().getLocalProxyPort());
+              return tunnelInfo;
+            } else {
+              ltLogger.debug("Invalid tunnel info response: status='{}', data={}", tunnelInfo.getStatus(),
+                tunnelInfo.getData() != null ? "present" : "null");
+            }
+          } catch (Exception parseException) {
+            ltLogger.error("Failed to parse tunnel info response: {}", parseException.getMessage());
           }
+        } else {
+          ltLogger.error("Empty or null response from tunnel info API");
         }
       } catch (Exception e) {
         ltLogger.error("Exception occurred while getting tunnel info details -> {}", e.getMessage());
@@ -214,8 +239,11 @@ public class TunnelManager extends BaseClass implements Runnable {
 
   public String getCurrentTunnelMode() {
     try {
+      ltLogger.info("Getting current tunnel mode...");
       TunnelInfoResponseDTO tunnelInfo = getTunnelInfoDetails();
-      return tunnelInfo.getData().getMode();
+      String mode = tunnelInfo.getData().getMode();
+      ltLogger.debug("Current tunnel mode: {}", mode);
+      return mode;
     } catch (Exception e) {
       ltLogger.error("Failed to get current tunnel mode: {}", e.getMessage());
       throw new RuntimeException("Failed to get current tunnel mode", e);

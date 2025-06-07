@@ -1,8 +1,10 @@
 package automationHelper;
 
+import DTOs.Others.TunnelInfoResponseDTO;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
+import com.google.gson.Gson;
 import factory.Locator;
 import factory.LocatorTypes;
 import io.restassured.response.Response;
@@ -1183,48 +1185,224 @@ public class AutomationHelper extends BaseClass {
   }
 
   public boolean verifyTunnelMode(String expectedMode) {
+    ltLogger.debug("Expected mode: {}", expectedMode);
+
     if (tunnelManager == null) {
-      ltLogger.error("Tunnel manager is not initialized");
+      ltLogger.warn("Tunnel manager is not initialized - using tunnel info API for verification");
+
+      try {
+        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
+        String currentMode = sharedTunnelInfo.getData().getMode();
+        boolean result = expectedMode.equalsIgnoreCase(currentMode);
+        ltLogger.info("Tunnel mode verification via shared API: Expected={}, Actual={}, Result={}", expectedMode,
+          currentMode, result);
+        return result;
+      } catch (Exception e) {
+        ltLogger.error("Failed to verify tunnel mode via shared API: {}", e.getMessage());
+        return false;
+      }
+    }
+
+    try {
+      boolean result = tunnelManager.verifyTunnelMode(expectedMode);
+      ltLogger.info("Tunnel mode verification result: Expected={}, Result={}", expectedMode, result);
+      return result;
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify tunnel mode: {}", e.getMessage());
       return false;
     }
-    return tunnelManager.verifyTunnelMode(expectedMode);
   }
 
   public boolean verifySshConnectionType(String expectedSshConnType) {
+    ltLogger.debug("Expected SSH connection type: {}", expectedSshConnType);
+
     if (tunnelManager == null) {
-      ltLogger.error("Tunnel manager is not initialized");
+      ltLogger.warn("Tunnel manager is not initialized - using tunnel info API for SSH connection type verification");
+
+      try {
+        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
+        String currentSshConnType = sharedTunnelInfo.getData().getSshConnType();
+        boolean result = expectedSshConnType.equalsIgnoreCase(currentSshConnType);
+        ltLogger.info("SSH connection type verification via shared API: Expected={}, Actual={}, Result={}",
+          expectedSshConnType, currentSshConnType, result);
+        return result;
+      } catch (Exception e) {
+        ltLogger.error("Failed to verify SSH connection type via shared API: {}", e.getMessage());
+        return false;
+      }
+    }
+
+    try {
+      boolean result = tunnelManager.verifySshConnectionType(expectedSshConnType);
+      ltLogger.info("SSH connection type verification result: Expected={}, Result={}", expectedSshConnType, result);
+      return result;
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify SSH connection type: {}", e.getMessage());
       return false;
     }
-    return tunnelManager.verifySshConnectionType(expectedSshConnType);
   }
 
   public int getCurrentTunnelPort() {
     if (tunnelManager == null) {
-      ltLogger.error("Tunnel manager is not initialized");
-      return -1;
+      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API for port");
+
+      try {
+        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
+        String mode = sharedTunnelInfo.getData().getMode();
+        String sshConnType = sharedTunnelInfo.getData().getSshConnType();
+
+        int port = -1;
+        if ("ssh".equalsIgnoreCase(mode)) {
+          if ("over_22".equalsIgnoreCase(sshConnType)) {
+            port = 22;
+          } else if ("over_443".equalsIgnoreCase(sshConnType) || "over_ws".equalsIgnoreCase(sshConnType)) {
+            port = 443;
+          }
+        } else if ("tcp".equalsIgnoreCase(mode) || "ws".equalsIgnoreCase(mode)) {
+          port = 443;
+        }
+
+        ltLogger.info("Retrieved tunnel port from shared API: Mode={}, SshConnType={}, Port={}", mode, sshConnType,
+          port);
+        return port;
+      } catch (Exception e) {
+        ltLogger.error("Failed to get tunnel port from shared API: {}", e.getMessage());
+        return -1;
+      }
     }
     return tunnelManager.getCurrentTunnelPort();
   }
 
-  public boolean verifyTunnelPort(int expectedPort) {
-    int currentPort = getCurrentTunnelPort();
-    ltLogger.info("Expected port: {}, Current port: {}", expectedPort, currentPort);
-    return expectedPort == currentPort;
-  }
-
   public String getCurrentTunnelMode() {
+    ltLogger.info("GETTING CURRENT TUNNEL MODE FROM AUTOMATION HELPER");
+
     if (tunnelManager == null) {
-      ltLogger.error("Tunnel manager is not initialized");
-      return null;
+      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API");
+
+      try {
+        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
+        String mode = sharedTunnelInfo.getData().getMode();
+        ltLogger.info("Retrieved tunnel mode from shared API: {}", mode);
+        return mode;
+      } catch (Exception e) {
+        String errorMsg = "Failed to get tunnel mode from shared API: " + e.getMessage();
+        ltLogger.error(errorMsg);
+        throw new RuntimeException(errorMsg, e);
+      }
     }
-    return tunnelManager.getCurrentTunnelMode();
+
+    try {
+      String mode = tunnelManager.getCurrentTunnelMode();
+      ltLogger.info("Retrieved tunnel mode from TunnelManager: {}", mode);
+      return mode;
+    } catch (Exception e) {
+      ltLogger.error("Failed to get tunnel mode from TunnelManager: {}", e.getMessage());
+      throw new RuntimeException("Failed to get tunnel mode", e);
+    }
   }
 
   public String getCurrentSshConnectionType() {
     if (tunnelManager == null) {
-      ltLogger.error("Tunnel manager is not initialized");
-      return null;
+      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API for SSH connection type");
+
+      try {
+        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
+        String sshConnType = sharedTunnelInfo.getData().getSshConnType();
+        ltLogger.info("Retrieved SSH connection type from shared API: {}", sshConnType);
+        return sshConnType;
+      } catch (Exception e) {
+        String errorMsg = "Failed to get SSH connection type from shared API: " + e.getMessage();
+        ltLogger.error(errorMsg);
+        throw new RuntimeException(errorMsg, e);
+      }
     }
-    return tunnelManager.getCurrentSshConnectionType();
+
+    try {
+      String sshConnType = tunnelManager.getCurrentSshConnectionType();
+      ltLogger.info("Retrieved SSH connection type from TunnelManager: {}", sshConnType);
+      return sshConnType;
+    } catch (Exception e) {
+      ltLogger.error("Failed to get SSH connection type from TunnelManager: {}", e.getMessage());
+      throw new RuntimeException("Failed to get SSH connection type", e);
+    }
+  }
+
+  public static TunnelInfoResponseDTO getSharedTunnelInfoDetails() {
+    Logger logger = LogManager.getLogger(AutomationHelper.class);
+    String sharedApiPort = TEST_TUNNEL_INFO_API_PORT.get();
+
+    if (sharedApiPort == null || sharedApiPort.isEmpty()) {
+      String errorMsg = "Shared tunnel info API port is not available. Tunnel may not be started properly.";
+      logger.error(errorMsg);
+      throw new RuntimeException(errorMsg);
+    }
+
+    String url = LOCAL_HOST_URL + sharedApiPort + TUNNEL_INFO_API_PATH;
+    logger.info("Getting shared tunnel info details from API URL: {}", url);
+    logger.debug("Shared API Port: {}", sharedApiPort);
+
+    AutomationAPIHelper apiManager = new AutomationAPIHelper();
+    int maxRetries = 5;
+    int retryDelay = 2;
+
+    for (int i = 0; i < maxRetries; i++) {
+      try {
+        String tunnelResponse = apiManager.getRequestAsString(url);
+        logger.info("Tunnel info API response (attempt {}) -> {}", i + 1, tunnelResponse);
+        logger.debug("Raw Response: {}", tunnelResponse);
+
+        if (tunnelResponse != null && !tunnelResponse.isEmpty()) {
+          try {
+            Gson gson = new Gson();
+            TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
+
+            logger.debug("SHARED PARSED RESPONSE");
+            logger.debug("Status: {}", tunnelInfo.getStatus());
+            logger.debug("Data object: {}", (tunnelInfo.getData() != null ? "Present" : "NULL"));
+
+            if (tunnelInfo.getData() != null) {
+              logger.debug("Mode: {}", tunnelInfo.getData().getMode());
+              logger.debug("SSH Connection Type: {}", tunnelInfo.getData().getSshConnType());
+              logger.debug("Local Proxy Port: {}", tunnelInfo.getData().getLocalProxyPort());
+              logger.debug("Tunnel Name: {}", tunnelInfo.getData().getTunnelName());
+              logger.debug("Environment: {}", tunnelInfo.getData().getEnvironment());
+              logger.debug("Version: {}", tunnelInfo.getData().getVersion());
+              logger.debug("ID: {}", tunnelInfo.getData().getId());
+            }
+
+            if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
+              logger.info("Shared tunnel info retrieved successfully: Mode={}, SshConnType={}, Port={}",
+                tunnelInfo.getData().getMode(), tunnelInfo.getData().getSshConnType(),
+                tunnelInfo.getData().getLocalProxyPort());
+              return tunnelInfo;
+            } else {
+              logger.warn("Invalid shared tunnel info response: status='{}', data={}", tunnelInfo.getStatus(),
+                tunnelInfo.getData() != null ? "present" : "null");
+            }
+          } catch (Exception parseException) {
+            logger.error("Failed to parse shared tunnel info response: {}", parseException.getMessage());
+          }
+        } else {
+          logger.warn("Empty or null response from shared tunnel info API");
+        }
+      } catch (Exception e) {
+        logger.error("Exception occurred while getting shared tunnel info details (attempt {}) -> {}", i + 1,
+          e.getMessage());
+      }
+
+      if (i < maxRetries - 1) {
+        logger.info("Retrying to get shared tunnel info in {} seconds... (attempt {}/{})", retryDelay, i + 1,
+          maxRetries);
+        try {
+          Thread.sleep(retryDelay * 1000L);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new RuntimeException("Interrupted while waiting to retry", e);
+        }
+      }
+    }
+    String errorMsg = "Failed to get shared tunnel info details after " + maxRetries + " attempts";
+    logger.error(errorMsg);
+    throw new RuntimeException(errorMsg);
   }
 }

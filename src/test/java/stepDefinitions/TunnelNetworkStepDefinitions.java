@@ -127,8 +127,7 @@ public class TunnelNetworkStepDefinitions extends BaseClass {
       Assert.fail(
         "Tunnel is not using the expected SSH connection type. Expected: " + connectionType + ", Actual: " + currentSshConnType);
     }
-
-    ltLogger.info("✓ Tunnel SSH connection type verification successful. Using: {}", connectionType);
+    ltLogger.info("Tunnel SSH connection type verification successful. Using: {}", connectionType);
   }
 
   @Then("I verify tunnel connects on port {int}")
@@ -137,10 +136,10 @@ public class TunnelNetworkStepDefinitions extends BaseClass {
 
     waitForTime(3);
 
-    boolean isPortCorrect = automationHelper.verifyTunnelPort(port);
+    int currentPort = automationHelper.getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
 
     if (!isPortCorrect) {
-      int currentPort = automationHelper.getCurrentTunnelPort();
       ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
       Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
     }
@@ -161,9 +160,9 @@ public class TunnelNetworkStepDefinitions extends BaseClass {
       Assert.fail("Tunnel is not using SSH mode. Expected: ssh, Actual: " + currentMode);
     }
 
-    boolean isPortCorrect = automationHelper.verifyTunnelPort(port);
+    int currentPort = automationHelper.getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
     if (!isPortCorrect) {
-      int currentPort = automationHelper.getCurrentTunnelPort();
       ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
       Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
     }
@@ -184,9 +183,9 @@ public class TunnelNetworkStepDefinitions extends BaseClass {
       Assert.fail("Tunnel is not using TCP mode. Expected: tcp, Actual: " + currentMode);
     }
 
-    boolean isPortCorrect = automationHelper.verifyTunnelPort(port);
+    int currentPort = automationHelper.getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
     if (!isPortCorrect) {
-      int currentPort = automationHelper.getCurrentTunnelPort();
       ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
       Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
     }
@@ -264,9 +263,9 @@ public class TunnelNetworkStepDefinitions extends BaseClass {
       if (parts.length == 2) {
         try {
           int expectedPort = Integer.parseInt(parts[1]);
-          boolean isPortCorrect = automationHelper.verifyTunnelPort(expectedPort);
+          int currentPort = automationHelper.getCurrentTunnelPort();
+          boolean isPortCorrect = (currentPort == expectedPort);
           if (!isPortCorrect) {
-            int currentPort = automationHelper.getCurrentTunnelPort();
             ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", expectedPort, currentPort);
             Assert.fail(
               "Tunnel is not connecting on the expected port. Expected: " + expectedPort + ", Actual: " + currentPort);
