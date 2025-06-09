@@ -61,15 +61,7 @@ public class TunnelManager extends BaseClass implements Runnable {
   private String constructTunnelRunCommand(String params) {
     ltLogger.info("Given custom tunnel params: {}", params);
     Map<String, Object> tunnelFlags = new HashMap<>(defaultTunnelFlags);
-
-    String processedParams = params;
-    if (params != null && params.contains("omit=")) {
-      processedParams = processOmitFunctionality(params, tunnelFlags);
-    }
-
-    Map<String, Object> customFlags = getHashMapFromString(processedParams, "--", " ");
-
-    tunnelFlags.putAll(customFlags);
+    tunnelFlags.putAll(getHashMapFromString(params, "--", " "));
     tunnelFlags.putAll(getHashMapFromString(customTunnelFlagsString, "--", " "));
 
     String command = tunnelBinaryPath + " " + tunnelFlags.entrySet().stream().map(
@@ -86,55 +78,13 @@ public class TunnelManager extends BaseClass implements Runnable {
     return command;
   }
 
-  private String processOmitFunctionality(String params, Map<String, Object> tunnelFlags) {
-    ltLogger.info("Processing omit functionality from params: {}", params);
-
-    String[] paramParts = params.split("--");
-    StringBuilder processedParamsBuilder = new StringBuilder();
-
-    for (String part : paramParts) {
-      part = part.trim();
-      if (part.isEmpty()) {
-        continue;
-      }
-
-      if (part.startsWith("omit=")) {
-        String omitValue = part.substring(5); // Remove "omit="
-        ltLogger.info("Processing omit flags: {}", omitValue);
-
-        String[] flagsToOmit = omitValue.split("--");
-        for (String flagToOmit : flagsToOmit) {
-          flagToOmit = flagToOmit.trim();
-          if (!flagToOmit.isEmpty()) {
-            if (tunnelFlags.containsKey(flagToOmit)) {
-              ltLogger.info("Omitting flag '{}' from tunnel start command", flagToOmit);
-              tunnelFlags.remove(flagToOmit);
-            } else {
-              ltLogger.warn("Flag '{}' specified in omit but not found in default flags", flagToOmit);
-            }
-          }
-        }
-      } else {
-        if (!processedParamsBuilder.isEmpty()) {
-          processedParamsBuilder.append("--");
-        }
-        processedParamsBuilder.append(part);
-      }
-    }
-
-    String result = processedParamsBuilder.toString();
-    ltLogger.info("Processed params after omit handling: {}", result);
-    return result;
-  }
-
   @Override
   public void run() {
     runMacShellCommand(wrapCommandForShellInvocation(tunnelRunCommand));
   }
 
   public void startTunnel(String params) {
-    // Create logs directory if it doesn't exist so that tunnel debug logs can be
-    // stored
+    // Create logs directory if it doesn't exist so that tunnel debug logs can be stored
     String tunnelLogsDirectory = "logs/tunnelLogs";
     createDirectoryIfNotExists(tunnelLogsDirectory);
 

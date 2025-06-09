@@ -55,7 +55,7 @@ Feature: Automation of all tunnel test cases
       | browserName=chrome,platform=sequoia,version=latest,tunnel=true,network=true,name=Tunnel_With_Default_Flags_And_Network_True   |
 
   @tunnel_regression_5 @tunnel_mode
-  Scenario Outline: TC-019: Tunnel Mode Configuration - Verify different tunnel modes
+  Scenario Outline: Tunnel Mode Configuration - Verify different tunnel modes
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
@@ -69,7 +69,7 @@ Feature: Automation of all tunnel test cases
       | mode ws     | ws   | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_6 @ssh_connection_type
-  Scenario Outline: TC-020: SSH Connection Type - Verify different SSH connection types
+  Scenario Outline: SSH Connection Type - Verify different SSH connection types
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
@@ -83,52 +83,49 @@ Feature: Automation of all tunnel test cases
       | mode ssh--sshConnType over_ws  | over_ws     | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
 
-  #TODO @RahulMishra: Modify the script to omit some tunnel flags based on the requirement in this case --mode
   @tunnel_regression_7 @default_ssh_connection
-  Scenario Outline: TC-024: Default SSH Connection - Verify primary connection method
+  Scenario Outline: Default SSH Connection - Verify primary connection method
     Given Setup user details
     And I ensure port 22 is open
-    Then I start tunnel with <tunnelFlags>
+    Then I start tunnel
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 22
     Then I stop tunnel
 
     Examples:
-      | tunnelFlags | capabilities                                             |
-      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | capabilities                                             |
+      | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
-  #TODO @RahulMishra: Modify the script to omit some tunnel flags based on the requirement in this case --mode
   @tunnel_regression_8 @ssh_443_fallback
-  Scenario Outline: TC-025: SSH:443 Fallback - Verify fallback when port 22 is blocked
+  Scenario Outline: SSH:443 Fallback - Verify fallback when port 22 is blocked
     Given Setup user details
     And I block port 22
-    Then I start tunnel with <tunnelFlags>
+    Then I start tunnel
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using SSH
     Then I stop tunnel
     Then I unblock port 22
 
     Examples:
-      | tunnelFlags | capabilities                                             |
-      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | capabilities                                             |
+      | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
-  #TODO @RahulMishra: Modify the script to omit some tunnel flags based on the requirement in this case --mode
   @tunnel_regression_9 @tcp_443_fallback
-  Scenario Outline: TC-026: TCP:443 Fallback - Verify TCP fallback
+  Scenario Outline: TCP:443 Fallback - Verify TCP fallback
     Given Setup user details
     And I block ports 22 and SSH:443
-    Then I start tunnel with <tunnelFlags>
+    Then I start tunnel
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using TCP
     Then I stop tunnel
     Then I unblock all ports
 
     Examples:
-      | tunnelFlags | capabilities                                             |
-      | omit=mode   | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | capabilities                                             |
+      | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_10 @websocket_fallback
-  Scenario Outline: TC-012: WebSocket Fallback - Verify WebSocket fallback
+  Scenario Outline: WebSocket Fallback - Verify WebSocket fallback
     Given Setup user details
     # And I block all SSH and TCP connections
     Then I start tunnel with <tunnelFlags>
@@ -142,7 +139,7 @@ Feature: Automation of all tunnel test cases
       | mode ws     | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_11 @progressive_fallback
-  Scenario Outline: TC-027: Progressive Fallback Testing - Verify sequential fallback mechanisms
+  Scenario Outline: Progressive Fallback Testing - Verify sequential fallback mechanisms
     Given Setup user details
     Then I start tunnel
     And I verify tunnel connects on port 22
@@ -163,7 +160,7 @@ Feature: Automation of all tunnel test cases
       | mode=ws     | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_12 @recovery_testing
-  Scenario Outline: TC-028: Recovery Testing - Verify connection recovery after unblocking
+  Scenario Outline: Recovery Testing - Verify connection recovery after unblocking
     Given Setup user details
     And I block port 22
     Then I start tunnel
@@ -178,7 +175,7 @@ Feature: Automation of all tunnel test cases
       | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_13 @flags_with_fallback
-  Scenario Outline: TC-029: Flags with Fallback - Verify flags work across different protocols
+  Scenario Outline: Flags with Fallback - Verify flags work across different protocols
     Given Setup user details
     And I set up network restrictions according to <networkScenario>
     Then I start tunnel with <tunnelFlags>
@@ -195,7 +192,7 @@ Feature: Automation of all tunnel test cases
       | block_all_but_websocket | allowHosts=localhost:8080 mode=ws     | ws               | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_14 @connection_modes_verification
-  Scenario Outline: TC-030: Connection Modes Verification - Test all SSH connection modes
+  Scenario Outline: Connection Modes Verification - Test all SSH connection modes
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
@@ -211,7 +208,7 @@ Feature: Automation of all tunnel test cases
       | mode ws                        | ws                 | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_15 @mixed_flags_testing
-  Scenario Outline: TC-031: Mixed Flags Testing - Verify complex flag combinations work with fallbacks
+  Scenario Outline: Mixed Flags Testing - Verify complex flag combinations work with fallbacks
     Given Setup user details
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test allowHost,bypassHost,local with <capabilities>

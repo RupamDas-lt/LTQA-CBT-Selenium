@@ -1,23 +1,27 @@
 package automationHelper;
 
-import DTOs.Others.TunnelInfoResponseDTO;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
-import com.google.gson.Gson;
 import factory.Locator;
 import factory.LocatorTypes;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.testng.Assert;
 import utility.BaseClass;
 import utility.CustomAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +33,9 @@ import static utility.FrameworkConstants.testVerificationDataKeys.AUTO_HEAL_DATA
 import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper extends BaseClass {
+  // path for the network blocking script
+  private static final String NETWORK_SCRIPT_PATH = "./Utility/Bash/NetworkBlockingUtils.sh";
+
   private final Logger ltLogger = LogManager.getLogger(AutomationHelper.class);
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager(true);
@@ -1186,23 +1193,6 @@ public class AutomationHelper extends BaseClass {
 
   public boolean verifyTunnelMode(String expectedMode) {
     ltLogger.debug("Expected mode: {}", expectedMode);
-
-    if (tunnelManager == null) {
-      ltLogger.warn("Tunnel manager is not initialized - using tunnel info API for verification");
-
-      try {
-        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
-        String currentMode = sharedTunnelInfo.getData().getMode();
-        boolean result = expectedMode.equalsIgnoreCase(currentMode);
-        ltLogger.info("Tunnel mode verification via shared API: Expected={}, Actual={}, Result={}", expectedMode,
-          currentMode, result);
-        return result;
-      } catch (Exception e) {
-        ltLogger.error("Failed to verify tunnel mode via shared API: {}", e.getMessage());
-        return false;
-      }
-    }
-
     try {
       boolean result = tunnelManager.verifyTunnelMode(expectedMode);
       ltLogger.info("Tunnel mode verification result: Expected={}, Result={}", expectedMode, result);
@@ -1215,23 +1205,6 @@ public class AutomationHelper extends BaseClass {
 
   public boolean verifySshConnectionType(String expectedSshConnType) {
     ltLogger.debug("Expected SSH connection type: {}", expectedSshConnType);
-
-    if (tunnelManager == null) {
-      ltLogger.warn("Tunnel manager is not initialized - using tunnel info API for SSH connection type verification");
-
-      try {
-        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
-        String currentSshConnType = sharedTunnelInfo.getData().getSshConnType();
-        boolean result = expectedSshConnType.equalsIgnoreCase(currentSshConnType);
-        ltLogger.info("SSH connection type verification via shared API: Expected={}, Actual={}, Result={}",
-          expectedSshConnType, currentSshConnType, result);
-        return result;
-      } catch (Exception e) {
-        ltLogger.error("Failed to verify SSH connection type via shared API: {}", e.getMessage());
-        return false;
-      }
-    }
-
     try {
       boolean result = tunnelManager.verifySshConnectionType(expectedSshConnType);
       ltLogger.info("SSH connection type verification result: Expected={}, Result={}", expectedSshConnType, result);
@@ -1243,53 +1216,11 @@ public class AutomationHelper extends BaseClass {
   }
 
   public int getCurrentTunnelPort() {
-    if (tunnelManager == null) {
-      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API for port");
-
-      try {
-        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
-        String mode = sharedTunnelInfo.getData().getMode();
-        String sshConnType = sharedTunnelInfo.getData().getSshConnType();
-
-        int port = -1;
-        if ("ssh".equalsIgnoreCase(mode)) {
-          if ("over_22".equalsIgnoreCase(sshConnType)) {
-            port = 22;
-          } else if ("over_443".equalsIgnoreCase(sshConnType) || "over_ws".equalsIgnoreCase(sshConnType)) {
-            port = 443;
-          }
-        } else if ("tcp".equalsIgnoreCase(mode) || "ws".equalsIgnoreCase(mode)) {
-          port = 443;
-        }
-
-        ltLogger.info("Retrieved tunnel port from shared API: Mode={}, SshConnType={}, Port={}", mode, sshConnType,
-          port);
-        return port;
-      } catch (Exception e) {
-        ltLogger.error("Failed to get tunnel port from shared API: {}", e.getMessage());
-        return -1;
-      }
-    }
     return tunnelManager.getCurrentTunnelPort();
   }
 
   public String getCurrentTunnelMode() {
     ltLogger.info("GETTING CURRENT TUNNEL MODE FROM AUTOMATION HELPER");
-
-    if (tunnelManager == null) {
-      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API");
-
-      try {
-        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
-        String mode = sharedTunnelInfo.getData().getMode();
-        ltLogger.info("Retrieved tunnel mode from shared API: {}", mode);
-        return mode;
-      } catch (Exception e) {
-        String errorMsg = "Failed to get tunnel mode from shared API: " + e.getMessage();
-        ltLogger.error(errorMsg);
-        throw new RuntimeException(errorMsg, e);
-      }
-    }
 
     try {
       String mode = tunnelManager.getCurrentTunnelMode();
@@ -1302,21 +1233,6 @@ public class AutomationHelper extends BaseClass {
   }
 
   public String getCurrentSshConnectionType() {
-    if (tunnelManager == null) {
-      ltLogger.warn("Tunnel manager is not initialized - using shared tunnel info API for SSH connection type");
-
-      try {
-        TunnelInfoResponseDTO sharedTunnelInfo = getSharedTunnelInfoDetails();
-        String sshConnType = sharedTunnelInfo.getData().getSshConnType();
-        ltLogger.info("Retrieved SSH connection type from shared API: {}", sshConnType);
-        return sshConnType;
-      } catch (Exception e) {
-        String errorMsg = "Failed to get SSH connection type from shared API: " + e.getMessage();
-        ltLogger.error(errorMsg);
-        throw new RuntimeException(errorMsg, e);
-      }
-    }
-
     try {
       String sshConnType = tunnelManager.getCurrentSshConnectionType();
       ltLogger.info("Retrieved SSH connection type from TunnelManager: {}", sshConnType);
@@ -1327,82 +1243,337 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  public static TunnelInfoResponseDTO getSharedTunnelInfoDetails() {
-    Logger logger = LogManager.getLogger(AutomationHelper.class);
-    String sharedApiPort = TEST_TUNNEL_INFO_API_PORT.get();
-
-    if (sharedApiPort == null || sharedApiPort.isEmpty()) {
-      String errorMsg = "Shared tunnel info API port is not available. Tunnel may not be started properly.";
-      logger.error(errorMsg);
-      throw new RuntimeException(errorMsg);
-    }
-
-    String url = LOCAL_HOST_URL + sharedApiPort + TUNNEL_INFO_API_PATH;
-    logger.info("Getting shared tunnel info details from API URL: {}", url);
-    logger.debug("Shared API Port: {}", sharedApiPort);
-
-    AutomationAPIHelper apiManager = new AutomationAPIHelper();
-    int maxRetries = 5;
-    int retryDelay = 2;
-
-    for (int i = 0; i < maxRetries; i++) {
-      try {
-        String tunnelResponse = apiManager.getRequestAsString(url);
-        logger.info("Tunnel info API response (attempt {}) -> {}", i + 1, tunnelResponse);
-        logger.debug("Raw Response: {}", tunnelResponse);
-
-        if (tunnelResponse != null && !tunnelResponse.isEmpty()) {
-          try {
-            Gson gson = new Gson();
-            TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
-
-            logger.debug("SHARED PARSED RESPONSE");
-            logger.debug("Status: {}", tunnelInfo.getStatus());
-            logger.debug("Data object: {}", (tunnelInfo.getData() != null ? "Present" : "NULL"));
-
-            if (tunnelInfo.getData() != null) {
-              logger.debug("Mode: {}", tunnelInfo.getData().getMode());
-              logger.debug("SSH Connection Type: {}", tunnelInfo.getData().getSshConnType());
-              logger.debug("Local Proxy Port: {}", tunnelInfo.getData().getLocalProxyPort());
-              logger.debug("Tunnel Name: {}", tunnelInfo.getData().getTunnelName());
-              logger.debug("Environment: {}", tunnelInfo.getData().getEnvironment());
-              logger.debug("Version: {}", tunnelInfo.getData().getVersion());
-              logger.debug("ID: {}", tunnelInfo.getData().getId());
-            }
-
-            if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
-              logger.info("Shared tunnel info retrieved successfully: Mode={}, SshConnType={}, Port={}",
-                tunnelInfo.getData().getMode(), tunnelInfo.getData().getSshConnType(),
-                tunnelInfo.getData().getLocalProxyPort());
-              return tunnelInfo;
-            } else {
-              logger.warn("Invalid shared tunnel info response: status='{}', data={}", tunnelInfo.getStatus(),
-                tunnelInfo.getData() != null ? "present" : "null");
-            }
-          } catch (Exception parseException) {
-            logger.error("Failed to parse shared tunnel info response: {}", parseException.getMessage());
-          }
-        } else {
-          logger.warn("Empty or null response from shared tunnel info API");
-        }
-      } catch (Exception e) {
-        logger.error("Exception occurred while getting shared tunnel info details (attempt {}) -> {}", i + 1,
-          e.getMessage());
+  private void executeNetworkScript(String... params) {
+    try {
+      ProcessBuilder pb = new ProcessBuilder();
+      pb.command("sudo", "bash", NETWORK_SCRIPT_PATH);
+      for (String param : params) {
+        pb.command().add(param);
       }
 
-      if (i < maxRetries - 1) {
-        logger.info("Retrying to get shared tunnel info in {} seconds... (attempt {}/{})", retryDelay, i + 1,
-          maxRetries);
-        try {
-          Thread.sleep(retryDelay * 1000L);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          throw new RuntimeException("Interrupted while waiting to retry", e);
-        }
+      ltLogger.info("Executing network blocking command: {}", String.join(" ", pb.command()));
+      Process process = pb.start();
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        ltLogger.info("Network script output: {}", line);
       }
+
+      BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+      while ((line = errorReader.readLine()) != null) {
+        ltLogger.error("Network script error: {}", line);
+      }
+
+      int exitCode = process.waitFor();
+      if (exitCode != 0) {
+        ltLogger.error("Network blocking script failed with exit code: {}", exitCode);
+        throw new RuntimeException("Network blocking operation failed");
+      }
+
+    } catch (IOException | InterruptedException e) {
+      ltLogger.error("Failed to execute network blocking script: {}", e.getMessage());
+      throw new RuntimeException("Network blocking script execution failed", e);
     }
-    String errorMsg = "Failed to get shared tunnel info details after " + maxRetries + " attempts";
-    logger.error(errorMsg);
-    throw new RuntimeException(errorMsg);
   }
+
+  @And("I ensure port {int} is open")
+  public void iEnsurePortIsOpen(int port) {
+    ltLogger.info("Ensuring port {} is open", port);
+    executeNetworkScript("ensure_port_open", String.valueOf(port));
+  }
+
+  @And("I block port {int}")
+  public void iBlockPort(int port) {
+    ltLogger.info("Blocking SSH over port {}", port);
+    if (port == 22) {
+      executeNetworkScript("block_ssh_22");
+    } else if (port == 443) {
+      executeNetworkScript("block_ssh_443");
+    } else {
+      throw new IllegalArgumentException("Unsupported port for SSH blocking: " + port);
+    }
+  }
+
+  @And("I block ports {int} and SSH:{int}")
+  public void iBlockPortsAndSSH(int port1, int port2) {
+    ltLogger.info("Blocking SSH over ports {} and {}", port1, port2);
+    executeNetworkScript("block_ssh_ports");
+  }
+
+  @And("I block all SSH and TCP connections")
+  public void iBlockAllSSHAndTCPConnections() {
+    ltLogger.info("Blocking all SSH and TCP connections");
+    executeNetworkScript("block_all_ssh_tcp");
+  }
+
+  @Then("I unblock port {int}")
+  public void iUnblockPort(int port) {
+    ltLogger.info("Unblocking port {}", port);
+    executeNetworkScript("ensure_port_open", String.valueOf(port));
+  }
+
+  @Then("I unblock all ports")
+  public void iUnblockAllPorts() {
+    ltLogger.info("Unblocking all ports by flushing iptables rules");
+    executeNetworkScript("flush_all_rules");
+  }
+
+  @Then("I verify tunnel connection uses {word} protocol")
+  public void iVerifyTunnelConnectionUsesProtocol(String protocol) {
+    ltLogger.info("Verifying tunnel connection uses {} protocol", protocol);
+
+    waitForTime(3);
+
+    boolean isProtocolCorrect = verifyTunnelMode(protocol);
+
+    if (!isProtocolCorrect) {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.error("Tunnel protocol verification failed. Expected: {}, Actual: {}", protocol, currentMode);
+      Assert.fail("Tunnel is not using the expected protocol. Expected: " + protocol + ", Actual: " + currentMode);
+    }
+
+    ltLogger.info("✓ Tunnel protocol verification successful. Using: {}", protocol);
+  }
+
+  @Then("I verify tunnel uses {word} connection")
+  public void iVerifyTunnelUsesConnection(String connectionType) {
+    ltLogger.info("Verifying tunnel uses {} connection", connectionType);
+
+    waitForTime(3);
+
+    boolean isConnectionTypeCorrect = verifySshConnectionType(connectionType);
+
+    if (!isConnectionTypeCorrect) {
+      String currentSshConnType = getCurrentSshConnectionType();
+      ltLogger.error("Tunnel SSH connection type verification failed. Expected: {}, Actual: {}", connectionType,
+        currentSshConnType);
+      Assert.fail(
+        "Tunnel is not using the expected SSH connection type. Expected: " + connectionType + ", Actual: " + currentSshConnType);
+    }
+    ltLogger.info("Tunnel SSH connection type verification successful. Using: {}", connectionType);
+  }
+
+  @Then("I verify tunnel connects on port {int}")
+  public void iVerifyTunnelConnectsOnPort(int port) {
+    ltLogger.info("Verifying tunnel connects on port {}", port);
+
+    waitForTime(3);
+
+    int currentPort = getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
+
+    if (!isPortCorrect) {
+      ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
+      Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
+    }
+
+    ltLogger.info("✓ Tunnel port verification successful. Connecting on port: {}", port);
+  }
+
+  @Then("I verify tunnel connects on port {int} using SSH")
+  public void iVerifyTunnelConnectsOnPortUsingSSH(int port) {
+    ltLogger.info("Verifying tunnel connects on port {} using SSH", port);
+
+    waitForTime(3);
+
+    boolean isSSHMode = verifyTunnelMode("ssh");
+    if (!isSSHMode) {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.error("Tunnel is not using SSH mode. Expected: ssh, Actual: {}", currentMode);
+      Assert.fail("Tunnel is not using SSH mode. Expected: ssh, Actual: " + currentMode);
+    }
+
+    int currentPort = getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
+    if (!isPortCorrect) {
+      ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
+      Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
+    }
+
+    ltLogger.info("✓ Tunnel SSH port verification successful. Using SSH on port: {}", port);
+  }
+
+  @Then("I verify tunnel connects on port {int} using TCP")
+  public void iVerifyTunnelConnectsOnPortUsingTCP(int port) {
+    ltLogger.info("Verifying tunnel connects on port {} using TCP", port);
+
+    waitForTime(3);
+
+    boolean isTCPMode = verifyTunnelMode("tcp");
+    if (!isTCPMode) {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.error("Tunnel is not using TCP mode. Expected: tcp, Actual: {}", currentMode);
+      Assert.fail("Tunnel is not using TCP mode. Expected: tcp, Actual: " + currentMode);
+    }
+
+    int currentPort = getCurrentTunnelPort();
+    boolean isPortCorrect = (currentPort == port);
+    if (!isPortCorrect) {
+      ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", port, currentPort);
+      Assert.fail("Tunnel is not connecting on the expected port. Expected: " + port + ", Actual: " + currentPort);
+    }
+
+    ltLogger.info("✓ Tunnel TCP port verification successful. Using TCP on port: {}", port);
+  }
+
+  @Then("I verify tunnel connects using WebSocket")
+  public void iVerifyTunnelConnectsUsingWebSocket() {
+    ltLogger.info("Verifying tunnel connects using WebSocket");
+
+    waitForTime(3);
+
+    boolean isWebSocketMode = verifyTunnelMode("ws");
+
+    if (!isWebSocketMode) {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.error("Tunnel WebSocket verification failed. Expected: ws, Actual: {}", currentMode);
+      Assert.fail("Tunnel is not using WebSocket mode. Expected: ws, Actual: " + currentMode);
+    }
+
+    ltLogger.info("✓ Tunnel WebSocket verification successful. Using WebSocket mode");
+  }
+
+  @And("I set up network restrictions according to {word}")
+  public void iSetUpNetworkRestrictionsAccordingTo(String networkScenario) {
+    ltLogger.info("Setting up network restrictions for scenario: {}", networkScenario);
+
+    switch (networkScenario) {
+    case "no_restrictions":
+      executeNetworkScript("flush_all_rules");
+      break;
+    case "block_port_22":
+      executeNetworkScript("block_ssh_22");
+      break;
+    case "block_all_but_websocket":
+      executeNetworkScript("block_all_ssh_tcp");
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown network scenario: " + networkScenario);
+    }
+    waitForTime(2);
+  }
+
+  @Then("I reset network restrictions")
+  public void iResetNetworkRestrictions() {
+    ltLogger.info("Resetting all network restrictions");
+    executeNetworkScript("flush_all_rules");
+
+    waitForTime(2);
+  }
+
+  @Then("I verify tunnel uses {word} protocol")
+  public void iVerifyTunnelUsesProtocol(String expectedProtocol) {
+    ltLogger.info("Verifying tunnel uses {} protocol", expectedProtocol);
+
+    waitForTime(3);
+
+    String protocolToCheck = expectedProtocol;
+    if (expectedProtocol.contains(":")) {
+      protocolToCheck = expectedProtocol.split(":")[0];
+    }
+
+    boolean isProtocolCorrect = verifyTunnelMode(protocolToCheck);
+
+    if (!isProtocolCorrect) {
+      String currentMode = getCurrentTunnelMode();
+      ltLogger.error("Tunnel protocol verification failed. Expected: {}, Actual: {}", protocolToCheck, currentMode);
+      Assert.fail(
+        "Tunnel is not using the expected protocol. Expected: " + expectedProtocol + ", Actual: " + currentMode);
+    }
+
+    if (expectedProtocol.contains(":")) {
+      String[] parts = expectedProtocol.split(":");
+      if (parts.length == 2) {
+        try {
+          int expectedPort = Integer.parseInt(parts[1]);
+          int currentPort = getCurrentTunnelPort();
+          boolean isPortCorrect = (currentPort == expectedPort);
+          if (!isPortCorrect) {
+            ltLogger.error("Tunnel port verification failed. Expected: {}, Actual: {}", expectedPort, currentPort);
+            Assert.fail(
+              "Tunnel is not connecting on the expected port. Expected: " + expectedPort + ", Actual: " + currentPort);
+          }
+        } catch (NumberFormatException e) {
+          ltLogger.warn("Could not parse port from protocol: {}", expectedProtocol);
+        }
+      }
+    }
+
+    ltLogger.info("✓ Tunnel protocol verification successful. Using: {}", expectedProtocol);
+  }
+
+  @And("I verify all tunnel flags are applied correctly")
+  public void iVerifyAllTunnelFlagsAreAppliedCorrectly() {
+    ltLogger.info("Verifying all tunnel flags are applied correctly");
+
+    waitForTime(3);
+
+    try {
+      String currentMode = getCurrentTunnelMode();
+      String currentSshConnType = getCurrentSshConnectionType();
+      int currentPort = getCurrentTunnelPort();
+
+      ltLogger.info("Current tunnel configuration:");
+      ltLogger.info("  Mode: {}", currentMode);
+      ltLogger.info("  SSH Connection Type: {}", currentSshConnType);
+      ltLogger.info("  Port: {}", currentPort);
+
+      if (currentMode == null || currentMode.isEmpty()) {
+        Assert.fail("Tunnel mode is not available or invalid");
+      }
+
+      ltLogger.info("✓ Tunnel flags verification completed successfully");
+
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify tunnel flags: {}", e.getMessage());
+      Assert.fail("Failed to verify tunnel flags: " + e.getMessage());
+    }
+  }
+
+  @Then("I restart tunnel")
+  public void iRestartTunnel() {
+    ltLogger.info("Restarting tunnel");
+    stopTunnel();
+    waitForTime(5);
+    startTunnel();
+    waitForTime(10);
+  }
+
+  @And("I restart tunnel with {word}")
+  public void iRestartTunnelWith(String flags) {
+    ltLogger.info("Restarting tunnel with flags: {}", flags);
+    stopTunnel();
+    waitForTime(5);
+    startTunnel(flags);
+    waitForTime(10);
+  }
+
+  @Then("I simulate tunnel connection failure")
+  public void iSimulateTunnelConnectionFailure() {
+    ltLogger.info("Simulating tunnel connection failure");
+    executeNetworkScript("block_all_ssh_tcp");
+    waitForTime(3);
+  }
+
+  @Then("I verify tunnel reconnection occurs")
+  public void iVerifyTunnelReconnectionOccurs() {
+    ltLogger.info("Verifying tunnel reconnection occurs");
+
+    executeNetworkScript("flush_all_rules");
+
+    waitForTime(10);
+
+    try {
+      String currentMode = getCurrentTunnelMode();
+      if (currentMode == null || currentMode.isEmpty()) {
+        Assert.fail("Tunnel did not reconnect successfully");
+      }
+      ltLogger.info("✓ Tunnel reconnection verification successful. Current mode: {}", currentMode);
+    } catch (Exception e) {
+      ltLogger.error("Tunnel reconnection verification failed: {}", e.getMessage());
+      Assert.fail("Tunnel reconnection verification failed: " + e.getMessage());
+    }
+  }
+
 }

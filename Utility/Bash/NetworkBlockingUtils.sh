@@ -3,6 +3,7 @@
 # Network Blocking Utilities for Tunnel Testing
 # This script provides functions to block/unblock network traffic to test tunnel fallback mechanisms
 
+# Enhanced server list with more comprehensive blocking
 get_server_ip_by_name() {
     case $1 in
         "dc-virginia") echo "199.58.84.59" ;;
@@ -48,6 +49,10 @@ check_firewall() {
         # Linux - use iptables
         if ! command -v iptables &> /dev/null; then
             log_operation "ERROR: iptables not found. Please install iptables to use network blocking features."
+            exit 1
+        fi
+        if ! command -v iptables-save &> /dev/null; then
+            log_operation "ERROR: iptables-save not found. Please install iptables-persistent."
             exit 1
         fi
     fi
@@ -217,7 +222,6 @@ unblock_all_for_servers() {
     fi
 }
 
-
 flush_all_rules() {
     check_firewall
     if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -231,27 +235,80 @@ flush_all_rules() {
     fi
 }
 
-
+# Enhanced blocking functions for Linux containers
 block_ssh_22() {
     local servers=("${@:-${DEFAULT_TEST_SERVERS[@]}}")
     log_operation "Applying scenario: Block SSH over port 22"
-    flush_all_rules
-    block_ssh_port 22 "${servers[@]}"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_operation "macOS detected - using mock blocking for SSH port 22"
+        return 0
+    else
+        # Linux - comprehensive blocking
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip_by_name "$server")
+            local domain=$(get_server_domain_by_name "$server")
+            if [ -n "$ip" ]; then
+                # Block by IP
+                iptables -I OUTPUT -p tcp -d "$ip" --dport 22 -j DROP
+                log_operation "Blocked SSH port 22 to server $server ($ip)"
+            fi
+            if [ -n "$domain" ]; then
+                # Block by domain (resolve and block)
+                local resolved_ips=$(nslookup "$domain" 2>/dev/null | grep -A 1 "Name:" | grep "Address:" | awk '{print $2}' || echo "")
+                for resolved_ip in $resolved_ips; do
+                    if [[ $resolved_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                        iptables -I OUTPUT -p tcp -d "$resolved_ip" --dport 22 -j DROP
+                        log_operation "Blocked SSH port 22 to resolved IP $resolved_ip for domain $domain"
+                    fi
+                done
+            fi
+        done
+        
+        # Also block common LambdaTest tunnel endpoints
+        iptables -I OUTPUT -p tcp --dport 22 -m string --string "lambdatest" --algo bm -j DROP
+        log_operation "Added generic block for SSH port 22 to LambdaTest endpoints"
+    fi
 }
 
 block_ssh_443() {
     local servers=("${@:-${DEFAULT_TEST_SERVERS[@]}}")
     log_operation "Applying scenario: Block SSH over port 443"
-    flush_all_rules
-    block_ssh_port 443 "${servers[@]}"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_operation "macOS detected - using mock blocking for SSH port 443"
+        return 0
+    else
+        # Linux - comprehensive blocking
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip_by_name "$server")
+            local domain=$(get_server_domain_by_name "$server")
+            if [ -n "$ip" ]; then
+                # Block SSH over 443 by detecting SSH handshake
+                iptables -I OUTPUT -p tcp -d "$ip" --dport 443 -m string --string "SSH-" --algo bm -j DROP
+                log_operation "Blocked SSH over port 443 to server $server ($ip)"
+            fi
+            if [ -n "$domain" ]; then
+                local resolved_ips=$(nslookup "$domain" 2>/dev/null | grep -A 1 "Name:" | grep "Address:" | awk '{print $2}' || echo "")
+                for resolved_ip in $resolved_ips; do
+                    if [[ $resolved_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                        iptables -I OUTPUT -p tcp -d "$resolved_ip" --dport 443 -m string --string "SSH-" --algo bm -j DROP
+                        log_operation "Blocked SSH over port 443 to resolved IP $resolved_ip for domain $domain"
+                    fi
+                done
+            fi
+        done
+        
+        # Generic block for SSH over 443 to LambdaTest
+        iptables -I OUTPUT -p tcp --dport 443 -m string --string "SSH-" --algo bm -m string --string "lambdatest" --algo bm -j DROP
+        log_operation "Added generic block for SSH over port 443 to LambdaTest endpoints"
+    fi
 }
 
 block_ssh_ports() {
-    local servers=("${@:-${DEFAULT_TEST_SERVERS[@]}}")
     log_operation "Applying scenario: Block SSH over ports 22 and 443"
-    flush_all_rules
-    block_ssh_port 22 "${servers[@]}"
-    block_ssh_port 443 "${servers[@]}"
+    block_ssh_22 "$@"
+    block_ssh_443 "$@"
 }
 
 block_tcp_443() {
@@ -264,10 +321,29 @@ block_tcp_443() {
 block_all_ssh_tcp() {
     local servers=("${@:-${DEFAULT_TEST_SERVERS[@]}}")
     log_operation "Applying scenario: Block all SSH and TCP connections"
-    flush_all_rules
-    block_ssh_port 22 "${servers[@]}"
-    block_ssh_port 443 "${servers[@]}"
-    block_tcp_connections 443 "${servers[@]}"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_operation "macOS detected - using mock blocking for all SSH/TCP"
+        return 0
+    else
+        # Block SSH on both ports
+        block_ssh_22 "$@"
+        block_ssh_443 "$@"
+        
+        # Block TCP connections to port 443 (but allow first connection for WebSocket negotiation)
+        for server in "${servers[@]}"; do
+            local ip=$(get_server_ip_by_name "$server")
+            local domain=$(get_server_domain_by_name "$server")
+            if [ -n "$ip" ]; then
+                # Block TCP after initial connection
+                iptables -I OUTPUT -p tcp -d "$ip" --dport 443 -m conntrack --ctstate NEW -m recent --set --name tcp_block_"${ip//./_}"
+                iptables -I OUTPUT -p tcp -d "$ip" --dport 443 -m conntrack --ctstate NEW -m recent --update --seconds 1 --hitcount 2 --name tcp_block_"${ip//./_}" -j DROP
+                log_operation "Blocked subsequent TCP connections to port 443 for server $server ($ip)"
+            fi
+        done
+        
+        log_operation "Applied comprehensive SSH and TCP blocking"
+    fi
 }
 
 show_help() {
@@ -277,12 +353,12 @@ Network Blocking Utilities for Tunnel Testing
 Usage: $0 [FUNCTION] [ARGUMENTS...]
 
 Available Functions:
-  ensure_port_open PORT [SERVERS...]     - Ensure specific port is open
+  ensure_port_open PORT                  - Ensure specific port is open (clears all rules)
   block_ssh_22 [SERVERS...]              - Block SSH over port 22
   block_ssh_443 [SERVERS...]             - Block SSH over port 443  
   block_ssh_ports [SERVERS...]           - Block SSH over both ports 22 and 443
   block_tcp_443 [SERVERS...]             - Block TCP over port 443
-  block_all_ssh_tcp [SERVERS...]         - Block all SSH and TCP connections
+  block_all_ssh_tcp [SERVERS...]         - Block all SSH and TCP connections (forces WebSocket)
   flush_all_rules                        - Remove all iptables rules
   unblock_all_for_servers [SERVERS...]   - Remove all rules for specific servers
 
@@ -295,7 +371,7 @@ Examples:
   $0 ensure_port_open 22
   $0 flush_all_rules
 
-Note: This script requires root privileges to modify iptables rules.
+Note: This script requires root privileges to modify iptables rules on Linux.
 EOF
 }
 
