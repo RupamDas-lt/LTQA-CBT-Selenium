@@ -99,12 +99,12 @@ Feature: Automation of all tunnel test cases
   @tunnel_regression_8 @ssh_443_fallback
   Scenario Outline: SSH:443 Fallback - Verify fallback when port 22 is blocked
     Given Setup user details
-    And I block port 22
+    And I set up network restrictions according to block_port_22
     Then I start tunnel
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using SSH
     Then I stop tunnel
-    Then I unblock port 22
+    And I ensure port 22 is open
 
     Examples:
       | capabilities                                             |
@@ -113,12 +113,12 @@ Feature: Automation of all tunnel test cases
   @tunnel_regression_9 @tcp_443_fallback
   Scenario Outline: TCP:443 Fallback - Verify TCP fallback
     Given Setup user details
-    And I block ports 22 and SSH:443
+    And I set up network restrictions according to block_ssh_ports
     Then I start tunnel
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects on port 443 using TCP
     Then I stop tunnel
-    Then I unblock all ports
+    And I set up network restrictions according to no_restrictions
 
     Examples:
       | capabilities                                             |
@@ -127,12 +127,12 @@ Feature: Automation of all tunnel test cases
   @tunnel_regression_10 @websocket_fallback
   Scenario Outline: WebSocket Fallback - Verify WebSocket fallback
     Given Setup user details
-    # And I block all SSH and TCP connections
+    # And I set up network restrictions according to block_all_ssh_tcp
     Then I start tunnel with <tunnelFlags>
     Then I start session with driver quit to test local with <capabilities>
     Then I verify tunnel connects using WebSocket
     Then I stop tunnel
-    # Then I unblock all ports
+    # And I set up network restrictions according to no_restrictions
 
     Examples:
       | tunnelFlags | capabilities                                             |
@@ -143,17 +143,17 @@ Feature: Automation of all tunnel test cases
     Given Setup user details
     Then I start tunnel
     And I verify tunnel connects on port 22
-    Then I block port 22
+    And I set up network restrictions according to block_port_22
     And I restart tunnel
     And I verify tunnel connects on port 443 using SSH
-    Then I block ports 22 and SSH:443
+    And I set up network restrictions according to block_ssh_ports
     And I restart tunnel
     And I verify tunnel connects on port 443 using TCP
-    Then I block all SSH and TCP connections
+    And I set up network restrictions according to block_all_ssh_tcp
     And I restart tunnel with <tunnelFlags>
     And I verify tunnel connects using WebSocket
     Then I stop tunnel
-    Then I unblock all ports
+    And I set up network restrictions according to no_restrictions
 
     Examples:
       | tunnelFlags | capabilities                                             |
@@ -162,10 +162,10 @@ Feature: Automation of all tunnel test cases
   @tunnel_regression_12 @recovery_testing
   Scenario Outline: Recovery Testing - Verify connection recovery after unblocking
     Given Setup user details
-    And I block port 22
+    And I set up network restrictions according to block_port_22
     Then I start tunnel
     And I verify tunnel connects on port 443 using SSH
-    Then I unblock port 22
+    And I ensure port 22 is open
     And I restart tunnel
     And I verify tunnel connects on port 22
     Then I stop tunnel
@@ -183,13 +183,13 @@ Feature: Automation of all tunnel test cases
     Then I verify tunnel uses <expectedProtocol> protocol
     And I verify all tunnel flags are applied correctly
     Then I stop tunnel
-    Then I reset network restrictions
+    And I set up network restrictions according to no_restrictions
 
     Examples:
-      | networkScenario         | tunnelFlags                           | expectedProtocol | capabilities                                             |
-      | no_restrictions         | allowHosts=localhost:8080 dns=8.8.8.8 | ssh              | browserName=chrome,platform=win10,version=.*,tunnel=true |
-      | block_port_22           | allowHosts=localhost:8080 dns=8.8.8.8 | ssh:443          | browserName=chrome,platform=win10,version=.*,tunnel=true |
-      | block_all_but_websocket | allowHosts=localhost:8080 mode=ws     | ws               | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | networkScenario   | tunnelFlags                           | expectedProtocol | capabilities                                             |
+      | no_restrictions   | allowHosts=localhost:8080 dns=8.8.8.8 | ssh              | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | block_port_22     | allowHosts=localhost:8080 dns=8.8.8.8 | ssh:443          | browserName=chrome,platform=win10,version=.*,tunnel=true |
+      | block_all_ssh_tcp | allowHosts=localhost:8080 mode=ws     | ws               | browserName=chrome,platform=win10,version=.*,tunnel=true |
 
   @tunnel_regression_14 @connection_modes_verification
   Scenario Outline: Connection Modes Verification - Test all SSH connection modes

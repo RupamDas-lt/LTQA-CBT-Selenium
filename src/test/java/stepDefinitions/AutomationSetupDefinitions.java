@@ -118,16 +118,15 @@ public class AutomationSetupDefinitions {
     clientAutomationHelper.verifyTestMediaFromUI(TEST_SESSION_ID.get(), testMediaType);
   }
 
-  /**
-   * Tunnel related step definitions
-   */
-
+  /// Tunnel related step definitions
   @Then("^I ([a-zA-Z0-9_=,: ]+) tunnel$")
-  public void iStartTunnel(String startOrStop) {
-    if (startOrStop.equals("start")) {
+  public void iStartTunnel(String startOrStopOrRestart) {
+    if (startOrStopOrRestart.equals("start")) {
       automationHelper.startTunnel();
-    } else if (startOrStop.equals("stop")) {
+    } else if (startOrStopOrRestart.equals("stop")) {
       automationHelper.stopTunnel();
+    } else if (startOrStopOrRestart.equals("restart")) {
+      automationHelper.iRestartTunnel();
     }
   }
 
@@ -148,34 +147,9 @@ public class AutomationSetupDefinitions {
     automationHelper.stopRunningTunnelViaAPI(tunnelID);
   }
 
-  @And("I ensure port {int} is open")
-  public void iEnsurePortIsOpen(int port) {
-    automationHelper.iEnsurePortIsOpen(port);
-  }
-
-  @And("I block port {int}")
-  public void iBlockPort(int port) {
-    automationHelper.iBlockPort(port);
-  }
-
-  @And("I block ports {int} and SSH:{int}")
-  public void iBlockPortsAndSSH(int port1, int port2) {
-    automationHelper.iBlockPortsAndSSH(port1, port2);
-  }
-
-  @And("I block all SSH and TCP connections")
-  public void iBlockAllSSHAndTCPConnections() {
-    automationHelper.iBlockAllSSHAndTCPConnections();
-  }
-
-  @Then("I unblock port {int}")
-  public void iUnblockPort(int port) {
-    automationHelper.iUnblockPort(port);
-  }
-
-  @Then("I unblock all ports")
-  public void iUnblockAllPorts() {
-    automationHelper.iUnblockAllPorts();
+  @And("I ensure port {word} is open")
+  public void iEnsurePortIsOpen(String port) {
+    automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.ENSURE_PORT_OPEN, port);
   }
 
   @Then("I verify tunnel connection uses {word} protocol")
@@ -183,9 +157,12 @@ public class AutomationSetupDefinitions {
     automationHelper.iVerifyTunnelConnectionUsesProtocol(protocol);
   }
 
-  @Then("I verify tunnel uses {word} connection")
-  public void iVerifyTunnelUsesConnection(String connectionType) {
-    automationHelper.iVerifyTunnelUsesConnection(connectionType);
+  @Then("^I verify tunnel uses (\\S+) (connection|protocol)$")
+  public void iVerifyTunnelUsesProtocol(String expectedProtocol, String connectionType) {
+    if (connectionType.equals("connection"))
+      automationHelper.iVerifyTunnelUsesConnection(expectedProtocol);
+    else if (connectionType.equals("protocol"))
+      automationHelper.iVerifyTunnelUsesProtocol(expectedProtocol);
   }
 
   @Then("I verify tunnel connects on port {int}")
@@ -210,17 +187,32 @@ public class AutomationSetupDefinitions {
 
   @And("I set up network restrictions according to {word}")
   public void iSetUpNetworkRestrictionsAccordingTo(String networkScenario) {
-    automationHelper.iSetUpNetworkRestrictionsAccordingTo(networkScenario);
-  }
-
-  @Then("I reset network restrictions")
-  public void iResetNetworkRestrictions() {
-    automationHelper.iResetNetworkRestrictions();
-  }
-
-  @Then("I verify tunnel uses {word} protocol")
-  public void iVerifyTunnelUsesProtocol(String expectedProtocol) {
-    automationHelper.iVerifyTunnelUsesProtocol(expectedProtocol);
+    switch (networkScenario) {
+    case "block_port_22":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.BLOCK_SSH_22);
+      break;
+    case "block_ssh_443":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.BLOCK_SSH_443);
+      break;
+    case "block_ssh_ports":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.BLOCK_SSH_PORTS);
+      break;
+    case "block_tcp_443":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.BLOCK_TCP_443);
+      break;
+    case "block_all_ssh_tcp":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.BLOCK_ALL_SSH_TCP);
+      break;
+    case "no_restrictions":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.FLUSH_ALL_RULES);
+      break;
+    case "unblock_all_for_servers":
+      automationHelper.modifyNetworkRestrictions(clientSideNetworkOperations.UNBLOCK_ALL_FOR_SERVERS);
+      break;
+    default:
+      ltLogger.error("Unknown network scenario: {}", networkScenario);
+      throw new IllegalArgumentException("Unknown network scenario: " + networkScenario);
+    }
   }
 
   @And("I verify all tunnel flags are applied correctly")
@@ -228,19 +220,9 @@ public class AutomationSetupDefinitions {
     automationHelper.iVerifyAllTunnelFlagsAreAppliedCorrectly();
   }
 
-  @Then("I restart tunnel")
-  public void iRestartTunnel() {
-    automationHelper.iRestartTunnel();
-  }
-
   @And("I restart tunnel with {word}")
   public void iRestartTunnelWith(String flags) {
     automationHelper.iRestartTunnelWith(flags);
-  }
-
-  @Then("I simulate tunnel connection failure")
-  public void iSimulateTunnelConnectionFailure() {
-    automationHelper.iSimulateTunnelConnectionFailure();
   }
 
   @Then("I verify tunnel reconnection occurs")

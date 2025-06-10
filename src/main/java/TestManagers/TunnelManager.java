@@ -2,6 +2,8 @@ package TestManagers;
 
 import DTOs.Others.TunnelInfoResponseDTO;
 import automationHelper.AutomationAPIHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.reflect.TypeToken;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -191,6 +193,11 @@ public class TunnelManager extends BaseClass implements Runnable {
               new TypeToken<TunnelInfoResponseDTO>() {
               });
 
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            String prettyJson = mapper.writeValueAsString(tunnelInfo);
+            ltLogger.info("Tunnel info API response: {}", prettyJson);
+
             if ("SUCCESS".equals(tunnelInfo.getStatus()) && tunnelInfo.getData() != null) {
               return tunnelInfo;
             }
@@ -247,29 +254,6 @@ public class TunnelManager extends BaseClass implements Runnable {
     } catch (Exception e) {
       ltLogger.error("Failed to get tunnel local proxy port: {}", e.getMessage());
       throw new RuntimeException("Failed to get tunnel local proxy port", e);
-    }
-  }
-
-  public boolean verifyTunnelMode(String expectedMode) {
-    try {
-      String currentMode = getCurrentTunnelMode();
-      ltLogger.info("Expected mode: {}, Current mode: {}", expectedMode, currentMode);
-      return expectedMode.equalsIgnoreCase(currentMode);
-    } catch (Exception e) {
-      ltLogger.error("Failed to verify tunnel mode: {}", e.getMessage());
-      return false;
-    }
-  }
-
-  public boolean verifySshConnectionType(String expectedSshConnType) {
-    try {
-      String currentSshConnType = getCurrentSshConnectionType();
-      ltLogger.info("Expected SSH connection type: {}, Current SSH connection type: {}", expectedSshConnType,
-        currentSshConnType);
-      return expectedSshConnType.equalsIgnoreCase(currentSshConnType);
-    } catch (Exception e) {
-      ltLogger.error("Failed to verify SSH connection type: {}", e.getMessage());
-      return false;
     }
   }
 
