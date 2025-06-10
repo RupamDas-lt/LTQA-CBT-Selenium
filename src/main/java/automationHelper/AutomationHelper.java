@@ -5,8 +5,6 @@ import TestManagers.DriverManager;
 import TestManagers.TunnelManager;
 import factory.Locator;
 import factory.LocatorTypes;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -1277,13 +1275,11 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  @And("I ensure port {int} is open")
   public void iEnsurePortIsOpen(int port) {
     ltLogger.info("Ensuring port {} is open", port);
     executeNetworkScript("ensure_port_open", String.valueOf(port));
   }
 
-  @And("I block port {int}")
   public void iBlockPort(int port) {
     ltLogger.info("Blocking SSH over port {}", port);
     if (port == 22) {
@@ -1295,31 +1291,26 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  @And("I block ports {int} and SSH:{int}")
   public void iBlockPortsAndSSH(int port1, int port2) {
     ltLogger.info("Blocking SSH over ports {} and {}", port1, port2);
     executeNetworkScript("block_ssh_ports");
   }
 
-  @And("I block all SSH and TCP connections")
   public void iBlockAllSSHAndTCPConnections() {
     ltLogger.info("Blocking all SSH and TCP connections");
     executeNetworkScript("block_all_ssh_tcp");
   }
 
-  @Then("I unblock port {int}")
   public void iUnblockPort(int port) {
     ltLogger.info("Unblocking port {}", port);
     executeNetworkScript("ensure_port_open", String.valueOf(port));
   }
 
-  @Then("I unblock all ports")
   public void iUnblockAllPorts() {
     ltLogger.info("Unblocking all ports by flushing iptables rules");
     executeNetworkScript("flush_all_rules");
   }
 
-  @Then("I verify tunnel connection uses {word} protocol")
   public void iVerifyTunnelConnectionUsesProtocol(String protocol) {
     ltLogger.info("Verifying tunnel connection uses {} protocol", protocol);
 
@@ -1336,7 +1327,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel protocol verification successful. Using: {}", protocol);
   }
 
-  @Then("I verify tunnel uses {word} connection")
   public void iVerifyTunnelUsesConnection(String connectionType) {
     ltLogger.info("Verifying tunnel uses {} connection", connectionType);
 
@@ -1354,7 +1344,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("Tunnel SSH connection type verification successful. Using: {}", connectionType);
   }
 
-  @Then("I verify tunnel connects on port {int}")
   public void iVerifyTunnelConnectsOnPort(int port) {
     ltLogger.info("Verifying tunnel connects on port {}", port);
 
@@ -1371,7 +1360,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel port verification successful. Connecting on port: {}", port);
   }
 
-  @Then("I verify tunnel connects on port {int} using SSH")
   public void iVerifyTunnelConnectsOnPortUsingSSH(int port) {
     ltLogger.info("Verifying tunnel connects on port {} using SSH", port);
 
@@ -1394,7 +1382,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel SSH port verification successful. Using SSH on port: {}", port);
   }
 
-  @Then("I verify tunnel connects on port {int} using TCP")
   public void iVerifyTunnelConnectsOnPortUsingTCP(int port) {
     ltLogger.info("Verifying tunnel connects on port {} using TCP", port);
 
@@ -1417,7 +1404,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel TCP port verification successful. Using TCP on port: {}", port);
   }
 
-  @Then("I verify tunnel connects using WebSocket")
   public void iVerifyTunnelConnectsUsingWebSocket() {
     ltLogger.info("Verifying tunnel connects using WebSocket");
 
@@ -1434,7 +1420,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel WebSocket verification successful. Using WebSocket mode");
   }
 
-  @And("I set up network restrictions according to {word}")
   public void iSetUpNetworkRestrictionsAccordingTo(String networkScenario) {
     ltLogger.info("Setting up network restrictions for scenario: {}", networkScenario);
 
@@ -1454,7 +1439,6 @@ public class AutomationHelper extends BaseClass {
     waitForTime(2);
   }
 
-  @Then("I reset network restrictions")
   public void iResetNetworkRestrictions() {
     ltLogger.info("Resetting all network restrictions");
     executeNetworkScript("flush_all_rules");
@@ -1462,7 +1446,6 @@ public class AutomationHelper extends BaseClass {
     waitForTime(2);
   }
 
-  @Then("I verify tunnel uses {word} protocol")
   public void iVerifyTunnelUsesProtocol(String expectedProtocol) {
     ltLogger.info("Verifying tunnel uses {} protocol", expectedProtocol);
 
@@ -1503,7 +1486,6 @@ public class AutomationHelper extends BaseClass {
     ltLogger.info("✓ Tunnel protocol verification successful. Using: {}", expectedProtocol);
   }
 
-  @And("I verify all tunnel flags are applied correctly")
   public void iVerifyAllTunnelFlagsAreAppliedCorrectly() {
     ltLogger.info("Verifying all tunnel flags are applied correctly");
 
@@ -1531,7 +1513,6 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  @Then("I restart tunnel")
   public void iRestartTunnel() {
     ltLogger.info("Restarting tunnel");
     stopTunnel();
@@ -1540,7 +1521,6 @@ public class AutomationHelper extends BaseClass {
     waitForTime(10);
   }
 
-  @And("I restart tunnel with {word}")
   public void iRestartTunnelWith(String flags) {
     ltLogger.info("Restarting tunnel with flags: {}", flags);
     stopTunnel();
@@ -1549,14 +1529,12 @@ public class AutomationHelper extends BaseClass {
     waitForTime(10);
   }
 
-  @Then("I simulate tunnel connection failure")
   public void iSimulateTunnelConnectionFailure() {
     ltLogger.info("Simulating tunnel connection failure");
     executeNetworkScript("block_all_ssh_tcp");
     waitForTime(3);
   }
 
-  @Then("I verify tunnel reconnection occurs")
   public void iVerifyTunnelReconnectionOccurs() {
     ltLogger.info("Verifying tunnel reconnection occurs");
 

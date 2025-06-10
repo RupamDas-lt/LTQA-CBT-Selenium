@@ -3,6 +3,7 @@ package TestManagers;
 import DTOs.Others.TunnelInfoResponseDTO;
 import automationHelper.AutomationAPIHelper;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -140,11 +141,7 @@ public class TunnelManager extends BaseClass implements Runnable {
 
       if (i < maxRetries - 1) {
         ltLogger.info("Looks like Tunnel is not started. Sleeping for {} seconds...", retryDelay);
-        try {
-          TimeUnit.SECONDS.sleep(retryDelay);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
+        waitForTime(retryDelay);
       }
       return false;
     }).filter(Boolean::booleanValue).findFirst().orElseThrow(() -> new RuntimeException(
@@ -196,7 +193,9 @@ public class TunnelManager extends BaseClass implements Runnable {
         if (tunnelResponse != null && !tunnelResponse.isEmpty()) {
           try {
             Gson gson = new Gson();
-            TunnelInfoResponseDTO tunnelInfo = gson.fromJson(tunnelResponse, TunnelInfoResponseDTO.class);
+            TunnelInfoResponseDTO tunnelInfo = convertJsonStringToPojo(tunnelResponse,
+              new TypeToken<TunnelInfoResponseDTO>() {
+              });
             ltLogger.debug("Status: {}", tunnelInfo.getStatus());
             ltLogger.debug("Data object: {}", (tunnelInfo.getData() != null ? "Present" : "NULL"));
 
@@ -231,7 +230,7 @@ public class TunnelManager extends BaseClass implements Runnable {
 
       if (i < maxRetries - 1) {
         ltLogger.info("Retrying to get tunnel info in {} seconds...", retryDelay);
-        TimeUnit.SECONDS.sleep(retryDelay);
+        waitForTime(retryDelay);
       }
     }
 
