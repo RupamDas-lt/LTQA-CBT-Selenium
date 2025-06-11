@@ -16,6 +16,22 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.pull_request.labels.*.name, 'change-report-database') }}
     steps:
+      - name: Check Java version and install Java 21 if not present
+        id: setup_java
+        run: |
+          JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d. -f1)
+          if [ "$JAVA_VERSION" != "21" ]; then
+            echo "Java 21 not found. Installing Java 21..."
+            sudo apt-get update
+            sudo apt-get install -y openjdk-21-jdk
+            echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> $GITHUB_ENV
+            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+            export PATH=$JAVA_HOME/bin:$PATH
+          else
+            echo "Java 21 is already installed."
+          fi
+        shell: bash
+
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
