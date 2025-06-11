@@ -289,6 +289,18 @@ public class FrameworkConstants extends BaseClass {
     }
   }
 
+  @Getter public enum clientSideNetworkOperations {
+    ENSURE_PORT_OPEN("ensure_port_open"), BLOCK_SSH_22("block_ssh_22"), BLOCK_SSH_443("block_ssh_443"), BLOCK_SSH_PORTS(
+      "block_ssh_ports"), BLOCK_TCP_443("block_tcp_443"), BLOCK_ALL_SSH_TCP("block_all_ssh_tcp"), FLUSH_ALL_RULES(
+      "flush_all_rules"), UNBLOCK_ALL_FOR_SERVERS("unblock_all_for_servers"), HELP("help");
+
+    private final String value;
+
+    clientSideNetworkOperations(String value) {
+      this.value = value;
+    }
+  }
+
   /// The updated tunnel server ips can be fetched by running GetTunnelServers.sh and the values will be saved in tunnelServers.json
   public static final HashMap<String, String> tunnelServerDomainToIPMap = new HashMap<>() {
     {

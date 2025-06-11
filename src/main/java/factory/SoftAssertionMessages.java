@@ -128,9 +128,8 @@ import lombok.Getter;
     "Unable to open test home page"), UNABLE_TO_STOP_BUILD_ERROR_MESSAGE(
     "Unable to initiate build stop as the build is not in Running state. Current state: %s"), UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE(
     "Unable to open %s url"), UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE(
-    "Unable to set baseline for auto heal test: %s."),
-
-  ;
+    "Unable to set baseline for auto heal test: %s."), TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE(
+    "Tunnel is not using the expected %s. Expected: %s, Actual: %s");
 
   private final String value;
 
