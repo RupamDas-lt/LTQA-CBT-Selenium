@@ -193,7 +193,7 @@ public class TunnelManager extends BaseClass implements Runnable {
               new TypeToken<TunnelInfoResponseDTO>() {
               });
 
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             String prettyJson = mapper.writeValueAsString(tunnelInfo);
             ltLogger.info("Tunnel info API response: {}", prettyJson);
