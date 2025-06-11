@@ -2,6 +2,7 @@ package automationHelper;
 
 import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.Others.SeleniumVersionsDTO;
+import DTOs.Others.TestShareAPIResponseDTO;
 import DTOs.Others.TunnelsAPIResponseDTO;
 import DTOs.SwaggerAPIs.GetBuildResponseDTO;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
@@ -15,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.EnvSetup;
@@ -23,10 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -460,9 +459,67 @@ public class AutomationAPIHelper extends ApiManager {
     return getCookiesFromResponse(uri, Method.POST, body, null, null);
   }
 
+  public String getBearerTokenFromLoginAPI() {
+    if (BEARER_TOKEN.get() != null && !BEARER_TOKEN.get().isEmpty()) {
+      ltLogger.info("Using cached Bearer token: {}", BEARER_TOKEN.get());
+      return BEARER_TOKEN.get();
+    }
+    final String bearerTokenKey = "accessToken";
+    Map<String, String> cookies = getCookiesFromLoginAPI();
+    String bearerToken = cookies.get(bearerTokenKey);
+    ltLogger.info("Bearer token fetched from login API: {}", bearerToken);
+    if (StringUtils.isNullOrEmpty(bearerToken)) {
+      throw new RuntimeException("Bearer token is null or empty. Please check your credentials.");
+    }
+    BEARER_TOKEN.set(bearerToken);
+    ltLogger.info("Bearer token set in ThreadLocal: {}", BEARER_TOKEN.get());
+    return BEARER_TOKEN.get();
+  }
+
   public String getCurrentIPFromAPI() {
     String ip = getRequestAsString(API_TO_GET_IP);
     ltLogger.info("Current local machine IP fetched from API: {}", ip);
     return ip;
+  }
+
+  @SneakyThrows
+  public String getTestShareLinkUrl(String sessionId) {
+    String testID = getTestIdFromSessionId(sessionId);
+    final int[] validExpiryDays = { 3, 7, 10, 30 };
+    String bearerToken = getBearerTokenFromLoginAPI();
+    HashMap<String, Object> headers = new HashMap<>();
+    headers.put("Authorization", "Bearer " + bearerToken);
+
+    HashMap<String, Object> body = new HashMap<>();
+    body.put("expiresAt", validExpiryDays[new Random().nextInt(validExpiryDays.length)]);
+    body.put("themeVersion", "v2");
+    body.put("isThemeEnabled", true);
+    body.put("selectedTab", "home");
+    body.put("entityType", "Automation Test");
+    body.put("entityIds", new String[] { testID });
+
+    // Convert HashMap to JSON using Jackson
+    //    ObjectMapper objectMapper = new ObjectMapper();
+    //    String jsonString = objectMapper.writeValueAsString(body);
+
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, GENERATE_TEST_SHARE_LINK_API_ENDPOINT);
+
+    ltLogger.info("Generating test share link for test ID: {} with api: {}", testID, uri);
+
+    String response = postRequestWithCustomHeaders(uri, body, headers).getBody().asString();
+
+    ltLogger.info("Response from test share link generation API: {}", response);
+
+    if (response == null || response.isEmpty()) {
+      throw new RuntimeException("Failed to generate test share link. Response is :" + response);
+    }
+
+    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
+      new TypeToken<TestShareAPIResponseDTO>() {
+      });
+
+    String testShareUrl = testShareLinkResponseDTO.getShareIdUrl();
+    ltLogger.info("Test share link generated successfully: {}", testShareUrl);
+    return testShareUrl;
   }
 }

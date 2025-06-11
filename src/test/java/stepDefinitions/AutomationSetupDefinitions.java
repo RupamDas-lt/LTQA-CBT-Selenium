@@ -98,11 +98,26 @@ public class AutomationSetupDefinitions {
     automationHelper.verifyBuildStatusViaAPI(status);
   }
 
+  @Then("^I create (test|build) share link$")
+  public void iCreateTestShareLink(String linkType) {
+    if (linkType.equals("test")) {
+      automationHelper.createTestShareLinkAndStoreItToSessionReport(TEST_SESSION_ID.get());
+    } else if (linkType.equals("build")) {
+      //      automationHelper.createBuildShareLinkAndStoreItToSessionReport(BUILD_ID.get());
+    }
+  }
+
+  @Then("^I verify (test|build) share link via API$")
+  public void iVerifyTestShareLink(String linkType) {
+    automationHelper.verifyShareLinkViaApi(linkType);
+  }
+
   @Then("^I set test actions repeat count to ([0-9])$")
   public void iSetTestActionsRepeatCountToTestActionsRepeatCount(String count) {
     System.setProperty(REPEAT_TEST_ACTIONS, count);
   }
 
+  /// Client test related step definitions
   @Then("I navigate to ML dashboard of current test")
   public void iNavigateToMLDashboardOfCurrentTest() {
     clientAutomationHelper.navigateToDashboardOfSpecificTest(TEST_SESSION_ID.get());

@@ -72,6 +72,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
   public static final String BUILD_STOP_API_ENDPOINT = "/api/v1/test/stop/?buildId=";
   public static final String SESSION_LIGHTHOUSE_REPORT_ENDPOINT = "/automation/api/v1/lighthouse/report/";
+  public static final String GENERATE_TEST_SHARE_LINK_API_ENDPOINT = "/lshs/api/v1.0/share-item/generate-sharable-link";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -264,7 +265,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK
   }
 
   @Getter public enum videoMetadataTypes {
