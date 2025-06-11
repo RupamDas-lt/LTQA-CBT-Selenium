@@ -817,5 +817,12 @@
     "sub_category": "command-logs-issues",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "d33e70891734c4a2ddd2de21ab8086cc5c242b258e044d4eebef9b577a7eeeee": {
+    "message": "Tunnel is not using the expected %s. Expected: %s, Actual: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

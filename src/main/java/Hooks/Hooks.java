@@ -45,7 +45,7 @@ public class Hooks extends BaseClass {
   @Before(order = 2, value = "@tunnel_regression")
   public void beforeTunnelRegression() {
     ltLogger.info("Executing bash script for updating local hosts mapping");
-    runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING, "--addEntry");
+    runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING, false, "--addEntry");
   }
 
   private String getStackTrace(Throwable error) {

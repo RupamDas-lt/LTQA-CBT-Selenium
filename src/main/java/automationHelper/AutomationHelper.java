@@ -6,6 +6,7 @@ import TestManagers.TunnelManager;
 import factory.Locator;
 import factory.LocatorTypes;
 import io.restassured.response.Response;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +17,9 @@ import utility.CustomAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +31,9 @@ import static utility.FrameworkConstants.testVerificationDataKeys.AUTO_HEAL_DATA
 import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper extends BaseClass {
+  // path for the network blocking script
+  private static final String NETWORK_SCRIPT_PATH = "./Utility/Bash/NetworkBlockingUtils.sh";
+
   private final Logger ltLogger = LogManager.getLogger(AutomationHelper.class);
   CapabilityManager capabilityManager = new CapabilityManager();
   DriverManager driverManager = new DriverManager(true);
@@ -588,7 +595,7 @@ public class AutomationHelper extends BaseClass {
 
   private void runDifferentHerokuAppTest() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    //    runABTestIHA(softAssert);
+    // runABTestIHA(softAssert);
     addOrRemoveElementIHA(softAssert);
     basicAuthenticationIHA();
     testBrokenImagesIHA(softAssert);
@@ -731,9 +738,10 @@ public class AutomationHelper extends BaseClass {
       validLogsToCheck = true; // Always verify selenium/webDriver logs
     }
 
-    //    softAssert.assertTrue(validLogsToCheck,
-    //      logs + " logs verification is skipped as required caps are not used. Required caps: " + testArtefactsToCapsMap.getOrDefault(
-    //        logs, Collections.emptyMap()));
+    // softAssert.assertTrue(validLogsToCheck,
+    // logs + " logs verification is skipped as required caps are not used. Required
+    // caps: " + testArtefactsToCapsMap.getOrDefault(
+    // logs, Collections.emptyMap()));
 
     if (!validLogsToCheck) {
       System.err.println(
@@ -1049,7 +1057,7 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  ///  Create baseline for long locators
+  /// Create baseline for long locators
   private void createBaseLineForAutoHealTestOfLongLocator() {
     final String todoListPageHeading = "To Do List";
     driverManager.getURL(AUTO_HEAL_TO_DO_LIST_SAMPLE_URL);
@@ -1180,4 +1188,254 @@ public class AutomationHelper extends BaseClass {
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
+
+  public String getCurrentSshConnectionType() {
+    try {
+      String sshConnType = tunnelManager.getCurrentSshConnectionType();
+      ltLogger.info("Retrieved SSH connection type from TunnelManager: {}", sshConnType);
+      return sshConnType;
+    } catch (Exception e) {
+      ltLogger.error("Failed to get SSH connection type from TunnelManager: {}", e.getMessage());
+      throw new RuntimeException("Failed to get SSH connection type", e);
+    }
+  }
+
+  public void iVerifyTunnelConnectionUsesProtocol(String protocol) {
+    ltLogger.info("Verifying tunnel connection uses {} protocol", protocol);
+
+    waitForTime(3);
+
+    String actualProtocol = tunnelManager.getCurrentTunnelMode();
+    ltLogger.info("Protocol used in Tunnel: Expected={}, Actual={}", protocol, actualProtocol);
+    CustomAssert.assertTrue(actualProtocol.equalsIgnoreCase(protocol),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "protocol", protocol,
+        actualProtocol));
+    ltLogger.info("Tunnel protocol verification successful. Using protocol: {}", protocol);
+  }
+
+  public void iVerifyTunnelUsesConnection(String expectedConnectionType) {
+    ltLogger.info("Verifying tunnel uses {} connection", expectedConnectionType);
+
+    waitForTime(3);
+
+    String actualSshConnType = tunnelManager.getCurrentSshConnectionType();
+    ltLogger.info("SSH connection type verification result: Expected={}, Actual={}", expectedConnectionType,
+      actualSshConnType);
+    CustomAssert.assertTrue(expectedConnectionType.equalsIgnoreCase(actualSshConnType),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "SSH connection type",
+        expectedConnectionType, actualSshConnType));
+
+    ltLogger.info("Tunnel SSH connection type verification successful. Using: {}", expectedConnectionType);
+  }
+
+  public void iVerifyTunnelConnectsOnPort(int port) {
+    ltLogger.info("Verifying tunnel connects on port {}", port);
+
+    waitForTime(3);
+
+    int currentPort = tunnelManager.getCurrentTunnelPort();
+    CustomAssert.assertTrue(currentPort == port,
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "expected port for connection", port,
+        currentPort));
+
+    ltLogger.info("Tunnel port verification successful. Connecting on port: {}", port);
+  }
+
+  public void iVerifyTunnelConnectsOnPortUsingSSH(int port) {
+    ltLogger.info("Verifying tunnel connects on port {} using SSH", port);
+
+    waitForTime(3);
+
+    String actualTunnelMode = tunnelManager.getCurrentTunnelMode();
+    ltLogger.info("Tunnel mode verification: Expected=ssh, Actual={}", actualTunnelMode);
+    CustomAssert.assertTrue(actualTunnelMode.equalsIgnoreCase("ssh"),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "mode", "ssh", actualTunnelMode));
+
+    int currentPort = tunnelManager.getCurrentTunnelPort();
+    ltLogger.error("Tunnel SSH port verification status. Expected port: {}, Actual port: {}", port, currentPort);
+    CustomAssert.assertTrue(currentPort == port,
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "port", port, currentPort));
+    ltLogger.info("Tunnel SSH port verification successful. Using SSH on port: {}", port);
+  }
+
+  public void iVerifyTunnelConnectsOnPortUsingTCP(int port) {
+    ltLogger.info("Verifying tunnel connects on port {} using TCP", port);
+
+    waitForTime(3);
+
+    String currentMode = tunnelManager.getCurrentTunnelMode();
+    ltLogger.info("Tunnel mode verification: Expected=tcp, Actual={}", currentMode);
+    CustomAssert.assertTrue(currentMode.equalsIgnoreCase("tcp"),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "mode", "tcp", currentMode));
+
+    int currentPort = tunnelManager.getCurrentTunnelPort();
+    ltLogger.info("Tunnel TCP port verification status. Expected port: {}, Actual port: {}", port, currentPort);
+    CustomAssert.assertTrue(currentPort == port,
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "port", port, currentPort));
+
+    ltLogger.info("Tunnel TCP port verification successful. Using TCP on port: {}", port);
+  }
+
+  public void iVerifyTunnelConnectsUsingWebSocket() {
+    ltLogger.info("Verifying tunnel connects using WebSocket");
+
+    waitForTime(3);
+
+    String currentMode = tunnelManager.getCurrentTunnelMode();
+    ltLogger.info("Tunnel mode verification: Expected=ws, Actual={}", currentMode);
+    CustomAssert.assertTrue(currentMode.equalsIgnoreCase("ws"),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "mode", "ws", currentMode));
+
+    ltLogger.info("Tunnel WebSocket verification successful. Using WebSocket mode");
+  }
+
+  public void iVerifyTunnelUsesProtocol(String expectedProtocol) {
+    ltLogger.info("Verifying tunnel uses {} protocol", expectedProtocol);
+
+    waitForTime(3);
+
+    String protocolToCheck = expectedProtocol;
+    if (expectedProtocol.contains(":")) {
+      protocolToCheck = expectedProtocol.split(":")[0];
+    }
+
+    String actualProtocol = tunnelManager.getCurrentTunnelMode();
+    ltLogger.info("Tunnel protocol verification result: Expected protocol={}, Actual protocol={}", protocolToCheck,
+      actualProtocol);
+    CustomAssert.assertTrue(actualProtocol.equalsIgnoreCase(protocolToCheck),
+      softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "protocol", expectedProtocol,
+        actualProtocol));
+
+    if (expectedProtocol.contains(":")) {
+      String[] parts = expectedProtocol.split(":");
+      if (parts.length == 2) {
+        try {
+          int expectedPort = Integer.parseInt(parts[1]);
+          int currentPort = tunnelManager.getCurrentTunnelPort();
+          CustomAssert.assertTrue(expectedPort == currentPort,
+            softAssertMessageFormat(TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE, "port", expectedPort,
+              currentPort));
+        } catch (NumberFormatException e) {
+          ltLogger.warn("Could not parse port from protocol: {}", expectedProtocol);
+        }
+      }
+    }
+
+    ltLogger.info("Tunnel protocol verification successful. Using: {}", expectedProtocol);
+  }
+
+  public void iVerifyAllTunnelFlagsAreAppliedCorrectly() {
+    ltLogger.info("Verifying all tunnel flags are applied correctly");
+
+    waitForTime(3);
+
+    try {
+      String currentMode = tunnelManager.getCurrentTunnelMode();
+      String currentSshConnType = getCurrentSshConnectionType();
+      int currentPort = tunnelManager.getCurrentTunnelPort();
+
+      ltLogger.info("Current tunnel configuration:");
+      ltLogger.info("  Mode: {}", currentMode);
+      ltLogger.info("  SSH Connection Type: {}", currentSshConnType);
+      ltLogger.info("  Port: {}", currentPort);
+
+      if (currentMode == null || currentMode.isEmpty())
+        softAssertMessageFormat(NULL_OR_EMPTY_API_RESPONSE_ERROR_MESSAGE, "tunnel info API", currentMode);
+      ltLogger.info("Tunnel flags verification completed successfully");
+    } catch (Exception e) {
+      ltLogger.error("Failed to verify tunnel flags: {}", e.getMessage());
+      throw new RuntimeException("Failed to verify tunnel flags: " + e.getMessage());
+    }
+  }
+
+  public void iRestartTunnel() {
+    ltLogger.info("Restarting tunnel");
+    stopTunnel();
+    waitForTime(5);
+    startTunnel();
+    waitForTime(10);
+  }
+
+  public void iRestartTunnelWith(String flags) {
+    ltLogger.info("Restarting tunnel with flags: {}", flags);
+    stopTunnel();
+    waitForTime(5);
+    startTunnel(flags);
+    waitForTime(10);
+  }
+
+  public void iVerifyTunnelReconnectionOccurs() {
+    ltLogger.info("Verifying tunnel reconnection occurs");
+    modifyNetworkRestrictions(clientSideNetworkOperations.FLUSH_ALL_RULES);
+    waitForTime(10);
+
+    try {
+      String currentMode = tunnelManager.getCurrentTunnelMode();
+      if (currentMode == null || currentMode.isEmpty())
+        CustomAssert.fail(
+          softAssertMessageFormat(NULL_OR_EMPTY_API_RESPONSE_ERROR_MESSAGE, "tunnel info API", currentMode));
+      ltLogger.info("Tunnel reconnection verification successful. Current mode: {}", currentMode);
+    } catch (Exception e) {
+      ltLogger.error("Tunnel reconnection verification failed: {}", e.getMessage());
+      throw new RuntimeException("Tunnel reconnection verification failed", e);
+    }
+  }
+
+  //    Remove this part if the modifyNetworkRestrictions method work as expected
+  @SneakyThrows
+  private void executeNetworkScript(String... params) {
+    try {
+      ProcessBuilder pb = new ProcessBuilder();
+      pb.command("sudo", "bash", NETWORK_SCRIPT_PATH);
+      for (String param : params) {
+        pb.command().add(param);
+      }
+
+      ltLogger.info("Executing network blocking command: {}", String.join(" ", pb.command()));
+      Process process = pb.start();
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        ltLogger.info("Network script output: {}", line);
+      }
+
+      BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+      while ((line = errorReader.readLine()) != null) {
+        ltLogger.error("Network script error: {}", line);
+      }
+
+      int exitCode = process.waitFor();
+      if (exitCode != 0) {
+        ltLogger.error("Network blocking script failed with exit code: {}", exitCode);
+        throw new RuntimeException("Network blocking operation failed");
+      }
+
+    } catch (IOException | InterruptedException e) {
+      ltLogger.error("Failed to execute network blocking script: {}", e.getMessage());
+      throw new RuntimeException("Network blocking script execution failed", e);
+    }
+  }
+
+  public void modifyNetworkRestrictions(clientSideNetworkOperations restrictionType, String... additionalParams) {
+    ltLogger.info("Modifying network restrictions: {}, with params: {}", restrictionType,
+      Arrays.toString(additionalParams));
+
+    // Ensure that necessary parameters are provided
+    if (restrictionType == clientSideNetworkOperations.ENSURE_PORT_OPEN && (additionalParams.length == 0 || additionalParams[0].isEmpty())) {
+      throw new IllegalArgumentException("Port number must be provided for ENSURE_PORT_OPEN operation");
+    }
+
+    // Determine the script and parameters to use based on the restriction type
+    String[] params = (restrictionType == clientSideNetworkOperations.ENSURE_PORT_OPEN) ?
+      new String[] { restrictionType.getValue(), additionalParams[0] } :
+      new String[] { restrictionType.getValue() };
+
+    // Run the bash script with the correct parameters
+    runBashScriptWithFlags(NETWORK_SCRIPT_PATH, true, params);
+
+    // Adding a small wait after the operation
+    waitForTime(2);
+  }
+
 }

@@ -747,8 +747,10 @@ public class BaseClass {
    * @param bashFilePath The path to the Bash script.
    * @param flags        Optional flags to pass to the script.
    */
-  public void runBashScriptWithFlags(String bashFilePath, String... flags) {
-    StringBuilder command = new StringBuilder("bash " + bashFilePath);
+  public void runBashScriptWithFlags(String bashFilePath, boolean needSudoAccess, String... flags) {
+    StringBuilder command = needSudoAccess ?
+      new StringBuilder("sudo bash " + bashFilePath) :
+      new StringBuilder("bash " + bashFilePath);
     for (String flag : flags) {
       command.append(" ").append(flag);
     }
@@ -763,8 +765,8 @@ public class BaseClass {
         System.out.println("Bash script execution failed. Exit code: " + exitCode);
       }
     } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
-      System.out.println("Error executing the script.");
+      ltLogger.info("Bash script execution failed. Error: {}", e.getMessage());
+      throw new RuntimeException("Error executing bash script: " + bashFilePath, e);
     }
   }
 
