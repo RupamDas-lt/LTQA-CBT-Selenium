@@ -824,5 +824,12 @@
     "sub_category": "tunnel-issues",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "d251b936f5be24b08d55809aa731049c59a62f2642035981af91f4ef32e038ef": {
+    "message": "Unable to open LambdaTest page.",
+    "category": "lt-dashboard-issues",
+    "sub_category": "lt-page-down",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }
