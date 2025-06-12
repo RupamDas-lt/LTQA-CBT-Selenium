@@ -499,7 +499,12 @@ public class AutomationHelper extends BaseClass {
 
   private void loginCacheCleanedCheckUsingLTLoginPage() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    driverManager.getURL(LT_LOGIN_URL);
+
+    String ltDashboardUrl = Boolean.parseBoolean(IS_GDPR_TEST_CONFIG) ?
+      getCorrespondingDashboardUrlForGDPRUser(LT_LOGIN_URL) :
+      LT_LOGIN_URL;
+    
+    driverManager.getURL(ltDashboardUrl);
 
     boolean isLTPageOpened = driverManager.isDisplayed(ltPageHeading, 10);
     boolean isLoginFormDisplayed = driverManager.isDisplayed(ltLoginPageEmailInput, 5);
