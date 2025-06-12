@@ -502,7 +502,7 @@ public class AutomationHelper extends BaseClass {
     driverManager.getURL(LT_LOGIN_URL);
     softAssert.assertTrue(driverManager.isDisplayed(ltLoginPageEmailInput, 5),
       softAssertMessageFormat(LOGIN_CACHE_CHECK_FAILED_ERROR_MESSAGE));
-    if (!driverManager.isDisplayed(ltLoginPageEmailInput)) {
+    if (driverManager.isDisplayed(ltLoginPageEmailInput)) {
       driverManager.sendKeys(ltLoginPageEmailInput, USER_EMAIL);
       driverManager.sendKeys(ltLoginPagePasswordInput, USER_PASS);
       driverManager.click(ltLoginPageSubmitButton);
