@@ -776,14 +776,17 @@ public class BaseClass {
       return url;
     }
 
+    String gdprUrl;
     String prefix = "https://";
     String rest = url.substring(prefix.length());
 
     if (rest.startsWith("stage-")) {
-      return prefix + "stage-eu-" + rest.substring("stage-".length());
+      gdprUrl = prefix + "stage-eu-" + rest.substring("stage-".length());
     } else {
-      return prefix + "eu-" + rest;
+      gdprUrl = prefix + "eu-" + rest;
     }
+    ltLogger.info("GDPR URL: {}", gdprUrl);
+    return gdprUrl;
   }
 
   public String handleCapabilityGeneratorAPIsForGDPRUser(String url) {
