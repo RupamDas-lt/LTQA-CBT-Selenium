@@ -80,7 +80,6 @@ public class EnvSetup {
     ConcurrentLinkedQueue::new);
   public static final ThreadLocal<Queue<String>> CLIENT_TEST_SESSION_ID_QUEUE = ThreadLocal.withInitial(
     ConcurrentLinkedQueue::new);
-  public static final ThreadLocal<String> BEARER_TOKEN = ThreadLocal.withInitial(() -> "");
 
   private static Map<String, String> getEnvConfig() {
     if (TEST_ENV.equalsIgnoreCase("local")) {

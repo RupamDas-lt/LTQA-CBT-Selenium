@@ -16,10 +16,10 @@ import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.util.StringUtils;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.EnvSetup;
+import utility.FileLockUtility;
 
 import java.io.File;
 import java.io.IOException;
@@ -460,10 +460,6 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public String getBearerTokenFromLoginAPI() {
-    if (BEARER_TOKEN.get() != null && !BEARER_TOKEN.get().isEmpty()) {
-      ltLogger.info("Using cached Bearer token: {}", BEARER_TOKEN.get());
-      return BEARER_TOKEN.get();
-    }
     final String bearerTokenKey = "accessToken";
     Map<String, String> cookies = getCookiesFromLoginAPI();
     String bearerToken = cookies.get(bearerTokenKey);
@@ -471,9 +467,39 @@ public class AutomationAPIHelper extends ApiManager {
     if (StringUtils.isNullOrEmpty(bearerToken)) {
       throw new RuntimeException("Bearer token is null or empty. Please check your credentials.");
     }
-    BEARER_TOKEN.set(bearerToken);
-    ltLogger.info("Bearer token set in ThreadLocal: {}", BEARER_TOKEN.get());
-    return BEARER_TOKEN.get();
+    return bearerToken;
+  }
+
+  public String getBearerToken() {
+    String user = testEmail.get();
+
+    // Check if the token is already cached and return immediately if present
+    String cachedToken = USER_TO_BEARER_TOKEN_MAP.get(user);
+    if (cachedToken != null && !cachedToken.isEmpty()) {
+      ltLogger.info("Using cached Bearer token: {}", cachedToken);
+      return cachedToken;
+    }
+
+    // Acquire the lock only if token is not cached
+    FileLockUtility.fileLock.lock();
+    try {
+      // Double-check if another thread has already fetched and cached the token while we were waiting for the lock
+      cachedToken = USER_TO_BEARER_TOKEN_MAP.get(user);
+      if (cachedToken != null && !cachedToken.isEmpty()) {
+        ltLogger.info("Using cached Bearer token after lock: {}", cachedToken);
+        return cachedToken;
+      }
+
+      // Token was not cached, fetch and cache it
+      ltLogger.info("Fetching Bearer token from login API for user: {}", user);
+      String bearerToken = getBearerTokenFromLoginAPI();
+      USER_TO_BEARER_TOKEN_MAP.put(user, bearerToken);
+      ltLogger.info("Bearer token set in Map: {}", bearerToken);
+      return bearerToken;
+
+    } finally {
+      FileLockUtility.fileLock.unlock(); // Ensure lock is released even if an exception occurs
+    }
   }
 
   public String getCurrentIPFromAPI() {
@@ -482,31 +508,17 @@ public class AutomationAPIHelper extends ApiManager {
     return ip;
   }
 
-  @SneakyThrows
   public String getTestShareLinkUrl(String sessionId) {
     String testID = getTestIdFromSessionId(sessionId);
-    final int[] validExpiryDays = { 3, 7, 10, 30 };
-    String bearerToken = getBearerTokenFromLoginAPI();
-    HashMap<String, Object> headers = new HashMap<>();
-    headers.put("Authorization", "Bearer " + bearerToken);
+    String bearerToken = getBearerToken();
 
-    HashMap<String, Object> body = new HashMap<>();
-    body.put("expiresAt", validExpiryDays[new Random().nextInt(validExpiryDays.length)]);
-    body.put("themeVersion", "v2");
-    body.put("isThemeEnabled", true);
-    body.put("selectedTab", "home");
-    body.put("entityType", "Automation Test");
-    body.put("entityIds", new String[] { testID });
-
-    // Convert HashMap to JSON using Jackson
-    //    ObjectMapper objectMapper = new ObjectMapper();
-    //    String jsonString = objectMapper.writeValueAsString(body);
+    HashMap<String, Object> body = getRequestBodyForShareLinks("test", testID);
 
     String uri = constructAPIUrl(EnvSetup.API_URL_BASE, GENERATE_TEST_SHARE_LINK_API_ENDPOINT);
 
     ltLogger.info("Generating test share link for test ID: {} with api: {}", testID, uri);
 
-    String response = postRequestWithCustomHeaders(uri, body, headers).getBody().asString();
+    String response = postRequestWithBearerToken(uri, bearerToken, body).getBody().asString();
 
     ltLogger.info("Response from test share link generation API: {}", response);
 
@@ -521,5 +533,25 @@ public class AutomationAPIHelper extends ApiManager {
     String testShareUrl = testShareLinkResponseDTO.getShareIdUrl();
     ltLogger.info("Test share link generated successfully: {}", testShareUrl);
     return testShareUrl;
+  }
+
+  private HashMap<String, Object> getRequestBodyForShareLinks(String type, String id) {
+    final int[] validExpiryDays = { 3, 7, 10, 30 };
+
+    HashMap<String, Object> body = new HashMap<>();
+    body.put("expiresAt", validExpiryDays[new Random().nextInt(validExpiryDays.length)]); // Optimized random generation
+    body.put("themeVersion", "v2");
+    body.put("isThemeEnabled", true);
+    body.put("entityIds", new String[] { id });
+
+    // Set entityType and selectedTab based on 'type'
+    if ("test".equals(type)) {
+      body.put("entityType", "Automation Test");
+      body.put("selectedTab", "home");
+    } else {
+      body.put("entityType", "Automation Build");
+    }
+
+    return body;
   }
 }

@@ -197,6 +197,14 @@ public abstract class ApiManager extends BaseClass {
     return fieldValue;
   }
 
+  public Response postRequestWithBearerToken(String uri, String token, Object... customBody) {
+    Object body = customBody.length == 1 ? customBody[0] : null;
+    ltLogger.info("POST Request with Bearer Token: {}, Body: {}, Token: {}", uri, body, token);
+    HashMap<String, Object> headers = new HashMap<>();
+    headers.put("Authorization", "Bearer " + token);
+    return postRequestWithCustomHeaders(uri, body, headers);
+  }
+
   public void fetchDataAndWriteResponseToFile(String uri, String filePath) {
     FileLockUtility.fileLock.lock();
     try {

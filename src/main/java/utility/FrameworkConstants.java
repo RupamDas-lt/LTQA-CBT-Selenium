@@ -330,4 +330,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
   public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
 
+  // Runtime constants
+  public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();
+
 }
