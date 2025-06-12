@@ -85,7 +85,8 @@ import lombok.Getter;
     "Received null or empty response for %s API. Response: %s"), COMMAND_LOGS_NO_OF_PAGES_MISMATCH_ERROR_MESSAGE(
     "Number of pages in command logs does not match. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_SIZE_MISMATCH_ERROR_MESSAGE(
     "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_START_TIME_NULL_OR_EMPTY_ERROR_MESSAGE(
-    "Command logs page start time is null or empty for page: %s"), SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE(
+    "Command logs page start time is null or empty for page: %s"), UNABLE_TO_OPEN_LT_PAGE_ERROR_MESSAGE(
+    "Unable to open LambdaTest page."),SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE(
     "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s"),
 
   //  CLIENT side error messages

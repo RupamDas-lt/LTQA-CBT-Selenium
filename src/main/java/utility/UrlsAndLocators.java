@@ -89,6 +89,7 @@ public class UrlsAndLocators {
   public static final String LT_LOGIN_URL = EnvSetup.TEST_ENV.contains("stage") ?
     "https://stage-accounts.lambdatestinternal.com/login" :
     "https://accounts.lambdatest.com/login";
+  public static final Locator ltPageHeading = new Locator(LocatorTypes.CSS, "[aria-label*='LambdaTest']");
   public static final Locator ltLoginPageEmailInput = new Locator(LocatorTypes.ID, "email");
   public static final Locator ltLoginPagePasswordInput = new Locator(LocatorTypes.ID, "password");
   public static final Locator ltLoginPageSubmitButton = new Locator(LocatorTypes.ID, "login-button");

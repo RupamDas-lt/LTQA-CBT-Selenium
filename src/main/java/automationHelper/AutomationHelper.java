@@ -497,9 +497,18 @@ public class AutomationHelper extends BaseClass {
   private void loginCacheCleanedCheckUsingLTLoginPage() {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     driverManager.getURL(LT_LOGIN_URL);
-    softAssert.assertTrue(driverManager.isDisplayed(ltLoginPageEmailInput, 5),
-      softAssertMessageFormat(LOGIN_CACHE_CHECK_FAILED_ERROR_MESSAGE));
-    if (!driverManager.isDisplayed(ltLoginPageEmailInput)) {
+
+    boolean isLTPageOpened = driverManager.isDisplayed(ltPageHeading, 10);
+    boolean isLoginFormDisplayed = driverManager.isDisplayed(ltLoginPageEmailInput, 5);
+
+    if (!isLTPageOpened) {
+      // If the LT page is not opened, it could be due to a network issue or the page being down.
+      softAssert.fail(softAssertMessageFormat(UNABLE_TO_OPEN_LT_PAGE_ERROR_MESSAGE));
+    } else if (!isLoginFormDisplayed) {
+      // If the login form is not displayed, it could be due to a cache is not cleared, and it automatically redirects to the login success page.
+      softAssert.fail(softAssertMessageFormat(LOGIN_CACHE_CHECK_FAILED_ERROR_MESSAGE));
+    } else {
+      // If the login form is displayed, it means the cache is cleared, and we can proceed with the login.
       driverManager.sendKeys(ltLoginPageEmailInput, USER_EMAIL);
       driverManager.sendKeys(ltLoginPagePasswordInput, USER_PASS);
       driverManager.click(ltLoginPageSubmitButton);
