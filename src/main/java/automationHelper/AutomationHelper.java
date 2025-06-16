@@ -503,7 +503,7 @@ public class AutomationHelper extends BaseClass {
     String ltDashboardUrl = Boolean.parseBoolean(IS_GDPR_TEST_CONFIG) ?
       getCorrespondingDashboardUrlForGDPRUser(LT_LOGIN_URL) :
       LT_LOGIN_URL;
-    
+
     driverManager.getURL(ltDashboardUrl);
 
     boolean isLTPageOpened = driverManager.isDisplayed(ltPageHeading, 10);
@@ -734,6 +734,15 @@ public class AutomationHelper extends BaseClass {
   }
 
   public void verifyLogs(String logs) {
+
+    String jobPurpose = System.getProperty(JOB_PURPOSE, "");
+    // List of artefacts to skip for smoke tests
+    if (jobPurpose.equalsIgnoreCase("smoke") && skipArtefactsForSmokeTests.contains(logs)) {
+      ltLogger.info("Skipping api verification of {} logs for smoke tests", logs);
+      System.err.printf("Skipping api verification of %s logs for smoke tests%n", logs);
+      return;
+    }
+
     // Wait for logs to be uploaded
     waitForSomeTimeAfterTestCompletionForLogsToBeUploaded(EnvSetup.TEST_REPORT.get().get(TEST_END_TIMESTAMP).toString(),
       120);

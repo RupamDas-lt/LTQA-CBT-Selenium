@@ -141,6 +141,15 @@ public class ClientAutomationHelper extends BaseClass {
   }
 
   private void verifyTestLogsAndMediaFromUI(String testId, String logName, CustomSoftAssert softAssert) {
+
+    String jobPurpose = System.getProperty(JOB_PURPOSE, "");
+    // List of artefacts to skip for smoke tests
+    if (jobPurpose.equalsIgnoreCase("smoke") && skipArtefactsForSmokeTests.contains(logName)) {
+      ltLogger.info("Skipping UI verification of {} logs for smoke tests", logName);
+      System.err.printf("Skipping UI verification of %s logs for smoke tests%n", logName);
+      return;
+    }
+
     switch (logName.toLowerCase()) {
     case "command":
       verifyCommandLogs(testId, softAssert);
