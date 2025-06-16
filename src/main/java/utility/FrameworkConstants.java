@@ -304,6 +304,9 @@ public class FrameworkConstants extends BaseClass {
     }
   }
 
+  public static Set<String> skipArtefactsForSmokeTests = Set.of("performancereport", "performance report",
+    "lighthousereport", "lighthouse report");
+
   /// The updated tunnel server ips can be fetched by running GetTunnelServers.sh and the values will be saved in tunnelServers.json
   public static final HashMap<String, String> tunnelServerDomainToIPMap = new HashMap<>() {
     {
