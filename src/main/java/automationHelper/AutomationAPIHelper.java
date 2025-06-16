@@ -139,6 +139,7 @@ public class AutomationAPIHelper extends ApiManager {
     if (StringUtils.isNullOrEmpty(cachedBuildId)) {
       buildId = getSpecificSessionDetailsViaAPI(session_id, keyForBuildId);
       ltLogger.info("Fetched Build ID from session details API response: {}", buildId);
+      EnvSetup.BUILD_ID.set(buildId);
     } else {
       buildId = cachedBuildId;
       ltLogger.info("Using cached build id: {}", buildId);
@@ -508,33 +509,6 @@ public class AutomationAPIHelper extends ApiManager {
     return ip;
   }
 
-  public String getTestShareLinkUrl(String sessionId) {
-    String testID = getTestIdFromSessionId(sessionId);
-    String bearerToken = getBearerToken();
-
-    HashMap<String, Object> body = getRequestBodyForShareLinks("test", testID);
-
-    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, GENERATE_TEST_SHARE_LINK_API_ENDPOINT);
-
-    ltLogger.info("Generating test share link for test ID: {} with api: {}", testID, uri);
-
-    String response = postRequestWithBearerToken(uri, bearerToken, body).getBody().asString();
-
-    ltLogger.info("Response from test share link generation API: {}", response);
-
-    if (response == null || response.isEmpty()) {
-      throw new RuntimeException("Failed to generate test share link. Response is :" + response);
-    }
-
-    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
-      new TypeToken<TestShareAPIResponseDTO>() {
-      });
-
-    String testShareUrl = testShareLinkResponseDTO.getShareIdUrl();
-    ltLogger.info("Test share link generated successfully: {}", testShareUrl);
-    return testShareUrl;
-  }
-
   private HashMap<String, Object> getRequestBodyForShareLinks(String type, String id) {
     final int[] validExpiryDays = { 3, 7, 10, 30 };
 
@@ -553,5 +527,44 @@ public class AutomationAPIHelper extends ApiManager {
     }
 
     return body;
+  }
+
+  private String getLSHSApiResponseForShareLinks(String entityType, String entityId) {
+    String bearerToken = getBearerToken();
+    HashMap<String, Object> body = getRequestBodyForShareLinks(entityType, entityId);
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, GENERATE_SHARE_LINK_API_ENDPOINT);
+    ltLogger.info("Generating test share link for {} ID: {} with api: {}", entityType, entityId, uri);
+    String response = postRequestWithBearerToken(uri, bearerToken, body).getBody().asString();
+    ltLogger.info("Response from {} share link generation API: {}", entityType, response);
+
+    if (response == null || response.isEmpty()) {
+      throw new RuntimeException("Failed to generate " + entityType + " share link. Response is :" + response);
+    }
+    return response;
+  }
+
+  public String getTestShareLinkUrl(String sessionId) {
+    String testID = getTestIdFromSessionId(sessionId);
+    String response = getLSHSApiResponseForShareLinks("test", testID);
+
+    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
+      new TypeToken<TestShareAPIResponseDTO>() {
+      });
+
+    String testShareUrl = testShareLinkResponseDTO.getShareIdUrl();
+    ltLogger.info("Test share link generated successfully: {}", testShareUrl);
+    return testShareUrl;
+  }
+
+  public String getBuildShareLinkUrl(String buildId) {
+    String response = getLSHSApiResponseForShareLinks("build", buildId);
+
+    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
+      new TypeToken<TestShareAPIResponseDTO>() {
+      });
+
+    String buildShareUrl = testShareLinkResponseDTO.getShareIdUrl();
+    ltLogger.info("Build share link generated successfully: {}", buildShareUrl);
+    return buildShareUrl;
   }
 }

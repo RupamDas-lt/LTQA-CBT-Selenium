@@ -23,8 +23,7 @@ import java.util.regex.Pattern;
 import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
-import static utility.FrameworkConstants.testVerificationDataKeys.AUTO_HEAL_DATA;
-import static utility.FrameworkConstants.testVerificationDataKeys.TEST_SHARE_LINK;
+import static utility.FrameworkConstants.testVerificationDataKeys.*;
 import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper extends BaseClass {
@@ -1413,14 +1412,36 @@ public class AutomationHelper extends BaseClass {
     TEST_VERIFICATION_DATA.get().put(TEST_SHARE_LINK, getTestShareLinkUrl);
   }
 
+  public void createBuildShareLinkAndStoreItToSessionReport(String buildId) {
+    String getBuildShareLinkUrl = apiHelper.getBuildShareLinkUrl(buildId);
+    TEST_VERIFICATION_DATA.get().put(BUILD_SHARE_LINK, getBuildShareLinkUrl);
+  }
+
   public void verifyShareLinkViaApi(String linkType) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String shareLink = TEST_VERIFICATION_DATA.get().get(TEST_SHARE_LINK).toString();
+
+    String shareLink = linkType.equalsIgnoreCase("test") ?
+      TEST_VERIFICATION_DATA.get().get(TEST_SHARE_LINK).toString() :
+      TEST_VERIFICATION_DATA.get().get(BUILD_SHARE_LINK).toString();
+
     int responseCode = apiHelper.getRequest(shareLink).statusCode();
     ltLogger.info("Verifying {} share link: {}, Response Code: {}", linkType, shareLink, responseCode);
+
     softAssert.assertTrue(responseCode == 200,
       softAssertMessageFormat(SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE, linkType, responseCode, shareLink));
+
     EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void getBuildIdFromSessionIdAndStoreItToEnvVar(String sessionId) {
+    String buildId = apiHelper.getBuildIdFromSessionId(sessionId);
+    if (buildId != null && !buildId.isEmpty()) {
+      EnvSetup.BUILD_ID.set(buildId);
+      ltLogger.info("Build ID retrieved from session ID {}: {}", sessionId, buildId);
+    } else {
+      ltLogger.warn("No Build ID found for session ID: {}", sessionId);
+      throw new RuntimeException("No Build ID found for session ID: " + sessionId);
+    }
   }
 
 }

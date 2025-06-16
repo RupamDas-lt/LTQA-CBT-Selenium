@@ -458,4 +458,20 @@ public class DriverManager extends BaseClass {
       ltLogger.error("Failed to accept alert: {}", e.getMessage());
     }
   }
+
+  public boolean isClickable(Locator locator) {
+    WebElement element = waitForElementToBeVisible(locator, 5);
+    try {
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1));
+      wait.until(ExpectedConditions.elementToBeClickable(element));
+      ltLogger.info("Element with locator '{}' is clickable.", locator);
+      return true;
+    } catch (TimeoutException e) {
+      ltLogger.warn("Element with locator '{}' is not clickable.", locator);
+      return false;
+    } catch (Exception e) {
+      ltLogger.error("Error checking if element with locator '{}' is clickable: {}", locator, e.getMessage());
+      return false;
+    }
+  }
 }

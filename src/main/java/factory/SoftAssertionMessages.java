@@ -86,7 +86,7 @@ import lombok.Getter;
     "Number of pages in command logs does not match. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_SIZE_MISMATCH_ERROR_MESSAGE(
     "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_START_TIME_NULL_OR_EMPTY_ERROR_MESSAGE(
     "Command logs page start time is null or empty for page: %s"), UNABLE_TO_OPEN_LT_PAGE_ERROR_MESSAGE(
-    "Unable to open LambdaTest page."),SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE(
+    "Unable to open LambdaTest page."), SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE(
     "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s"),
 
   //  CLIENT side error messages
@@ -121,7 +121,13 @@ import lombok.Getter;
     "Video verification failed from UI. Video is generated."), VIDEO_VERIFICATION_FAILED_CLIENT_ERROR_MESSAGE(
     "Video verification is not valid. Please check from UI and review the script."), VIDEO_DURATION_MISMATCH_CLIENT_ERROR_MESSAGE(
     "Video duration is less than 10 seconds. Duration: %s"), VIDEO_NOT_PLAYABLE_CLIENT_ERROR_MESSAGE(
-    "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s"),
+    "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s"), UNABLE_TO_OPEN_SHARE_PAGE_ERROR_MESSAGE(
+    "Unable to open %s share page. Link: %s"), BUILD_NAME_MISMATCH_CLIENT_ERROR_MESSAGE(
+    "Build name mismatch in %s. Expected: %s, Actual: %s"), TEST_NAME_MISMATCH_CLIENT_ERROR_MESSAGE(
+    "Test name mismatch in %s. Expected: %s, Actual: %s"), LOGS_NOT_PRESENT_IN_SHARE_PAGE_CLIENT_ERROR_MESSAGE(
+    "%s logs are not present in share page"), VIDEO_NOT_PRESENT_IN_SHARE_PAGE_CLIENT_ERROR_MESSAGE(
+    "Video is not present in share page"), TESTS_LIST_MISMATCH_IN_BUILD_SHARE_PAGE_CLIENT_ERROR_MESSAGE(
+    "Build share page tests list mismatch"),
 
   // Hard assertion messages
   TEST_STATUS_MISMATCH_ERROR_MESSAGE(
