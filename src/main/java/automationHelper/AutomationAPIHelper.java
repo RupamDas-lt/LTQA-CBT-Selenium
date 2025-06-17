@@ -324,11 +324,19 @@ public class AutomationAPIHelper extends ApiManager {
         try {
           node = new ObjectMapper().readTree(
             getRequestWithBasicAuthAsString(uri, EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get()));
+
+          // If response is null or empty, retry
+          if (node == null || node.isEmpty()) {
+            ltLogger.error("Trial: {} -> Received null or empty response from: {}", retryCount, uri);
+            throw new RuntimeException("Received null or empty response from: " + uri);
+          }
+
           EnvSetup.TEST_DETAIL_API_RESPONSE.set(node);
           break;
         } catch (Exception e) {
           ltLogger.error("Trial: {} -> Failed to fetch test details from: {}. Error: {}", retryCount, uri,
             e.getMessage());
+          waitForTime(10);
           if (retryCount == maxRetryCount) {
             throw new RuntimeException("Failed to fetch test details from: " + uri, e);
           }
