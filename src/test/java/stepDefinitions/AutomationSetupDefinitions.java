@@ -2,6 +2,7 @@ package stepDefinitions;
 
 import automationHelper.AutomationHelper;
 import automationHelper.ClientAutomationHelper;
+import automationHelper.MultipleAutomationSessionsHelper;
 import com.mysql.cj.util.StringUtils;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -20,6 +21,13 @@ public class AutomationSetupDefinitions {
   @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
   public void startSessionAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
     automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions);
+  }
+
+  @Then("^I start ([0-9]+) sessions ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
+  public void startMultipleSessionsAndPerformActivity(String numberOfSessions, String quitDriverStatus,
+    String testActions, String capability) {
+    MultipleAutomationSessionsHelper.runMultipleConcurrentSessions(Integer.parseInt(numberOfSessions),
+      !quitDriverStatus.equals("without"), capability, testActions);
   }
 
   @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit on ([a-zA-Z0-9_=,: ]+) to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
@@ -98,11 +106,26 @@ public class AutomationSetupDefinitions {
     automationHelper.verifyBuildStatusViaAPI(status);
   }
 
+  @Then("^I create (test|build) share link$")
+  public void iCreateTestShareLink(String linkType) {
+    if (linkType.equals("test")) {
+      automationHelper.createTestShareLinkAndStoreItToSessionReport(TEST_SESSION_ID.get());
+    } else if (linkType.equals("build")) {
+      automationHelper.createBuildShareLinkAndStoreItToSessionReport(BUILD_ID.get());
+    }
+  }
+
+  @Then("^I verify (test|build) share link via API$")
+  public void iVerifyTestShareLink(String linkType) {
+    automationHelper.verifyShareLinkViaApi(linkType);
+  }
+
   @Then("^I set test actions repeat count to ([0-9])$")
   public void iSetTestActionsRepeatCountToTestActionsRepeatCount(String count) {
     System.setProperty(REPEAT_TEST_ACTIONS, count);
   }
 
+  /// Client test related step definitions
   @Then("I navigate to ML dashboard of current test")
   public void iNavigateToMLDashboardOfCurrentTest() {
     clientAutomationHelper.navigateToDashboardOfSpecificTest(TEST_SESSION_ID.get());
@@ -116,6 +139,11 @@ public class AutomationSetupDefinitions {
   @Then("^I verify test (video|screenshot|performanceReport) from UI$")
   public void iVerifyTestVideoFromUI(String testMediaType) {
     clientAutomationHelper.verifyTestMediaFromUI(TEST_SESSION_ID.get(), testMediaType);
+  }
+
+  @Then("^I verify (test|build) share link via UI$")
+  public void iVerifyShareLinkViaUI(String linkType) {
+    clientAutomationHelper.verifyShareLinkViaUI(linkType);
   }
 
   /// Tunnel related step definitions
@@ -228,5 +256,13 @@ public class AutomationSetupDefinitions {
   @Then("I verify tunnel reconnection occurs")
   public void iVerifyTunnelReconnectionOccurs() {
     automationHelper.iVerifyTunnelReconnectionOccurs();
+  }
+
+  @Then("I extract build id from session ID")
+  public void iExtractBuildIdFromSessionID() {
+    String sessionId = TEST_SESSION_ID_QUEUE.get() == null || TEST_SESSION_ID_QUEUE.get().isEmpty() ?
+      TEST_TEST_ID.get() :
+      TEST_SESSION_ID_QUEUE.get().peek();
+    automationHelper.getBuildIdFromSessionIdAndStoreItToEnvVar(sessionId);
   }
 }

@@ -831,5 +831,54 @@
     "sub_category": "lt-page-down",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "6423841d225a140473612057ce9954ab533592b7f7ddb15426bc2a943cbfc481": {
+    "message": "%s logs are not present in share page",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-artefacts-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "1eea1c583cade52f7a5fc2cbcf5e8167d3d69d62d778eae844fd95b7fed11c4b": {
+    "message": "Video is not present in share page",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-artefacts-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8f152c2f35f158e67f565ae6a1e26b116d829494d236ba8bc64edc2549902c0e": {
+    "message": "Test name mismatch in %s. Expected: %s, Actual: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "825ddaa119ce23f2e7f88ee39ddc7195786beb8bb9ddb4379d486b0dbc3541ec": {
+    "message": "Build name mismatch in %s. Expected: %s, Actual: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-build-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "b3d9cad6240f18c2b9cda1d8d23b0031b6e23c830aebdfc8b6df3f9f117047fb": {
+    "message": "Build share page tests list mismatch",
+    "category": "share-link-issues",
+    "sub_category": "share-page-build-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9c92286c68dc11bed7e807bdb16773ed8e9ad5bf00e414901905668027d8a758": {
+    "message": "Unable to open %s share page. Link: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-not-opening-issue",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "5286974e40f67410dddfa077751f54b7016470a1d256ad28254a47d43330602b": {
+    "message": "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-not-opening-issue",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

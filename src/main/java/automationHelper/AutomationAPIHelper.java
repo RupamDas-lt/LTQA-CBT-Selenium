@@ -2,6 +2,7 @@ package automationHelper;
 
 import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.Others.SeleniumVersionsDTO;
+import DTOs.Others.TestShareAPIResponseDTO;
 import DTOs.Others.TunnelsAPIResponseDTO;
 import DTOs.SwaggerAPIs.GetBuildResponseDTO;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
@@ -18,15 +19,13 @@ import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utility.EnvSetup;
+import utility.FileLockUtility;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
@@ -140,6 +139,7 @@ public class AutomationAPIHelper extends ApiManager {
     if (StringUtils.isNullOrEmpty(cachedBuildId)) {
       buildId = getSpecificSessionDetailsViaAPI(session_id, keyForBuildId);
       ltLogger.info("Fetched Build ID from session details API response: {}", buildId);
+      EnvSetup.BUILD_ID.set(buildId);
     } else {
       buildId = cachedBuildId;
       ltLogger.info("Using cached build id: {}", buildId);
@@ -460,9 +460,111 @@ public class AutomationAPIHelper extends ApiManager {
     return getCookiesFromResponse(uri, Method.POST, body, null, null);
   }
 
+  public String getBearerTokenFromLoginAPI() {
+    final String bearerTokenKey = "accessToken";
+    Map<String, String> cookies = getCookiesFromLoginAPI();
+    String bearerToken = cookies.get(bearerTokenKey);
+    ltLogger.info("Bearer token fetched from login API: {}", bearerToken);
+    if (StringUtils.isNullOrEmpty(bearerToken)) {
+      throw new RuntimeException("Bearer token is null or empty. Please check your credentials.");
+    }
+    return bearerToken;
+  }
+
+  public String getBearerToken() {
+    String user = testEmail.get();
+
+    // Check if the token is already cached and return immediately if present
+    String cachedToken = USER_TO_BEARER_TOKEN_MAP.get(user);
+    if (cachedToken != null && !cachedToken.isEmpty()) {
+      ltLogger.info("Using cached Bearer token: {}", cachedToken);
+      return cachedToken;
+    }
+
+    // Acquire the lock only if token is not cached
+    FileLockUtility.fileLock.lock();
+    try {
+      // Double-check if another thread has already fetched and cached the token while we were waiting for the lock
+      cachedToken = USER_TO_BEARER_TOKEN_MAP.get(user);
+      if (cachedToken != null && !cachedToken.isEmpty()) {
+        ltLogger.info("Using cached Bearer token after lock: {}", cachedToken);
+        return cachedToken;
+      }
+
+      // Token was not cached, fetch and cache it
+      ltLogger.info("Fetching Bearer token from login API for user: {}", user);
+      String bearerToken = getBearerTokenFromLoginAPI();
+      USER_TO_BEARER_TOKEN_MAP.put(user, bearerToken);
+      ltLogger.info("Bearer token set in Map: {}", bearerToken);
+      return bearerToken;
+
+    } finally {
+      FileLockUtility.fileLock.unlock(); // Ensure lock is released even if an exception occurs
+    }
+  }
+
   public String getCurrentIPFromAPI() {
     String ip = getRequestAsString(API_TO_GET_IP);
     ltLogger.info("Current local machine IP fetched from API: {}", ip);
     return ip;
+  }
+
+  private HashMap<String, Object> getRequestBodyForShareLinks(String type, String id) {
+    final int[] validExpiryDays = { 3, 7, 10, 30 };
+
+    HashMap<String, Object> body = new HashMap<>();
+    body.put("expiresAt", validExpiryDays[new Random().nextInt(validExpiryDays.length)]); // Optimized random generation
+    body.put("themeVersion", "v2");
+    body.put("isThemeEnabled", true);
+    body.put("entityIds", new String[] { id });
+
+    // Set entityType and selectedTab based on 'type'
+    if ("test".equals(type)) {
+      body.put("entityType", "Automation Test");
+      body.put("selectedTab", "home");
+    } else {
+      body.put("entityType", "Automation Build");
+    }
+
+    return body;
+  }
+
+  private String getLSHSApiResponseForShareLinks(String entityType, String entityId) {
+    String bearerToken = getBearerToken();
+    HashMap<String, Object> body = getRequestBodyForShareLinks(entityType, entityId);
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, GENERATE_SHARE_LINK_API_ENDPOINT);
+    ltLogger.info("Generating test share link for {} ID: {} with api: {}", entityType, entityId, uri);
+    String response = postRequestWithBearerToken(uri, bearerToken, body).getBody().asString();
+    ltLogger.info("Response from {} share link generation API: {}", entityType, response);
+
+    if (response == null || response.isEmpty()) {
+      throw new RuntimeException("Failed to generate " + entityType + " share link. Response is :" + response);
+    }
+    return response;
+  }
+
+  public String getTestShareLinkUrl(String sessionId) {
+    String testID = getTestIdFromSessionId(sessionId);
+    String response = getLSHSApiResponseForShareLinks("test", testID);
+
+    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
+      new TypeToken<TestShareAPIResponseDTO>() {
+      });
+
+    String testShareUrl = testShareLinkResponseDTO.getShareIdUrl();
+    ltLogger.info("Test share link generated successfully: {}", testShareUrl);
+    return testShareUrl;
+  }
+
+  public String getBuildShareLinkUrl(String buildId) {
+    String response = getLSHSApiResponseForShareLinks("build", buildId);
+
+    TestShareAPIResponseDTO testShareLinkResponseDTO = convertJsonStringToPojo(response,
+      new TypeToken<TestShareAPIResponseDTO>() {
+      });
+
+    String buildShareUrl = testShareLinkResponseDTO.getShareIdUrl();
+    ltLogger.info("Build share link generated successfully: {}", buildShareUrl);
+    return buildShareUrl;
   }
 }

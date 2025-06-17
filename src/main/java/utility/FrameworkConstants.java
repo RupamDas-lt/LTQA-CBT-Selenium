@@ -72,6 +72,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_VERSIONS_API_ENDPOINT = "/api/v2/capability?grid=selenium&browser=<BROWSER_NAME>&version=<BROWSER_VERSION>&os=<TEMPLATE>&browser_version_id=<BROWSER_VERSION_ID>";
   public static final String BUILD_STOP_API_ENDPOINT = "/api/v1/test/stop/?buildId=";
   public static final String SESSION_LIGHTHOUSE_REPORT_ENDPOINT = "/automation/api/v1/lighthouse/report/";
+  public static final String GENERATE_SHARE_LINK_API_ENDPOINT = "/lshs/api/v1.0/share-item/generate-sharable-link";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -156,6 +157,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_TELEMETRY_LOGS = "seTelemetryLogs";
   public static final String VERBOSE_WEBDRIVER_LOGGING = "verboseWebDriverLogging";
   public static final String IDLE_TIMEOUT = "idleTimeout";
+  public static final String TEST_TAGS = "tags";
+  public static final String BUILD_TAGS = "buildTags";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -264,7 +267,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK
   }
 
   @Getter public enum videoMetadataTypes {
@@ -331,5 +334,8 @@ public class FrameworkConstants extends BaseClass {
   public static final String jsForSettingDocumentCookies = "document.cookie = ";
   public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
   public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
+
+  // Runtime constants
+  public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();
 
 }

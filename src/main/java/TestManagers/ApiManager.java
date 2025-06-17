@@ -171,6 +171,10 @@ public abstract class ApiManager extends BaseClass {
     return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200);
   }
 
+  public Response postRequestWithCustomHeaders(String uri, Object body, HashMap<String, Object> headers) {
+    return httpMethod(POST, uri, body, ContentType.JSON, headers, null, 200);
+  }
+
   public String getRequestAsString(String uri) {
     Response response = httpMethod(GET_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
     ltLogger.info("Response: {}", response.asString());
@@ -191,6 +195,14 @@ public abstract class ApiManager extends BaseClass {
     String fieldValue = response.jsonPath().get(jsonPath).toString();
     ltLogger.info("Field Value: {}", fieldValue);
     return fieldValue;
+  }
+
+  public Response postRequestWithBearerToken(String uri, String token, Object... customBody) {
+    Object body = customBody.length == 1 ? customBody[0] : null;
+    ltLogger.info("POST Request with Bearer Token: {}, Body: {}, Token: {}", uri, body, token);
+    HashMap<String, Object> headers = new HashMap<>();
+    headers.put("Authorization", "Bearer " + token);
+    return postRequestWithCustomHeaders(uri, body, headers);
   }
 
   public void fetchDataAndWriteResponseToFile(String uri, String filePath) {

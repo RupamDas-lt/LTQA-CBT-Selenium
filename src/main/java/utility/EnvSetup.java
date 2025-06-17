@@ -50,6 +50,8 @@ public class EnvSetup {
   public static final ThreadLocal<MutableCapabilities> TEST_CAPS = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<String, Object>> CUSTOM_TEST_CAPS_MAP_FROM_ENV = new ThreadLocal<HashMap<String, Object>>();
   public static final ThreadLocal<Map<String, Object>> TEST_CAPS_MAP = new ThreadLocal<Map<String, Object>>();
+  public static final ThreadLocal<Map<String, Map<String, Object>>> MULTIPLE_TEST_CAPS_MAP = ThreadLocal.withInitial(
+    HashMap::new);
   public static final ThreadLocal<MutableCapabilities> CLIENT_TEST_CAPS = new ThreadLocal<>();
   public static final ThreadLocal<Map<String, Object>> CLIENT_TEST_CAPS_MAP = new ThreadLocal<>();
 
@@ -67,6 +69,8 @@ public class EnvSetup {
   public static final ThreadLocal<String> TEST_TUNNEL_INFO_API_PORT = new ThreadLocal<>();
   public static final ThreadLocal<String> TUNNEL_START_COMMAND = new ThreadLocal<>();
   public static final ThreadLocal<HashMap<FrameworkConstants.testVerificationDataKeys, Object>> TEST_VERIFICATION_DATA = ThreadLocal.withInitial(
+    HashMap::new);
+  public static final ThreadLocal<HashMap<String, HashMap<FrameworkConstants.testVerificationDataKeys, Object>>> MULTIPLE_TEST_VERIFICATION_DATA = ThreadLocal.withInitial(
     HashMap::new);
   public static final ThreadLocal<Boolean> IS_EXTENSION_TEST = new ThreadLocal<>();
   public static final ThreadLocal<Boolean> IS_EXTENSION_CLIENT_TEST = new ThreadLocal<>();

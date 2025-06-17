@@ -6,7 +6,6 @@ import TestManagers.TunnelManager;
 import factory.Locator;
 import factory.LocatorTypes;
 import io.restassured.response.Response;
-import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,9 +16,6 @@ import utility.CustomAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +23,7 @@ import java.util.regex.Pattern;
 import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
-import static utility.FrameworkConstants.testVerificationDataKeys.AUTO_HEAL_DATA;
+import static utility.FrameworkConstants.testVerificationDataKeys.*;
 import static utility.UrlsAndLocators.*;
 
 public class AutomationHelper extends BaseClass {
@@ -1404,42 +1400,6 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
-  //    Remove this part if the modifyNetworkRestrictions method work as expected
-  @SneakyThrows
-  private void executeNetworkScript(String... params) {
-    try {
-      ProcessBuilder pb = new ProcessBuilder();
-      pb.command("sudo", "bash", NETWORK_SCRIPT_PATH);
-      for (String param : params) {
-        pb.command().add(param);
-      }
-
-      ltLogger.info("Executing network blocking command: {}", String.join(" ", pb.command()));
-      Process process = pb.start();
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        ltLogger.info("Network script output: {}", line);
-      }
-
-      BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-      while ((line = errorReader.readLine()) != null) {
-        ltLogger.error("Network script error: {}", line);
-      }
-
-      int exitCode = process.waitFor();
-      if (exitCode != 0) {
-        ltLogger.error("Network blocking script failed with exit code: {}", exitCode);
-        throw new RuntimeException("Network blocking operation failed");
-      }
-
-    } catch (IOException | InterruptedException e) {
-      ltLogger.error("Failed to execute network blocking script: {}", e.getMessage());
-      throw new RuntimeException("Network blocking script execution failed", e);
-    }
-  }
-
   public void modifyNetworkRestrictions(clientSideNetworkOperations restrictionType, String... additionalParams) {
     ltLogger.info("Modifying network restrictions: {}, with params: {}", restrictionType,
       Arrays.toString(additionalParams));
@@ -1459,6 +1419,43 @@ public class AutomationHelper extends BaseClass {
 
     // Adding a small wait after the operation
     waitForTime(2);
+  }
+
+  public void createTestShareLinkAndStoreItToSessionReport(String sessionId) {
+    String getTestShareLinkUrl = apiHelper.getTestShareLinkUrl(sessionId);
+    TEST_VERIFICATION_DATA.get().put(TEST_SHARE_LINK, getTestShareLinkUrl);
+  }
+
+  public void createBuildShareLinkAndStoreItToSessionReport(String buildId) {
+    String getBuildShareLinkUrl = apiHelper.getBuildShareLinkUrl(buildId);
+    TEST_VERIFICATION_DATA.get().put(BUILD_SHARE_LINK, getBuildShareLinkUrl);
+  }
+
+  public void verifyShareLinkViaApi(String linkType) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+
+    String shareLink = linkType.equalsIgnoreCase("test") ?
+      TEST_VERIFICATION_DATA.get().get(TEST_SHARE_LINK).toString() :
+      TEST_VERIFICATION_DATA.get().get(BUILD_SHARE_LINK).toString();
+
+    int responseCode = apiHelper.getRequest(shareLink).statusCode();
+    ltLogger.info("Verifying {} share link: {}, Response Code: {}", linkType, shareLink, responseCode);
+
+    softAssert.assertTrue(responseCode == 200,
+      softAssertMessageFormat(SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE, linkType, responseCode, shareLink));
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void getBuildIdFromSessionIdAndStoreItToEnvVar(String sessionId) {
+    String buildId = apiHelper.getBuildIdFromSessionId(sessionId);
+    if (buildId != null && !buildId.isEmpty()) {
+      EnvSetup.BUILD_ID.set(buildId);
+      ltLogger.info("Build ID retrieved from session ID {}: {}", sessionId, buildId);
+    } else {
+      ltLogger.warn("No Build ID found for session ID: {}", sessionId);
+      throw new RuntimeException("No Build ID found for session ID: " + sessionId);
+    }
   }
 
 }

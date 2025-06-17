@@ -14,7 +14,7 @@ import utility.EnvSetup;
 import java.util.Map;
 
 import static factory.SoftAssertionMessages.*;
-import static utility.EnvSetup.TEST_SCENARIO_NAME;
+import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
 public class ClientAutomationHelper extends BaseClass {
@@ -242,5 +242,58 @@ public class ClientAutomationHelper extends BaseClass {
       return;
     }
     performanceReportPage.isPerformanceReportDisplayed();
+  }
+
+  private void verifyTestShareLinkViaUI() {
+    LTHooks.startStepContext(driverManager, "Verify Test Share Link via UI");
+    CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+
+    // Test data
+    String testShareLink = TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.TEST_SHARE_LINK, "")
+      .toString();
+    String buildName = TEST_CAPS_MAP.get().getOrDefault(BUILD_NAME, "").toString();
+    String testName = TEST_CAPS_MAP.get().getOrDefault(TEST_NAME, "").toString();
+
+    TestShareLinkPage testShareLinkPage = new TestShareLinkPage(driverManager, clientSoftAssert, testShareLink);
+    boolean status = testShareLinkPage.navigateToShareLink();
+    if (status) {
+      testShareLinkPage.verifyBuildName(buildName);
+      testShareLinkPage.verifyTestName(testName);
+      testShareLinkPage.verifyArtefactsAreDisplayed();
+    }
+    LTHooks.endStepContext(driverManager, "Verify Test Share Link via UI");
+  }
+
+  private void verifyBuildShareLinkPage() {
+    LTHooks.startStepContext(driverManager, "Verify Build Share Link via UI");
+    CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+
+    // Test data
+    String buildShareLink = TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.BUILD_SHARE_LINK, "")
+      .toString();
+    String buildName = MULTIPLE_TEST_CAPS_MAP.get().values().iterator().next().getOrDefault(BUILD_NAME, "").toString();
+    String testName = MULTIPLE_TEST_CAPS_MAP.get().values().iterator().next().getOrDefault(TEST_NAME, "").toString();
+
+    BuildShareLinkPage buildShareLinkPage = new BuildShareLinkPage(driverManager, clientSoftAssert, buildShareLink);
+    boolean status = buildShareLinkPage.navigateToShareLink();
+    if (status) {
+      buildShareLinkPage.verifyBuildName(buildName);
+      buildShareLinkPage.verifyTestList(testName);
+    }
+    LTHooks.endStepContext(driverManager, "Verify Build Share Link via UI");
+  }
+
+  public void verifyShareLinkViaUI(String linkType) {
+    switch (linkType.toLowerCase()) {
+    case "test":
+      verifyTestShareLinkViaUI();
+      break;
+    case "build":
+      verifyBuildShareLinkPage();
+      break;
+    default:
+      ltLogger.warn("Unsupported link type: {}", linkType);
+      throw new RuntimeException("Unsupported link type: " + linkType);
+    }
   }
 }
