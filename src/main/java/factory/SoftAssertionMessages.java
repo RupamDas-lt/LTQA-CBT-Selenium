@@ -3,6 +3,30 @@ package factory;
 import lombok.Getter;
 
 @Getter public enum SoftAssertionMessages {
+
+  /*************************************************************
+   * If you are adding new values to this enum, please          *
+   * follow the below steps:                                    *
+   *                                                            *
+   * - While raising any PR, make sure you add the tag          *
+   *   `change-report-database`.                                *
+   * - After this, a commit will be made by the GHA             *
+   *   workflow to update the database with the new             *
+   *   enum value.                                              *
+   * - After the commit is made, make sure you pull the         *
+   *   latest code, then update the new values in the           *
+   *   `testFailureAnalysis.json` file.                         *
+   * - Then commit the changes to the `testFailureAnalysis.json`*
+   *   file and push the changes.                               *
+   *                                                            *
+   * Do not change the values of these enums, as they           *
+   * will change the hashcode of the enum and break the         *
+   * test reporting.                                            *
+   * If you are willing to change the value, make sure          *
+   * you follow the same procedure of adding a new              *
+   * enum value.                                                *
+   ************************************************************/
+
   BASIC_AUTH_FAILED_MESSAGE("Basic Authentication Failed"), BASIC_AUTH_USING_KEYBOARD_EVENT_FAILED_MESSAGE(
     "Basic Authentication Failed using keyboard events."), SELF_SIGNED_CERT_ERROR_MESSAGE(
     "Self-signed site not open. There might be a certificate issue or website didn't open."), TIMEZONE_FAILURE_MESSAGE(
@@ -87,7 +111,9 @@ import lombok.Getter;
     "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s"), COMMAND_LOGS_PAGE_START_TIME_NULL_OR_EMPTY_ERROR_MESSAGE(
     "Command logs page start time is null or empty for page: %s"), UNABLE_TO_OPEN_LT_PAGE_ERROR_MESSAGE(
     "Unable to open LambdaTest page."), SHARE_LINK_VERIFICATION_FAILURE_ERROR_MESSAGE(
-    "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s"),
+    "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s"), FILE_NOT_UPDATED_IN_LAMBDA_STORAGE_ERROR_MESSAGE(
+    "File not updated in Lambda Storage. File type: %s, File name: %s, Last updated time: %s, Expected last updated time: %s"), CHROME_PROFILE_NOT_WORKING_ERROR_MESSAGE(
+    "User is unable to use chrome profile from s3 url. Used chrome profile name does not match with expected profile name. Expected: %s, Actual: %s"),
 
   //  CLIENT side error messages
   USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE(
@@ -137,7 +163,10 @@ import lombok.Getter;
     "Unable to initiate build stop as the build is not in Running state. Current state: %s"), UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE(
     "Unable to open %s url"), UNABLE_TO_SET_BASELINE_FOR_AUTO_HEAL_TEST_ERROR_MESSAGE(
     "Unable to set baseline for auto heal test: %s."), TUNNEL_MODE_PORT_VERIFICATION_FAILURE_ERROR_MESSAGE(
-    "Tunnel is not using the expected %s. Expected: %s, Actual: %s");
+    "Tunnel is not using the expected %s. Expected: %s, Actual: %s"), UNABLE_TO_UPLOAD_FILE_TO_LAMBDA_STORAGE_ERROR_MESSAGE(
+    "Unable to upload %s file to Lambda Storage. Status: %s, Message: %s, Error: %s"), FILE_NOT_FOUND_IN_LAMBDA_STORAGE_ERROR_MESSAGE(
+    "File not present in the lambda storage. File type: %s, File name: %s"), UNABLE_TO_DELETE_FILE_FROM_LAMBDA_STORAGE_ERROR_MESSAGE(
+    "Unable to delete %s file from Lambda Storage. Status: %s, Message: %s");
 
   private final String value;
 

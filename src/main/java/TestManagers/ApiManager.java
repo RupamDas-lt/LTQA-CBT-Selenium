@@ -123,10 +123,19 @@ public abstract class ApiManager extends BaseClass {
       .statusCode(200).extract().response();
   }
 
+  public Response postRequest(String uri, Object body) {
+    return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200);
+  }
+
   public Response postRequestWithBasicAuth(String uri, Object body, String username, String password) {
     return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200, username, password);
   }
 
+  public Response postRequestWithCustomHeaders(String uri, Object body, HashMap<String, Object> headers) {
+    return httpMethod(POST, uri, body, ContentType.JSON, headers, null, 200);
+  }
+
+  /// This method can handle the multipart requests as well.
   public Response postRequestWithBasicAuth(String uri, HashMap<String, Object> body, String username, String password) {
     ltLogger.info("POST Request body: {}", body);
     ContentType contentType = ContentType.JSON; // Default content type
@@ -163,16 +172,15 @@ public abstract class ApiManager extends BaseClass {
     return httpMethod(PUT_WITHOUT_STATUS_CODE_VERIFICATION, uri, requestBody, ContentType.JSON, null, null, 0);
   }
 
-  public Response deleteRequest(String uri) {
-    return httpMethod(DELETE_WITHOUT_STATUS_CODE_VERIFICATION, uri, null, ContentType.JSON, null, null, 0);
+  public Response deleteRequest(String uri, Object... body) {
+    Object requestBody = body.length == 1 ? body[0] : null;
+    return httpMethod(DELETE_WITHOUT_STATUS_CODE_VERIFICATION, uri, requestBody, ContentType.JSON, null, null, 0);
   }
 
-  public Response postRequest(String uri, Object body) {
-    return httpMethod(POST, uri, body, ContentType.JSON, null, null, 200);
-  }
-
-  public Response postRequestWithCustomHeaders(String uri, Object body, HashMap<String, Object> headers) {
-    return httpMethod(POST, uri, body, ContentType.JSON, headers, null, 200);
+  public Response deleteRequestWithBasicAuth(String uri, String username, String password, Object... body) {
+    Object requestBody = body.length == 1 ? body[0] : null;
+    return httpMethod(DELETE_WITHOUT_STATUS_CODE_VERIFICATION, uri, requestBody, ContentType.JSON, null, null, 0,
+      username, password);
   }
 
   public String getRequestAsString(String uri) {

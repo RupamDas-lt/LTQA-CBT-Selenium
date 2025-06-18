@@ -16,6 +16,7 @@ import utility.CustomAssert;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -179,6 +180,9 @@ public class AutomationHelper extends BaseClass {
         break;
       case "autoHealWithNewLocators":
         autoHealWithNewLocators();
+        break;
+      case "chromeProfile":
+        verifyChromeProfileName();
         break;
       case "networkLog":
       default:
@@ -1458,4 +1462,81 @@ public class AutomationHelper extends BaseClass {
     }
   }
 
+  public void verifyChromeProfileName() {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getURL(CHROME_BROWSER_VERSION_DETAILS_URL);
+    String profilePath = driverManager.getText(chromeBrowserProfilePath, 5);
+    ltLogger.info("Chrome profile path: {}", profilePath);
+    String expectedProfilePath = TEST_CAPS_MAP.get().getOrDefault(BROWSER_PROFILE, "default").toString();
+    String expectedProfileName = expectedProfilePath.substring(expectedProfilePath.lastIndexOf("/") + 1,
+      expectedProfilePath.lastIndexOf("."));
+    softAssert.assertTrue(profilePath.contains(expectedProfileName),
+      softAssertMessageFormat(CHROME_PROFILE_NOT_WORKING_ERROR_MESSAGE, expectedProfileName, profilePath));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  public void uploadFileToLambdaStorage(String type, String filePath) {
+    switch (type.toLowerCase()) {
+    case "browser profile" -> {
+      String[] s3urlAndLastUpdatedTime = apiHelper.uploadBrowserProfile(filePath);
+      EnvSetup.TEST_VERIFICATION_DATA.get().put(BROWSER_PROFILE_S3_URL, s3urlAndLastUpdatedTime[0]);
+      EnvSetup.TEST_VERIFICATION_DATA.get().put(BROWSER_PROFILE_LAST_UPDATED_TIME, s3urlAndLastUpdatedTime[1]);
+    }
+    case "extension" -> {
+      //      String s3url = apiHelper.uploadExtension(filePath);
+      //      EnvSetup.TEST_VERIFICATION_DATA.get().put(EXTENSION_S3_URL, s3url);
+    }
+    default -> throw new IllegalArgumentException("Unsupported file type for upload to lambda storage: " + type);
+    }
+  }
+
+  public void verifyFileInLambdaStorage(String type, String fileName) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    switch (type.toLowerCase()) {
+    case "browser profile" -> {
+      verifyBrowserProfileUpload(type, fileName, softAssert);
+    }
+    case "extension" -> {
+      //      apiHelper.verifyExtensionInLambdaStorage(fileName);
+    }
+    default -> throw new IllegalArgumentException("Unsupported file type for verification in lambda storage: " + type);
+    }
+  }
+
+  public void deleteFileFromLambdaStorage(String type, String fileName) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    switch (type.toLowerCase()) {
+    case "browser profile" -> {
+      apiHelper.deleteBrowserProfile(fileName);
+    }
+    case "extension" -> {
+      //      apiHelper.deleteExtension(fileName);
+      //      softAssert.assertTrue(apiHelper.isExtensionDeleted(fileName),
+      //        softAssertMessageFormat(FILE_NOT_DELETED_FROM_LAMBDA_STORAGE_ERROR_MESSAGE, type, fileName));
+    }
+    default -> throw new IllegalArgumentException("Unsupported file type for deletion from lambda storage: " + type);
+    }
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private void verifyBrowserProfileUpload(String type, String fileName, CustomSoftAssert softAssert) {
+    String lastUpdatedTime = apiHelper.verifyBrowserProfileInLambdaStorageAndGetLastUpdatedTimeStamp(fileName);
+    // Verify the last updated time only if it exists in the test verification data
+    if (TEST_VERIFICATION_DATA.get().get(BROWSER_PROFILE_LAST_UPDATED_TIME) != null) {
+      String expectedLastUpdatedTime = TEST_VERIFICATION_DATA.get().get(BROWSER_PROFILE_LAST_UPDATED_TIME).toString();
+      Duration timeDiff = getTimeDifference(expectedLastUpdatedTime, lastUpdatedTime, UTC_TimeZone,
+        UTC_DATE_TIME_FORMAT);
+      ltLogger.info(
+        "Expected last modified time; {}, actual last modified time: {}, Difference between expected and actual last updated time: {}",
+        expectedLastUpdatedTime, lastUpdatedTime, timeDiff.toSeconds());
+
+      // Assert that the time difference is less than 10 seconds
+      softAssert.assertTrue(Integer.toUnsignedLong(Math.toIntExact(timeDiff.toSeconds())) < 10,
+        softAssertMessageFormat(FILE_NOT_UPDATED_IN_LAMBDA_STORAGE_ERROR_MESSAGE, type, fileName, lastUpdatedTime,
+          expectedLastUpdatedTime));
+
+    } else {
+      ltLogger.warn("No last updated time found for browser profile verification");
+    }
+  }
 }

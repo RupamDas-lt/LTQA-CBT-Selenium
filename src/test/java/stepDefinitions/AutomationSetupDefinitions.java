@@ -7,6 +7,7 @@ import com.mysql.cj.util.StringUtils;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -125,7 +126,22 @@ public class AutomationSetupDefinitions {
     System.setProperty(REPEAT_TEST_ACTIONS, count);
   }
 
-  /// Client test related step definitions
+  @When("^I upload ([a-zA-Z0-9_=,: ]+) from file path (.+) to lambda storage$")
+  public void iUploadFileToLambdaStorage(String uploadType, String filePath) {
+    automationHelper.uploadFileToLambdaStorage(uploadType, filePath);
+  }
+
+  @Then("^I verify the ([a-zA-Z0-9_=,: ]+) is uploaded successfully with (.+) file name$")
+  public void iVerifyFileInLambdaStorage(String uploadType, String fileName) {
+    automationHelper.verifyFileInLambdaStorage(uploadType, fileName);
+  }
+
+  @Then("^I delete ([a-zA-Z0-9_=,: ]+) with (.+) from lambda storage$")
+  public void iDeleteFileFromLambdaStorage(String type, String fileName) {
+    automationHelper.deleteFileFromLambdaStorage(type, fileName);
+  }
+
+  /// --------------------------------- Client test related step definitions ---------------------------------
   @Then("I navigate to ML dashboard of current test")
   public void iNavigateToMLDashboardOfCurrentTest() {
     clientAutomationHelper.navigateToDashboardOfSpecificTest(TEST_SESSION_ID.get());
@@ -146,7 +162,7 @@ public class AutomationSetupDefinitions {
     clientAutomationHelper.verifyShareLinkViaUI(linkType);
   }
 
-  /// Tunnel related step definitions
+  /// --------------------------------- Tunnel related step definitions ---------------------------------
   @Then("^I ([a-zA-Z0-9_=,: ]+) tunnel$")
   public void iStartTunnel(String startOrStopOrRestart) {
     if (startOrStopOrRestart.equals("start")) {

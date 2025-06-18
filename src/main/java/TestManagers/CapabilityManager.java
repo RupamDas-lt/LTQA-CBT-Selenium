@@ -96,7 +96,8 @@ public class CapabilityManager extends BaseClass {
 
   private void setCustomValues(@NonNull Map<String, Object> capabilityMap, String purpose) {
     purpose = purpose.toLowerCase().contains("client") ? "Client" : "Test";
-    if (!StringUtils.isNullOrEmpty((String) capabilityMap.getOrDefault(TUNNEL, "")) && StringUtils.isNullOrEmpty(
+
+    if (capabilityMap.getOrDefault(TUNNEL, "false").toString().equalsIgnoreCase("true") && StringUtils.isNullOrEmpty(
       (String) capabilityMap.getOrDefault(TUNNEL_NAME, "")) && EnvSetup.TEST_TUNNEL_NAME.get() != null)
       capabilityMap.put(TUNNEL_NAME, EnvSetup.TEST_TUNNEL_NAME.get());
 
@@ -109,6 +110,10 @@ public class CapabilityManager extends BaseClass {
     if (capabilityMap.getOrDefault(LOAD_PUBLIC_EXTENSION, "false").equals("true"))
       insertToMapWithRandom(capabilityMap, LOAD_PUBLIC_EXTENSION, DASHLANE_EXTENSION_PUBLIC_URL, String.class,
         String[].class);
+
+    if (capabilityMap.getOrDefault(BROWSER_PROFILE, "").equals("RETRIEVED_S3_URL_PATH"))
+      capabilityMap.put(BROWSER_PROFILE,
+        TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.BROWSER_PROFILE_S3_URL, ""));
 
     handleSpecialCasesForTestNameAndBuildName(capabilityMap);
   }
