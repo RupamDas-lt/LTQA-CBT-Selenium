@@ -243,8 +243,8 @@ public class FrameworkConstants extends BaseClass {
   }};
   public static final Map<String, String> osKeywordToTemplateNameMap = Map.ofEntries(Map.entry("win10", "Windows 10"),
     Map.entry("win11", "Windows 11"), Map.entry("win8.1", "Windows 8.1"), Map.entry("win8", "Windows 8"),
-    Map.entry("win7", "Windows 7"), Map.entry("sequoia", "MacOS Sequoia"), Map.entry("sonoma", "MacOS Sonoma"),
-    Map.entry("ventura", "MacOS Ventura"), Map.entry("monterey", "MacOS Monterey"),
+    Map.entry("win7", "Windows 7"), Map.entry("tahoe", "MacOS Tahoe"), Map.entry("sequoia", "MacOS Sequoia"),
+    Map.entry("sonoma", "MacOS Sonoma"), Map.entry("ventura", "MacOS Ventura"), Map.entry("monterey", "MacOS Monterey"),
     Map.entry("bigsur", "MacOS Big Sur"), Map.entry("catalina", "MacOS Catalina"), Map.entry("mojave", "macOS Mojave"),
     Map.entry("sierra", "macOS Sierra"), Map.entry("high_sierra", "macOS High Sierra"),
     Map.entry("elcapitan", "OS X El Capitan"), Map.entry("yosemite", "OS X El Yosemite"),
