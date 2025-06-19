@@ -11,6 +11,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariOptions;
 import utility.BaseClass;
@@ -94,6 +95,66 @@ public class CapabilityManager extends BaseClass {
         capabilityMap.get(TEST_NAME).toString().replace("_randomName", getRandomAlphaNumericString(10)));
   }
 
+  private FirefoxProfile getFirefoxProfile(String profileName, Map<String, Object> capabilityMap) {
+    FirefoxProfile profile = new FirefoxProfile();
+    if (profileName.equals("USER_DEFINED_PROFILE_WITH_CUSTOM_DOWNLOAD_PATH")) {
+      profile.setPreference("browser.download.folderList", 2);
+      String downloadDirectory = capabilityMap.getOrDefault(PLATFORM_NAME, "").toString().toLowerCase()
+        .contains("win") ?
+        WINDOWS_USER_DATA_DIRECTORY_PATH + "\\Documents" :
+        MAC_USER_DATA_DIRECTORY_PATH + "/Documents";
+      profile.setPreference("browser.download.dir", downloadDirectory);
+      // Disable download prompts for PDF, JPEG, and TXT files
+      profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+        "text/csv,application/java-archive, application/x-msexcel,application/excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml,application/vnd.microsoft.portable-executable");
+    }
+    return profile;
+  }
+
+  private void handleFirefoxOptionsForBrowserCapabilities(Map<String, Object> capabilityMap) {
+    if (capabilityMap.get(FIREFOX_OPTIONS) instanceof Map) {
+      Map<String, Object> firefoxOptions = (Map<String, Object>) capabilityMap.get(FIREFOX_OPTIONS);
+      // Handle Firefox profile if it is defined in the options
+      if (firefoxOptions.containsKey(PROFILE_INSIDE_BROWSER_OPTIONS)) {
+        final String userDefinedProfileValueIdentifier = "USER_DEFINED_PROFILE_WITH_CUSTOM_DOWNLOAD_PATH";
+        ArrayList<String> profileArray = (ArrayList<String>) firefoxOptions.getOrDefault(PROFILE_INSIDE_BROWSER_OPTIONS,
+          new ArrayList<>());
+        String profileValue = !profileArray.isEmpty() ? profileArray.getFirst() : "";
+        if (profileValue.equals(userDefinedProfileValueIdentifier)) {
+          FirefoxProfile profile = getFirefoxProfile(profileValue, capabilityMap);
+          firefoxOptions.put(PROFILE_INSIDE_BROWSER_OPTIONS, profile);
+        }
+      }
+    }
+  }
+
+  private void handleEdgeOptionsForBrowserCapabilities(Map<String, Object> capabilityMap) {
+    // Handle Edge options if needed
+  }
+
+  private void handleChromeOptionsForBrowserCapabilities(Map<String, Object> capabilityMap) {
+    // Handle Chrome options if needed
+  }
+
+  private void handleSafariOptionsForBrowserCapabilities(Map<String, Object> capabilityMap) {
+    // Handle Safari options if needed
+  }
+
+  private void handleSpecialCasesForBrowserOptions(Map<String, Object> capabilityMap) {
+    if (capabilityMap.containsKey(FIREFOX_OPTIONS)) {
+      handleFirefoxOptionsForBrowserCapabilities(capabilityMap);
+    }
+    if (capabilityMap.containsKey(EDGE_OPTIONS)) {
+      handleEdgeOptionsForBrowserCapabilities(capabilityMap);
+    }
+    if (capabilityMap.containsKey(CHROME_OPTIONS)) {
+      handleChromeOptionsForBrowserCapabilities(capabilityMap);
+    }
+    if (capabilityMap.containsKey(SAFARI_OPTIONS)) {
+      handleSafariOptionsForBrowserCapabilities(capabilityMap);
+    }
+  }
+
   private void setCustomValues(@NonNull Map<String, Object> capabilityMap, String purpose) {
     purpose = purpose.toLowerCase().contains("client") ? "Client" : "Test";
 
@@ -115,7 +176,11 @@ public class CapabilityManager extends BaseClass {
       capabilityMap.put(BROWSER_PROFILE,
         TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.BROWSER_PROFILE_S3_URL, ""));
 
+    // Replaces the test name and build name with random values if they contain "_randomName$"
     handleSpecialCasesForTestNameAndBuildName(capabilityMap);
+
+    // Handle special cases for browser options
+    handleSpecialCasesForBrowserOptions(capabilityMap);
   }
 
   private void removeSpecificCaps(Map<String, Object> capsMap, String envVariable) {

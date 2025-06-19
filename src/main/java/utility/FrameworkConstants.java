@@ -161,6 +161,11 @@ public class FrameworkConstants extends BaseClass {
   public static final String TEST_TAGS = "tags";
   public static final String BUILD_TAGS = "buildTags";
   public static final String BROWSER_PROFILE = "browserProfile";
+  public static final String FIREFOX_OPTIONS = "moz:firefoxOptions";
+  public static final String CHROME_OPTIONS = "goog:chromeOptions";
+  public static final String EDGE_OPTIONS = "ms:edgeOptions";
+  public static final String SAFARI_OPTIONS = "safari.options";
+  public static final String PROFILE_INSIDE_BROWSER_OPTIONS = "profile";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -332,12 +337,16 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_4_VERSION_FLOOR_VALUE = "4.0.0";
   public static final String SELENIUM_4_VERSION_FLOOR_VALUE_FOR_LEGACY_LOGS = "4.28.0";
 
+  public static final String MAC_USER_DATA_DIRECTORY_PATH = "/Users/ltuser";
+  public static final String WINDOWS_USER_DATA_DIRECTORY_PATH = "C:\\Users\\ltuser";
+
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
   public static final String jsForScrollCertainHeightOnSpecificElement = "arguments[0].scrollTop += arguments[1];";
   public static final String jsForSettingDocumentCookies = "document.cookie = ";
   public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
   public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
+  public static final String jsToNavigateToUrl = "window.open('%s')";
 
   // Runtime constants
   public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();

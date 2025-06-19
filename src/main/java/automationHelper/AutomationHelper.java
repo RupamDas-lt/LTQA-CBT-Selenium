@@ -184,6 +184,9 @@ public class AutomationHelper extends BaseClass {
       case "chromeProfile":
         verifyChromeProfileName();
         break;
+      case "firefoxProfile":
+        verifyFirefoxProfile();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -1472,6 +1475,31 @@ public class AutomationHelper extends BaseClass {
       expectedProfilePath.lastIndexOf("."));
     softAssert.assertTrue(profilePath.contains(expectedProfileName),
       softAssertMessageFormat(CHROME_PROFILE_NOT_WORKING_ERROR_MESSAGE, expectedProfileName, profilePath));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
+  private String getDirectoryPathUrlInVM(String directoryName) {
+    String pathWithPlaceHolder = TEST_CAPS_MAP.get().getOrDefault(PLATFORM_NAME, "").toString().toLowerCase()
+      .contains("win") ? WIN_LT_USER_DIRECTORY_URL_FORMAT : MAC_LT_USER_DIRECTORY_URL_FORMAT;
+    return String.format(pathWithPlaceHolder, directoryName);
+  }
+
+  private Locator getFileLocatorInVM(String fileName) {
+    return new Locator(fileInLtUserDirectoryLocatorFormat.type(),
+      String.format(fileInLtUserDirectoryLocatorFormat.value(), fileName));
+  }
+
+  public void verifyFirefoxProfile() {
+    final String folderName = "Documents";
+    final String file = "sample1";
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    driverManager.getURLUsingJs(DOWNLOAD_SAMPLE_FILE_URL);
+    waitForTime(5);
+    String filePathUrl = getDirectoryPathUrlInVM(folderName);
+    Locator fileLocator = getFileLocatorInVM(file);
+    driverManager.getURL(filePathUrl);
+    softAssert.assertTrue(driverManager.isDisplayed(fileLocator, 5),
+      softAssertMessageFormat(FIREFOX_PROFILE_NOT_WORKING_ERROR_MESSAGE));
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 

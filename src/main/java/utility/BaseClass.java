@@ -197,8 +197,26 @@ public class BaseClass {
       return parseArray(valueStr.substring(1, valueStr.length() - 1), separators);
     }
 
+    // Handle integer values (only pure integers, not alphanumeric or floating-point)
+    if (isInteger(valueStr)) {
+      return Integer.parseInt(valueStr);
+    }
+
     // Default case: return as string
     return valueStr;
+  }
+
+  /**
+   * Checks if the string represents a valid integer (not a float or alphanumeric).
+   */
+  private boolean isInteger(String valueStr) {
+    try {
+      // Try parsing the string as an integer and check if it matches the whole string
+      Integer.parseInt(valueStr);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
   }
 
   /**
