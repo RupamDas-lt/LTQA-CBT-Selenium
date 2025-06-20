@@ -206,7 +206,7 @@ public class CapabilityManager extends BaseClass {
         case "timezone" -> getRandomTimeZone(capabilityMap.get("platform").toString(), jobPurpose);
         case "geoLocation" -> getRandomGeoLocation(jobPurpose);
         case "resolution" -> getRandomResolution(capabilityMap.get("platform").toString(), jobPurpose);
-        case "version" -> getRandomBrowserVersionFromTopSix((String) capabilityMap.getOrDefault("browserName", ""));
+        case "version" -> getRandomBrowserVersionFromTopFive((String) capabilityMap.getOrDefault("browserName", ""));
         case "selenium_version" -> getRandomSelenium4Version();
         default -> throw new RuntimeException(
           key + " this capability doesn't support random value. Supported values: " + Arrays.asList(
@@ -269,7 +269,7 @@ public class CapabilityManager extends BaseClass {
     return null;
   }
 
-  private String getRandomBrowserVersionFromTopSix(String browserName) {
+  private String getRandomBrowserVersionFromTopFive(String browserName) {
     if (browserName.matches(".*(safari|opera|ie).*"))
       return "latest";
     String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4" };
