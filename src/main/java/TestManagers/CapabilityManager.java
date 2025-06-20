@@ -272,7 +272,7 @@ public class CapabilityManager extends BaseClass {
   private String getRandomBrowserVersionFromTopSix(String browserName) {
     if (browserName.matches(".*(safari|opera|ie).*"))
       return "latest";
-    String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4", "latest-5" };
+    String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4" };
     return topFive[new Random().nextInt(topFive.length)];
   }
 
@@ -298,7 +298,8 @@ public class CapabilityManager extends BaseClass {
   }
 
   private String getRandomSelenium4Version() {
-    String[] topFive = { "latest", "latest-1", "latest-2", "4.17.0", "4.13.0", "4.8.0", "4.0.0" };
+    //    String[] topFiveBasedOnCustomerTests = { "latest", "latest-1", "latest-2", "4.17.0", "4.13.0", "4.8.0", "4.0.0" };
+    String[] topFive = { "latest", "latest-1", "latest-2", "latest-3", "latest-4" };
     return topFive[new Random().nextInt(topFive.length)];
   }
 
