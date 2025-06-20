@@ -4,8 +4,10 @@ import DTOs.Others.BrowserVersionsFromCapsGenerator;
 import DTOs.Others.SeleniumVersionsDTO;
 import DTOs.Others.TestShareAPIResponseDTO;
 import DTOs.Others.TunnelsAPIResponseDTO;
+import DTOs.SwaggerAPIs.GetBrowserProfileResponseDTO;
 import DTOs.SwaggerAPIs.GetBuildResponseDTO;
 import DTOs.SwaggerAPIs.GetSessionResponseDTO;
+import DTOs.SwaggerAPIs.UploadBrowserProfileResponseDTO;
 import TestManagers.ApiManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +20,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utility.CustomAssert;
 import utility.EnvSetup;
 import utility.FileLockUtility;
 
@@ -27,6 +30,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
 
+import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
 import static utility.FrameworkConstants.*;
 
@@ -574,5 +578,79 @@ public class AutomationAPIHelper extends ApiManager {
     String buildShareUrl = testShareLinkResponseDTO.getShareIdUrl();
     ltLogger.info("Build share link generated successfully: {}", buildShareUrl);
     return buildShareUrl;
+  }
+
+  public String[] uploadBrowserProfile(String filePath) {
+    final String uploadSuccessMessage = "File have been uploaded successfully to our lambda storage";
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, UPLOAD_BROWSER_PROFILE_API_ENDPOINT);
+    ltLogger.info("Uploading browser profile with api url: {}", uri);
+
+    // Prepare the multipart body
+    HashMap<String, Object> multipartBody = new HashMap<>();
+    multipartBody.put("contentType", REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM);
+    multipartBody.put("profile", new File(filePath));
+
+    String responseString = postRequestWithBasicAuth(uri, multipartBody, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get()).getBody().asString();
+    ltLogger.info("Browser profile upload response string: {}", responseString);
+
+    UploadBrowserProfileResponseDTO response = convertJsonStringToPojo(responseString,
+      new TypeToken<UploadBrowserProfileResponseDTO>() {
+      });
+    String status = response.getStatus();
+    String message = response.getData().getFirst().getMessage();
+    String error = response.getData().getFirst().getError();
+    String url = response.getData().getFirst().getUrl();
+
+    CustomAssert.assertTrue(status.equals("success") && message.equals(uploadSuccessMessage) && error.isEmpty(),
+      softAssertMessageFormat(UNABLE_TO_UPLOAD_FILE_TO_LAMBDA_STORAGE_ERROR_MESSAGE, "browser profile", status, message,
+        error));
+
+    String updatedTime = getCurrentTimeUST();
+
+    return new String[] { url, updatedTime };
+  }
+
+  public String verifyBrowserProfileInLambdaStorageAndGetLastUpdatedTimeStamp(String fileName) {
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, UPLOAD_BROWSER_PROFILE_API_ENDPOINT);
+    ltLogger.info("Verifying browser profile in Lambda storage with api url: {}", uri);
+
+    String responseString = getRequestWithBasicAuthAsString(uri, EnvSetup.testUserName.get(),
+      EnvSetup.testAccessKey.get());
+
+    GetBrowserProfileResponseDTO response = convertJsonStringToPojo(responseString,
+      new TypeToken<GetBrowserProfileResponseDTO>() {
+      });
+    List<GetBrowserProfileResponseDTO.UploadData> data = response.getData();
+
+    // Verify the existence of the file in Lambda storage
+    boolean isFilePresent = data.stream().anyMatch(uploadData -> uploadData.getKey().equals(fileName));
+    CustomAssert.assertTrue(isFilePresent,
+      softAssertMessageFormat(FILE_NOT_FOUND_IN_LAMBDA_STORAGE_ERROR_MESSAGE, "Browser profile", fileName));
+
+    // Return the last modified timestamp of the file
+    return data.stream().filter(uploadData -> uploadData.getKey().equals(fileName)).findFirst()
+      .map(GetBrowserProfileResponseDTO.UploadData::getLast_modified_at)
+      .orElseThrow(() -> new RuntimeException("File not found in Lambda storage: " + fileName));
+  }
+
+  public void deleteBrowserProfile(String filename) {
+    String deleteSuccessMessage = "File have been successfully deleted from our lambda storage";
+    String uri = constructAPIUrl(EnvSetup.API_URL_BASE, UPLOAD_BROWSER_PROFILE_API_ENDPOINT);
+    ltLogger.info("Deleting browser profile with api url: {}", uri);
+
+    HashMap<String, Object> body = new HashMap<>();
+    body.put("key", filename);
+
+    Response response = deleteRequestWithBasicAuth(uri, EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get(),
+      body);
+    ltLogger.info("Browser profile delete response: {}", response.getBody().asPrettyString());
+
+    String status = response.getBody().path("status").toString();
+    String message = response.getBody().path("message").toString();
+
+    CustomAssert.assertTrue(status.equals("success") && message.equals(deleteSuccessMessage),
+      softAssertMessageFormat(UNABLE_TO_DELETE_FILE_FROM_LAMBDA_STORAGE_ERROR_MESSAGE, "browser profile", status,
+        message));
   }
 }

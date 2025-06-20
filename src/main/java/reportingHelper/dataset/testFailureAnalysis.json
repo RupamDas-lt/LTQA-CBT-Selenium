@@ -880,5 +880,47 @@
     "sub_category": "share-page-not-opening-issue",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "095d8eb341c49c8b388373a58bcb8c133c4c9b8c21e9a53f90e4091fb5348f96": {
+    "message": "File not updated in Lambda Storage. File type: %s, File name: %s, Last updated time: %s, Expected last updated time: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-not-updated-in-lambda-storage",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "88d14c380a034dfbf99b62abbf997a1ef04d3e6910d5201aa4065f4edcdb516c": {
+    "message": "User is unable to use chrome profile from s3 url. Used chrome profile name does not match with expected profile name. Expected: %s, Actual: %s",
+    "category": "browser-profile-issues",
+    "sub_category": "chrome-profile-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "4651156705e895c172a366fc8c8f45d710844939b0db8f16c8e81ba1e21dbddc": {
+    "message": "File not present in the lambda storage. File type: %s, File name: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "chrome-profile-upload-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c62ece482b002b15374914874017de2a5c33ac0aaf1e2088ab77d14e1a6621f8": {
+    "message": "Firefox profile is not working via Firefox options",
+    "category": "browser-profile-issues",
+    "sub_category": "firefox-profile-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "7c577133c2d1975e7cb344d3ba9aa87c97a4f947f5f3a425bc0472bc39a5b5c3": {
+    "message": "Unable to upload %s file to Lambda Storage. Status: %s, Message: %s, Error: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-upload-to-lambda-storage-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "2814ba08963dcfa38cda0888e78ea4d90e263ee01ae0d8f4e1701c6682cd9dfb": {
+    "message": "Unable to delete %s file from Lambda Storage. Status: %s, Message: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-delete-from-lambda-storage-issues",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

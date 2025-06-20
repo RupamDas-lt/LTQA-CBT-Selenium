@@ -171,6 +171,12 @@ public class DriverManager extends BaseClass {
     putValueToVerificationData(testVerificationDataKeys.URL, url);
   }
 
+  ///  Use this method to open URL using JavaScript, this wouldn't block the driver while navigating to the URL.
+  public void getURLUsingJs(String url) {
+    ltLogger.info("Opening URL using JS: {}", url);
+    executeScript(String.format(jsToNavigateToUrl, url));
+  }
+
   public void quit() {
     driver.quit();
   }

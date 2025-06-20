@@ -197,8 +197,26 @@ public class BaseClass {
       return parseArray(valueStr.substring(1, valueStr.length() - 1), separators);
     }
 
+    // Handle integer values (only pure integers, not alphanumeric or floating-point)
+    if (isInteger(valueStr)) {
+      return Integer.parseInt(valueStr);
+    }
+
     // Default case: return as string
     return valueStr;
+  }
+
+  /**
+   * Checks if the string represents a valid integer (not a float or alphanumeric).
+   */
+  private boolean isInteger(String valueStr) {
+    try {
+      // Try parsing the string as an integer and check if it matches the whole string
+      Integer.parseInt(valueStr);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
   }
 
   /**
@@ -397,10 +415,29 @@ public class BaseClass {
     return indianTime.format(formatter);
   }
 
-  public Duration getTimeDifference(String start, String end, String zone, String... format) {
-    String tmeFormat = format.length > 0 ? format[0] : DEFAULT_DATE_TIME_FORMAT;
-    ZonedDateTime startTime = ZonedDateTime.parse(start, DateTimeFormatter.ofPattern(tmeFormat));
-    ZonedDateTime endTime = ZonedDateTime.parse(end, DateTimeFormatter.ofPattern(tmeFormat));
+  public String getCurrentTimeUST(String... format) {
+    String tmeFormat = format.length > 0 ? format[0] : UTC_DATE_TIME_FORMAT;
+    ZonedDateTime utcTime = ZonedDateTime.now(ZoneId.of(UTC_TimeZone));
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(tmeFormat);
+    return utcTime.format(formatter);
+  }
+
+  public static Duration getTimeDifference(String start, String end, String zone, String... format) {
+    String tmeFormat = format.length > 0 ?
+      format[0] :
+      DEFAULT_DATE_TIME_FORMAT; // Default to UTC format if no custom format
+
+    // Use the zone parameter to create the appropriate ZoneId, defaulting to UTC if not provided
+    ZoneId zoneId = (zone != null && !zone.isEmpty()) ? ZoneId.of(zone) : ZoneId.of(IST_TimeZone);
+
+    ZonedDateTime startTime;
+    ZonedDateTime endTime;
+
+    // Parse the start and end times using the provided format
+    startTime = ZonedDateTime.parse(start, DateTimeFormatter.ofPattern(tmeFormat).withZone(zoneId));
+    endTime = ZonedDateTime.parse(end, DateTimeFormatter.ofPattern(tmeFormat).withZone(zoneId));
+
+    // Return the duration between start and end times
     return Duration.between(startTime, endTime);
   }
 

@@ -73,6 +73,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String BUILD_STOP_API_ENDPOINT = "/api/v1/test/stop/?buildId=";
   public static final String SESSION_LIGHTHOUSE_REPORT_ENDPOINT = "/automation/api/v1/lighthouse/report/";
   public static final String GENERATE_SHARE_LINK_API_ENDPOINT = "/lshs/api/v1.0/share-item/generate-sharable-link";
+  public static final String UPLOAD_BROWSER_PROFILE_API_ENDPOINT = "/automation/api/v1/files/profile/chrome";
 
   public static final String REQUEST_BODY_CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
   public static final String REQUEST_BODY_CONTENT_TYPE_BINARY = "application/octet-stream";
@@ -159,6 +160,12 @@ public class FrameworkConstants extends BaseClass {
   public static final String IDLE_TIMEOUT = "idleTimeout";
   public static final String TEST_TAGS = "tags";
   public static final String BUILD_TAGS = "buildTags";
+  public static final String BROWSER_PROFILE = "browserProfile";
+  public static final String FIREFOX_OPTIONS = "moz:firefoxOptions";
+  public static final String CHROME_OPTIONS = "goog:chromeOptions";
+  public static final String EDGE_OPTIONS = "ms:edgeOptions";
+  public static final String SAFARI_OPTIONS = "safari.options";
+  public static final String PROFILE_INSIDE_BROWSER_OPTIONS = "profile";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -241,8 +248,8 @@ public class FrameworkConstants extends BaseClass {
   }};
   public static final Map<String, String> osKeywordToTemplateNameMap = Map.ofEntries(Map.entry("win10", "Windows 10"),
     Map.entry("win11", "Windows 11"), Map.entry("win8.1", "Windows 8.1"), Map.entry("win8", "Windows 8"),
-    Map.entry("win7", "Windows 7"), Map.entry("sequoia", "MacOS Sequoia"), Map.entry("sonoma", "MacOS Sonoma"),
-    Map.entry("ventura", "MacOS Ventura"), Map.entry("monterey", "MacOS Monterey"),
+    Map.entry("win7", "Windows 7"), Map.entry("tahoe", "MacOS Tahoe"), Map.entry("sequoia", "MacOS Sequoia"),
+    Map.entry("sonoma", "MacOS Sonoma"), Map.entry("ventura", "MacOS Ventura"), Map.entry("monterey", "MacOS Monterey"),
     Map.entry("bigsur", "MacOS Big Sur"), Map.entry("catalina", "MacOS Catalina"), Map.entry("mojave", "macOS Mojave"),
     Map.entry("sierra", "macOS Sierra"), Map.entry("high_sierra", "macOS High Sierra"),
     Map.entry("elcapitan", "OS X El Capitan"), Map.entry("yosemite", "OS X El Yosemite"),
@@ -264,10 +271,12 @@ public class FrameworkConstants extends BaseClass {
   }};
 
   public static final String IST_TimeZone = "Asia/Kolkata";
+  public static final String UTC_TimeZone = "UTC";
   public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+  public static final String UTC_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
   public enum testVerificationDataKeys {
-    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK
+    URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK, BROWSER_PROFILE_S3_URL, BROWSER_PROFILE_LAST_UPDATED_TIME
   }
 
   @Getter public enum videoMetadataTypes {
@@ -328,12 +337,16 @@ public class FrameworkConstants extends BaseClass {
   public static final String SELENIUM_4_VERSION_FLOOR_VALUE = "4.0.0";
   public static final String SELENIUM_4_VERSION_FLOOR_VALUE_FOR_LEGACY_LOGS = "4.28.0";
 
+  public static final String MAC_USER_DATA_DIRECTORY_PATH = "/Users/ltuser";
+  public static final String WINDOWS_USER_DATA_DIRECTORY_PATH = "C:\\Users\\ltuser";
+
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
   public static final String jsForScrollCertainHeightOnSpecificElement = "arguments[0].scrollTop += arguments[1];";
   public static final String jsForSettingDocumentCookies = "document.cookie = ";
   public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
   public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
+  public static final String jsToNavigateToUrl = "window.open('%s')";
 
   // Runtime constants
   public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();

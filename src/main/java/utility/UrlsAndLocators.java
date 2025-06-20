@@ -100,7 +100,17 @@ public class UrlsAndLocators {
   public static final Locator ipInfoIOIP = new Locator(LocatorTypes.CSS, "[class*='main-content'] h1");
   public static final Locator ipInfoIOLocation = new Locator(LocatorTypes.CSS, "[class*='main-content'] h2[class*=h5]");
 
-  /// Auto heal tests urls and locators, BaseLine locators are the original which will be mocked
+  public static final String CHROME_BROWSER_VERSION_DETAILS_URL = "chrome://version/";
+  public static final String FIREFOX_BROWSER_VERSION_DETAILS_URL = "about:profiles";
+  public static final Locator chromeBrowserProfilePath = new Locator(LocatorTypes.CSS, "#profile_path");
+
+  public static final String DOWNLOAD_SAMPLE_FILE_URL = "https://filesamples.com/samples/document/docx/sample1.docx";
+  public static final String MAC_LT_USER_DIRECTORY_URL_FORMAT = "file:///Users/ltuser/%s";
+  public static final String WIN_LT_USER_DIRECTORY_URL_FORMAT = "file:///C:/Users/ltuser/%s";
+  public static final Locator fileInLtUserDirectoryLocatorFormat = new Locator(LocatorTypes.CSS,
+    "td[sortable-data*='%s']");
+
+  /// ---- Auto heal tests urls and locators, BaseLine locators are the original which will be mocked ----
   public static final String CHALLENGING_DOM_PAGE_URL = "https://the-internet.herokuapp.com/challenging_dom";
   public static final Locator challengingDomPageHeading = new Locator(LocatorTypes.CSS, ".example>h3");
   public static final Locator challengingDomPageWorkOption = new Locator(LocatorTypes.CSS,
