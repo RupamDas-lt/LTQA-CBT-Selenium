@@ -116,16 +116,16 @@ public class CapabilityManager extends BaseClass {
 
     // Process string capabilities
     for (String key : stringKeys) {
-      processStringCapabilityOptimized(capabilityMap, key);
+      processStringCapability(capabilityMap, key);
     }
 
     // Process list capabilities
     for (String key : listKeys) {
-      processListCapabilityOptimized(capabilityMap, key);
+      processListCapability(capabilityMap, key);
     }
   }
 
-  private void processStringCapabilityOptimized(Map<String, Object> capabilityMap, String key) {
+  private void processStringCapability(Map<String, Object> capabilityMap, String key) {
     Object value = capabilityMap.get(key);
     if (value == null)
       return;
@@ -145,7 +145,7 @@ public class CapabilityManager extends BaseClass {
   }
 
   @SuppressWarnings("unchecked")
-  private void processListCapabilityOptimized(Map<String, Object> capabilityMap, String key) {
+  private void processListCapability(Map<String, Object> capabilityMap, String key) {
     Object value = capabilityMap.get(key);
     if (value == null)
       return;
