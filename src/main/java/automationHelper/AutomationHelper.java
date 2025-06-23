@@ -18,6 +18,7 @@ import utility.EnvSetup;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1567,4 +1568,52 @@ public class AutomationHelper extends BaseClass {
       ltLogger.warn("No last updated time found for browser profile verification");
     }
   }
+
+  @SuppressWarnings("unchecked")
+  public void verifyTestTags() {
+    verifyTags("Test", (List<String>) TEST_CAPS_MAP.get().getOrDefault(TEST_TAGS, Collections.emptyList()),
+      () -> apiHelper.getTagsFromSessionId(TEST_SESSION_ID.get()));
+  }
+
+  @SuppressWarnings("unchecked")
+  public void verifyBuildTags(String... givenBuildId) {
+    String buildId = (givenBuildId == null || givenBuildId.length == 0) ?
+      apiHelper.getBuildIdFromSessionId(TEST_SESSION_ID.get()) :
+      givenBuildId[0];
+
+    verifyTags("Build", (List<String>) TEST_CAPS_MAP.get().getOrDefault(BUILD_TAGS, Collections.emptyList()),
+      () -> apiHelper.getBuildTagsViaAPI(buildId));
+  }
+
+  private void verifyTags(String tagType, List<String> expectedTags, Supplier<List<String>> actualTagsSupplier) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    List<String> actualTags;
+
+    try {
+      actualTags = actualTagsSupplier.get();
+    } catch (Exception e) {
+      ltLogger.error("Failed to retrieve {} tags: {}, using empty list as fallback", tagType.toLowerCase(),
+        e.getMessage());
+      actualTags = Collections.emptyList();
+    }
+
+    if (expectedTags.isEmpty() && actualTags.isEmpty()) {
+      ltLogger.info("No {} tags set, skipping verification", tagType.toLowerCase());
+      return;
+    }
+
+    // Sort for consistent comparison
+    expectedTags = new ArrayList<>(expectedTags);
+    actualTags = new ArrayList<>(actualTags);
+    Collections.sort(expectedTags);
+    Collections.sort(actualTags);
+
+    ltLogger.info("Verifying {} tags. Expected: {}, Actual: {}", tagType.toLowerCase(), expectedTags, actualTags);
+
+    softAssert.assertTrue(expectedTags.equals(actualTags),
+      softAssertMessageFormat(TAGS_VERIFICATION_FAILURE_ERROR_MESSAGE, tagType, expectedTags, actualTags));
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
 }

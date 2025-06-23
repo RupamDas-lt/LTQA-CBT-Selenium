@@ -1,4 +1,4 @@
-@testTimeoutsVerification
+@testTimeoutsVerification @sharedFeatures
 Feature: Verify test timeouts
 
   @testIdleTimeoutVerification @smoke_api

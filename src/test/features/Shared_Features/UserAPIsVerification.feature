@@ -1,4 +1,4 @@
-@publicAPIsVerification
+@publicAPIsVerification @sharedFeatures
 Feature: Verify all the public APIs
 
   @testStopApiVerification @smoke_api

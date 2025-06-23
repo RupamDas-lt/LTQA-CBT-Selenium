@@ -19,6 +19,8 @@ import java.util.List;
     private String create_timestamp;
     private String end_timestamp;
     private String project_id;
+    private String project_key;
+    private String project_name;
     private List<String> tags;
     private String public_url;
     private int duration;

@@ -114,7 +114,8 @@ import lombok.Getter;
     "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s"), FILE_NOT_UPDATED_IN_LAMBDA_STORAGE_ERROR_MESSAGE(
     "File not updated in Lambda Storage. File type: %s, File name: %s, Last updated time: %s, Expected last updated time: %s"), CHROME_PROFILE_NOT_WORKING_ERROR_MESSAGE(
     "User is unable to use chrome profile from s3 url. Used chrome profile name does not match with expected profile name. Expected: %s, Actual: %s"), FIREFOX_PROFILE_NOT_WORKING_ERROR_MESSAGE(
-    "Firefox profile is not working via Firefox options"),
+    "Firefox profile is not working via Firefox options"), TAGS_VERIFICATION_FAILURE_ERROR_MESSAGE(
+    "%s tags verification failed. Expected: %s, Actual: %s"),
 
   //  CLIENT side error messages
   USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE(

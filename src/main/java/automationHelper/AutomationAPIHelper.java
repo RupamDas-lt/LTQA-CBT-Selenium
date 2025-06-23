@@ -61,7 +61,8 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   /// Retrieves specific session details via Sessions API from Swagger based on session ID and required detail.
-  public String getSpecificSessionDetailsViaAPI(String sessionId, String requiredDetail, boolean... isClientTest) {
+  public Object getSpecificSessionDetailsViaAPI(String sessionId, sessionDetailsAPIKeys requiredDetail,
+    boolean... isClientTest) {
     APIConfig apiConfig = getAPIConfigsBasedOnSessionType(isClientTest);
 
     final int maxRetries = 10;
@@ -70,7 +71,7 @@ public class AutomationAPIHelper extends ApiManager {
 
     Field field;
     try {
-      field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail);
+      field = GetSessionResponseDTO.Data.class.getDeclaredField(requiredDetail.getValue());
       field.setAccessible(true);
     } catch (NoSuchFieldException e) {
       throw new IllegalArgumentException("Invalid field requested: " + requiredDetail, e);
@@ -88,9 +89,10 @@ public class AutomationAPIHelper extends ApiManager {
 
         Object value = field.get(getSessionResponseDTO.getData());
         if (value != null) {
-          return value.toString();
+          return value;
         }
-        throw new RuntimeException("Field '" + requiredDetail + "' value is null");
+        throw new RuntimeException(
+          "Field '" + requiredDetail + "' value is null in Session details API response. URL: " + sessionAPIUrl);
 
       } catch (Exception e) {
         lastException = e;
@@ -109,7 +111,7 @@ public class AutomationAPIHelper extends ApiManager {
     throw new RuntimeException(errorMessage, lastException);
   }
 
-  public String getSpecificBuildDetailsViaAPI(String build_id, String requiredDetail) {
+  public Object getSpecificBuildDetailsViaAPI(String build_id, buildDetailsAPIKeys requiredDetail) {
     String buildAPIUrl = constructAPIUrlWithBasicAuth(EnvSetup.API_URL_BASE, BUILDS_API_ENDPOINT,
       EnvSetup.testUserName.get(), EnvSetup.testAccessKey.get(), build_id);
     ltLogger.info("Get Build Details via API: {}", buildAPIUrl);
@@ -119,9 +121,9 @@ public class AutomationAPIHelper extends ApiManager {
       });
     GetBuildResponseDTO.Data data = getBuildResponseDTO.getData();
     try {
-      Field field = GetBuildResponseDTO.Data.class.getDeclaredField(requiredDetail);
+      Field field = GetBuildResponseDTO.Data.class.getDeclaredField(requiredDetail.getValue());
       field.setAccessible(true);
-      return (String) field.get(data);
+      return field.get(data);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
       ltLogger.error("Unable to get the build details {} from the Sessions API response.", requiredDetail);
@@ -130,18 +132,17 @@ public class AutomationAPIHelper extends ApiManager {
   }
 
   public String getStatusOfSessionViaAPI(String session_id, boolean... isClientTest) {
-    final String keyForSessionStatus = "status_ind";
-    String status = getSpecificSessionDetailsViaAPI(session_id, keyForSessionStatus, isClientTest);
+    String status = getSpecificSessionDetailsViaAPI(session_id, sessionDetailsAPIKeys.STATUS_IND,
+      isClientTest).toString();
     ltLogger.info("Status of session: {} is: {}", session_id, status);
     return status;
   }
 
   public String getBuildIdFromSessionId(String session_id) {
-    final String keyForBuildId = "build_id";
     String buildId;
     String cachedBuildId = EnvSetup.BUILD_ID.get();
     if (StringUtils.isNullOrEmpty(cachedBuildId)) {
-      buildId = getSpecificSessionDetailsViaAPI(session_id, keyForBuildId);
+      buildId = getSpecificSessionDetailsViaAPI(session_id, sessionDetailsAPIKeys.BUILD_ID).toString();
       ltLogger.info("Fetched Build ID from session details API response: {}", buildId);
       EnvSetup.BUILD_ID.set(buildId);
     } else {
@@ -151,11 +152,31 @@ public class AutomationAPIHelper extends ApiManager {
     return buildId;
   }
 
+  public String getTestCreateTimeStampFromSessionId(String session_id) {
+    String startTimeStamp = getSpecificSessionDetailsViaAPI(session_id,
+      sessionDetailsAPIKeys.CREATE_TIMESTAMP).toString();
+    ltLogger.info("Create timestamp of session: {} is: {}", session_id, startTimeStamp);
+    return startTimeStamp;
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> getTagsFromSessionId(String session_id) {
+    List<String> tags = (List<String>) getSpecificSessionDetailsViaAPI(session_id, sessionDetailsAPIKeys.TAGS);
+    ltLogger.info("Tags of session: {} are: {}", session_id, tags);
+    return tags;
+  }
+
   public String getStatusOfBuildViaAPI(String build_id) {
-    final String keyForStatus = "status_ind";
-    String status = getSpecificBuildDetailsViaAPI(build_id, keyForStatus);
+    String status = getSpecificBuildDetailsViaAPI(build_id, buildDetailsAPIKeys.STATUS_IND).toString();
     ltLogger.info("Status of build: {} is: {}", build_id, status);
     return status;
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> getBuildTagsViaAPI(String buildID) {
+    List<String> buildTags = (List<String>) getSpecificBuildDetailsViaAPI(buildID, buildDetailsAPIKeys.TAGS);
+    ltLogger.info("Build tags of build: {} are: {}", buildID, buildTags);
+    return buildTags;
   }
 
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {

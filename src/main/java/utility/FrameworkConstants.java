@@ -166,6 +166,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String EDGE_OPTIONS = "ms:edgeOptions";
   public static final String SAFARI_OPTIONS = "safari.options";
   public static final String PROFILE_INSIDE_BROWSER_OPTIONS = "profile";
+  public static final String PROJECT_NAME = "projectName";
 
   // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
   public static final String LAMBDA_STATUS = "lambda-status";
@@ -330,6 +331,37 @@ public class FrameworkConstants extends BaseClass {
       put("ts-dc-london.lambdatest.com", "23.106.34.219");
     }
   };
+
+  @Getter public enum sessionDetailsAPIKeys {
+    TEST_ID("test_id"), BUILD_ID("build_id"), TEST_NAME("name"), USER_ID("user_id"), USER_NAME("username"), TEST_TYPE(
+      "test_type"), TEST_DURATION("duration"), PLATFORM("platform"), BROWSER("browser"), BROWSER_VERSION(
+      "browser_version"), DEVICE("device"), STATUS_IND("status_ind"), TEST_EXECUTION_STATUS(
+      "test_execution_status"), SESSION_ID("session_id"), BUILD_NAME("build_name"), CREATE_TIMESTAMP(
+      "create_timestamp"), START_TIMESTAMP("start_timestamp"), END_TIMESTAMP("end_timestamp"), TEST_REMARK(
+      "remark"), CONSOLE_LOGS_URL("console_logs_url"), NETWORK_LOGS_URL("network_logs_url"), COMMAND_LOGS_URL(
+      "command_logs_url"), SELENIUM_LOGS_URL("selenium_logs_url"), SCREENSHOT_URL("screenshot_url"), VIDEO_URL(
+      "video_url"), GEO_INFO("geoInfo"), TAGS("tags"), PUBLIC_URL("public_url"), RESOLUTION("resolution"), AUTO_HEALED(
+      "autohealed"), CUSTOM_DATA("customData");
+
+    private final String value;
+
+    sessionDetailsAPIKeys(String value) {
+      this.value = value;
+    }
+  }
+
+  @Getter public enum buildDetailsAPIKeys {
+    BUILD_ID("build_id"), NAME("name"), ORG_ID("org_id"), USER_ID("user_id"), USER_NAME("username"), STATUS_IND(
+      "status_ind"), CREATE_TIMESTAMP("create_timestamp"), END_TIMESTAMP("end_timestamp"), PROJECT_ID(
+      "project_id"), PROJECT_KEY("project_key"), PROJECT_NAME("project_name"), TAGS("tags"), PUBLIC_URL(
+      "public_url"), DURATION("duration"), DASHBOARD_URL("dashboard_url"), AUTO_HEALED("autohealed");
+
+    private final String value;
+
+    buildDetailsAPIKeys(String value) {
+      this.value = value;
+    }
+  }
 
   public static final Set<String> tunnelServerIPs = new HashSet<>(tunnelServerDomainToIPMap.values());
 

@@ -922,5 +922,12 @@
     "sub_category": "file-delete-from-lambda-storage-issues",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "f45972e24316b2406ce46080be07a448357dbb8debaaebba603dd13ed9e6a2c3": {
+    "message": "%s tags verification failed. Expected: %s, Actual: %s",
+    "category": "tags-verification-issues",
+    "sub_category": "test-and-build-tags-issues",
+    "priority": "p2",
+    "isKnown": "false"
   }
 }

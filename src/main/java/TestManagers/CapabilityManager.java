@@ -36,6 +36,15 @@ import static utility.FrameworkConstants.*;
 public class CapabilityManager extends BaseClass {
   private final Logger ltLogger = LogManager.getLogger(CapabilityManager.class);
   private final String[] randomValueSupportedCaps = new String[] { "geoLocation", "resolution", "version", "timezone" };
+  static final String RANDOM_VALUE_IDENTIFIER = "_randomName$";
+  static final String MAX_LENGTH_IDENTIFIER = "_MAX_LENGTH$";
+  static final Pattern RANDOM_VALUE_PATTERN = Pattern.compile(RANDOM_VALUE_IDENTIFIER, Pattern.CASE_INSENSITIVE);
+  static final Pattern MAX_LENGTH_PATTERN = Pattern.compile(MAX_LENGTH_IDENTIFIER, Pattern.CASE_INSENSITIVE);
+  static final Map<String, Integer> CAPS_NAME_TO_MAX_LENGTH_MAP = Map.of(TEST_NAME, 255, BUILD_NAME, 255, TEST_TAGS,
+    200, BUILD_TAGS, 50);
+  static final Map<String, Integer> CAPS_NAME_TO_MAX_ARRAY_SIZE_MAP = Map.of(TEST_TAGS, 10, BUILD_TAGS, 5);
+  static final int RANDOM_NAME_LENGTH = 10;
+
   MutableCapabilities capabilities;
   String capsString;
 
@@ -84,15 +93,99 @@ public class CapabilityManager extends BaseClass {
     return buildName;
   }
 
-  private void handleSpecialCasesForTestNameAndBuildName(Map<String, Object> capabilityMap) {
-    String specialCaseIdentifier = "_randomName$";
-    Pattern pattern = Pattern.compile(specialCaseIdentifier, Pattern.CASE_INSENSITIVE);
-    if (pattern.matcher(capabilityMap.getOrDefault(BUILD_NAME, "").toString()).find())
-      capabilityMap.put(BUILD_NAME,
-        capabilityMap.get(BUILD_NAME).toString().replace("_randomName", getRandomAlphaNumericString(10)));
-    if (pattern.matcher(capabilityMap.getOrDefault(TEST_NAME, "").toString()).find())
-      capabilityMap.put(TEST_NAME,
-        capabilityMap.get(TEST_NAME).toString().replace("_randomName", getRandomAlphaNumericString(10)));
+  /**
+   * This method checks and handles special cases for specific capability keys in the provided map,
+   * such as `TEST_NAME`, `BUILD_NAME`, `TEST_TAGS`, and `BUILD_TAGS`. The special cases are as follows:
+   * <p>
+   * 1. **Random Name Replacement**:
+   * - If the value contains the placeholder `_randomName$`, it will be replaced with a randomly generated alphanumeric string of length 10.
+   * <p>
+   * 2. **Max Length Replacement**:
+   * - If the value contains the placeholder `_MAX_LENGTH$`, the entire value will be replaced with:
+   * - A randomly generated alphanumeric string of length 255 if the value is a `String`.
+   * - A new list of random alphanumeric strings of length 255, with a size of `maxArraySize` (default is 10), if the value is a `List<String>`.
+   * <p>
+   * These replacements are done in-place in the provided `capabilityMap`.
+   *
+   * @param capabilityMap The map containing the capability keys and their values, which may require special handling for specific cases.
+   */
+  private void handleSpecialCases(Map<String, Object> capabilityMap) {
+    // Define capability keys to process
+    final String[] stringKeys = { BUILD_NAME, TEST_NAME, PROJECT_NAME };
+    final String[] listKeys = { TEST_TAGS, BUILD_TAGS };
+
+    // Process string capabilities
+    for (String key : stringKeys) {
+      processStringCapability(capabilityMap, key);
+    }
+
+    // Process list capabilities
+    for (String key : listKeys) {
+      processListCapability(capabilityMap, key);
+    }
+  }
+
+  private void processStringCapability(Map<String, Object> capabilityMap, String key) {
+    Object value = capabilityMap.get(key);
+    if (value == null)
+      return;
+
+    String stringValue = value.toString();
+    int maxLengthValue = CAPS_NAME_TO_MAX_LENGTH_MAP.getOrDefault(key, 200);
+
+    if (MAX_LENGTH_PATTERN.matcher(stringValue).find()) {
+      capabilityMap.put(key, getRandomAlphaNumericString(maxLengthValue));
+      ltLogger.info("Replaced {} with max length random string", key);
+    } else if (RANDOM_VALUE_PATTERN.matcher(stringValue).find()) {
+      String newValue = RANDOM_VALUE_PATTERN.matcher(stringValue)
+        .replaceAll(getRandomAlphaNumericString(RANDOM_NAME_LENGTH));
+      capabilityMap.put(key, newValue);
+      ltLogger.info("Replaced random identifier in {} with random string", key);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void processListCapability(Map<String, Object> capabilityMap, String key) {
+    Object value = capabilityMap.get(key);
+    if (value == null)
+      return;
+
+    List<String> list;
+    if (value instanceof List) {
+      list = (List<String>) value;
+    } else if (value instanceof String[]) {
+      list = new ArrayList<>(Arrays.asList((String[]) value));
+      capabilityMap.put(key, list);
+    } else {
+      ltLogger.warn("Expected List<String> or String[] for key {}, but got {}", key, value.getClass());
+      return;
+    }
+
+    if (list.isEmpty())
+      return;
+
+    // Check for MAX_LENGTH replacement first
+    boolean hasMaxLength = list.stream().anyMatch(tag -> tag != null && MAX_LENGTH_PATTERN.matcher(tag).find());
+
+    if (hasMaxLength) {
+      int maxLengthValue = CAPS_NAME_TO_MAX_LENGTH_MAP.getOrDefault(key, 200);
+      int maxArraySize = CAPS_NAME_TO_MAX_ARRAY_SIZE_MAP.getOrDefault(key, 5);
+      list.clear();
+      for (int i = 0; i < maxArraySize; i++) {
+        list.add(getRandomAlphaNumericString(maxLengthValue));
+      }
+      ltLogger.info("Replaced entire {} list with {} max length random strings", key, maxArraySize);
+    } else {
+      // Process random name replacements
+      for (int i = 0; i < list.size(); i++) {
+        String tag = list.get(i);
+        if (tag != null && RANDOM_VALUE_PATTERN.matcher(tag).find()) {
+          String newTag = RANDOM_VALUE_PATTERN.matcher(tag).replaceAll(getRandomAlphaNumericString(RANDOM_NAME_LENGTH));
+          list.set(i, newTag);
+          ltLogger.info("Replaced random identifier in {}: {} -> {}", key, tag, newTag);
+        }
+      }
+    }
   }
 
   private FirefoxProfile getFirefoxProfile(String profileName, Map<String, Object> capabilityMap) {
@@ -111,6 +204,7 @@ public class CapabilityManager extends BaseClass {
     return profile;
   }
 
+  @SuppressWarnings("unchecked")
   private void handleFirefoxOptionsForBrowserCapabilities(Map<String, Object> capabilityMap) {
     if (capabilityMap.get(FIREFOX_OPTIONS) instanceof Map) {
       Map<String, Object> firefoxOptions = (Map<String, Object>) capabilityMap.get(FIREFOX_OPTIONS);
@@ -177,7 +271,7 @@ public class CapabilityManager extends BaseClass {
         TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.BROWSER_PROFILE_S3_URL, ""));
 
     // Replaces the test name and build name with random values if they contain "_randomName$"
-    handleSpecialCasesForTestNameAndBuildName(capabilityMap);
+    handleSpecialCases(capabilityMap);
 
     // Handle special cases for browser options
     handleSpecialCasesForBrowserOptions(capabilityMap);
