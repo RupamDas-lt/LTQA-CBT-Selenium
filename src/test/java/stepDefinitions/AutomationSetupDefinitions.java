@@ -143,6 +143,7 @@ public class AutomationSetupDefinitions {
 
   @Then("^I verify ([a-zA-Z0-9_=,: ]+) via swagger (test|build) details API$")
   public void iVerifyDetailsFromTestAPI(String detailsToVerify, String sourceApi) {
+    ltLogger.info("Verifying details: {} from source API: {}", detailsToVerify, sourceApi);
     switch (detailsToVerify) {
     case "test tags":
       automationHelper.verifyTestTags();
