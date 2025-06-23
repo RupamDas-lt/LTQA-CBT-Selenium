@@ -418,13 +418,12 @@ public class TestArtefactsVerificationHelper extends ApiManager {
     String testType = (customTestType.length > 0) ? customTestType[0] : "desktop";
 
     final String flagForRequestPageSize = "requestPageSize";
-    final String testCreateTimeStampKey = "create_timestamp";
 
     // Fetch necessary values
     int commandsCountPerPage = Integer.parseInt(
       automationAPIHelper.getFeatureFlagValueOfSpecificSession(session_id, flagForRequestPageSize));
     int expectedNumberOfPages = (int) Math.ceil((double) expectedCommandLogsCount / commandsCountPerPage);
-    String testStartTimeStamp = automationAPIHelper.getSpecificSessionDetailsViaAPI(session_id, testCreateTimeStampKey);
+    String testStartTimeStamp = automationAPIHelper.getTestCreateTimeStampFromSessionId(session_id);
     String testID = automationAPIHelper.getTestIdFromSessionId(session_id);
     String orgID = automationAPIHelper.getOrgIDFromTestId(session_id);
     String testDate = testStartTimeStamp.split(" ")[0];

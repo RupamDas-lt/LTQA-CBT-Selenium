@@ -1,4 +1,4 @@
-@shareLinksValidation
+@shareLinksValidation @sharedFeatures
 Feature: Test, Build and Video Share links
 
   @testShareLink @testShareLinkAPI
@@ -29,4 +29,4 @@ Feature: Test, Build and Video Share links
 
     Examples:
       | capabilities                                                                                                                                     |
-      | browserName=chrome,platform=win11,version=latest,network=TRUE,console=TRUE,build=buildShareLinkVerificationBuild,name=buildShareLinkVerification |
+      | browserName=chrome,platform=win10,version=latest,network=TRUE,console=TRUE,build=buildShareLinkVerificationBuild,name=buildShareLinkVerification |

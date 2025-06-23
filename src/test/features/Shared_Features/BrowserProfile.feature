@@ -1,4 +1,4 @@
-@browserProfileSanity
+@browserProfileSanity @sharedFeatures
 Feature: Browser Profile Sanity
 
   @chromeProfileFromS3

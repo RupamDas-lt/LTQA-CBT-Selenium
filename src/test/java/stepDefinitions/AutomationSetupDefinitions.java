@@ -141,6 +141,21 @@ public class AutomationSetupDefinitions {
     automationHelper.deleteFileFromLambdaStorage(type, fileName);
   }
 
+  @Then("^I verify ([a-zA-Z0-9_=,: ]+) via swagger (test|build) details API$")
+  public void iVerifyDetailsFromTestAPI(String detailsToVerify, String sourceApi) {
+    switch (detailsToVerify) {
+    case "test tags":
+      automationHelper.verifyTestTags();
+      break;
+    case "build tags":
+      automationHelper.verifyBuildTags();
+      break;
+    default:
+      ltLogger.error("Unknown Details to verify: {}", detailsToVerify);
+      throw new IllegalArgumentException("Unknown Details to verify: " + detailsToVerify);
+    }
+  }
+
   /// --------------------------------- Client test related step definitions ---------------------------------
   @Then("I navigate to ML dashboard of current test")
   public void iNavigateToMLDashboardOfCurrentTest() {
