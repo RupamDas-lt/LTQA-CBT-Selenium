@@ -7,7 +7,7 @@ Feature: User is able to use build tags, test tags and project name
     Then I start session with driver quit to test networkLog with <capabilities>
     Then I verify test tags via swagger test details API
     Then I verify build tags via swagger build details API
-#    Then I verify project name from capabilities via build details API
+    Then I verify project name via swagger build details API
 
     Examples:
       | capabilities                                                                                                                                                                                        |

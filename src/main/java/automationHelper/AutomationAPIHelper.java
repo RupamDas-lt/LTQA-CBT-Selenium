@@ -181,6 +181,12 @@ public class AutomationAPIHelper extends ApiManager {
     return buildTags;
   }
 
+  public String getProjectNameViaAPI(String buildID) {
+    String projectName = getSpecificBuildDetailsViaAPI(buildID, buildDetailsAPIKeys.PROJECT_NAME).toString();
+    ltLogger.info("Project name of build: {} is: {}", buildID, projectName);
+    return projectName;
+  }
+
   public void sendCustomDataToSumo(HashMap<String, Object> customData) {
     customData.put("message", "New_Framework_Testing-2");
     customData.put("attempt", System.getProperty(TEST_ATTEMPT, "first"));

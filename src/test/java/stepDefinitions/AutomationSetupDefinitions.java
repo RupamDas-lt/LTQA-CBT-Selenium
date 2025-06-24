@@ -159,6 +159,9 @@ public class AutomationSetupDefinitions {
     case "build tags":
       automationHelper.verifyBuildTags();
       break;
+    case "project name":
+      automationHelper.verifyProjectName();
+      break;
     default:
       ltLogger.error("Unknown Details to verify: {}", detailsToVerify);
       throw new IllegalArgumentException("Unknown Details to verify: " + detailsToVerify);

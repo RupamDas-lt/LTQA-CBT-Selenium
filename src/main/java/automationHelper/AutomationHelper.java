@@ -1624,6 +1624,19 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  public void verifyProjectName(String... givenBuildId) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    String buildId = (givenBuildId == null || givenBuildId.length == 0) ?
+      apiHelper.getBuildIdFromSessionId(TEST_SESSION_ID.get()) :
+      givenBuildId[0];
+    String actualProjectName = apiHelper.getProjectNameViaAPI(buildId);
+    String expectedProjectName = TEST_CAPS_MAP.get().getOrDefault(PROJECT_NAME, "").toString();
+    ltLogger.info("Verifying project name. Expected: {}, Actual: {}", expectedProjectName, actualProjectName);
+    softAssert.assertTrue(actualProjectName.equalsIgnoreCase(expectedProjectName),
+      softAssertMessageFormat(PROJECT_NAME_VERIFICATION_FAILURE_ERROR_MESSAGE, expectedProjectName, actualProjectName));
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
+
   private void addAnnotationWithLambdaTestCase() {
     List<String> annotationsList = TEST_ACTIONS_TO_ANNOTATIONS_MAP.get("annotationWithLambdaTestCase");
     for (String annotation : annotationsList) {
