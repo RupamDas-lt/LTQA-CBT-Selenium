@@ -1,940 +1,947 @@
 {
-  "c1d3ba724cc5760e8ef4e5a03bee50a1b8605ca8c4707968017e6cf5b0c85133" : {
-    "message" : "Browser version doesn't match. Expected: %s, Actual: %s",
-    "category" : "infra-related-issues",
-    "sub_category" : "browser-mismatch",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "a183881b3d0173e3127605bd291f0ade305b17850f5f5cb60fab1294ced063dc" : {
-    "message" : "System logs size is lesser than expected %s.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "b3d63f5716fd568e5eb9f40adb8367ef4f33cd47d64ef6e18c7b84d26aaef0f4" : {
-    "message" : "Second swap failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "d268c749b65e73f87e5ece43b61987e66f979bd0071139b533b91ee5dfd5f49e" : {
-    "message" : "%s is not present in the %s logs.",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "missing-logs",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c772d3a5587f8bd1206b22dff16f46ba163a8d378887c83d4e3ca9d0fccb117e" : {
-    "message" : "Unable to open Heroku Login Page",
-    "category" : "infra-related-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "00134a74b782555af58c0f1980929ca84dea32063e7e183bb6b5c8dbd5d426df" : {
-    "message" : "Unable to download Lighthouse report (HTML). Status: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p1",
-    "isKnown" : "true"
-  },
-  "4503d4fa9705b509105c9c3640d7703ae1b21ec6229027b94eb553c59b8ac6d7" : {
-    "message" : "Selenium logs does not contain %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "7e162494cc230e20e44c466b74d7aee6fb07d478460df64574ccf61f062a0e52" : {
-    "message" : "Expected log: %s is missing from the console logs fetched from API version: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c830c81b79047bf534a8c4894ac7de1557623e6c12fddcce721d96d2c7078c2b" : {
-    "message" : "%s is not displayed",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "704a6ff0bf9e382b71062af79e260351f1cae0b1afb17003cb959d8120f4d325" : {
-    "message" : "Unable to open performance report tab. Please check if you have passed capability performance true or UI is breaking.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "4d4bd53d2ec03d61cc24b040935d23d645f89332c38f9208188f4e1cea3aee7f" : {
-    "message" : "Some URLs are not found in command logs. Missing URLs: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "08115e55b1763b720ed3c60a0de4ceabde2a478961e6bdbaabdbcb2d323c5183" : {
-    "message" : "First swap failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "6ac610b51fd04650cde361afb5bc3cfeaf904cfd5c830f3085cd29aac0a6e60f" : {
-    "message" : "bypassHosts flag is not working. %s should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened.",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "8590c9c9a19e7e9239a791c717021c78ec04c42cfa82986294bb0519e07c80fe" : {
-    "message" : "Unable to open console logs tab",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "fd49f5d747382afbbf78d1f1c2d645d8977651b7bf345dde59a58c20480d2eae" : {
-    "message" : "Actual video width is not greater than expected width. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "8c2345fe7f7880b57a52cd531b6f2a49eaaa33216b4a5e989f602f5771070de0" : {
-    "message" : "Timezone is not set correctly. Current timezone is: %s expected: %s",
-    "category" : "infra-related-issues",
-    "sub_category" : "timezone-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "8fd7219f139b38535bcbed086f5013a4f6e4098d0c3c9aa79c76d39f591310cf" : {
-    "message" : "Browser name doesn't match. Expected: %s, Actual: %s",
-    "category" : "infra-related-issues",
-    "sub_category" : "browser-mismatch",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d916b0822ae71717d04c919e4d0a5f446a148f04eb6ce8f90b965118a643c56a" : {
-    "message" : "Info level logs are missing for Selenium version %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d4b4351eb7c8ba5cfa208453c5d3254c98a8c20c7e1b653f7aa7636ab5310ec7" : {
-    "message" : "Unable to download system logs from UI",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "fd6b225d0d74a4593c576bd37c97f7376d8a74caee5afec2e1e949815cc6c26a" : {
-    "message" : "Unable to extract video urls from API response. Status: %s Message: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "bbd67ed39c69df29adb70a0f8b44e70e4d2af88d12fd9a7cdf25db4c2f72f614" : {
-    "message" : "Unable to upload file",
-    "category" : "infra-related-issues",
-    "sub_category" : "file-upload-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "ae1a1e193964cca53421b426ac4e97f8471caba6a3b219ab42e15be479879e29" : {
-    "message" : "Video verification failed from UI. Video is generated.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "11b3a3dbe468a902bb2ae868f5ca9d1c7d05f983e14591c062d699146fb3a416" : {
-    "message" : "Failed to upload terminal logs",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "terminal-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "82e15e54993a993e5d36c4fbee07300485411c356df0803b210133f9b5026133" : {
-    "message" : "User is not logged in",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "lt-dashboard-login-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "57fd22f3353687e56cb9be73134e7fcdba3d2df26f45b44612efbd86abb78d87" : {
-    "message" : "Unable to fetch %s logs from API %s. Received API response: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "lt-dashboard-login-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "800bbc3fb055fa5afb13c12000b8d1be6abb57d618ccb769baac324895fa6a8b" : {
-    "message" : "Actual video height is not greater than expected height. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "9fdd79efa1a92aa499b0aa89ce0ffcb4b9721657a0965c579d5d74621243a0d3" : {
-    "message" : "Expected port number is not present in the Selenium logs. Expected port number is: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "3a442d3ae53137ba4d90a435338e94aa6799ee8f4a8d70bf1ef16f475fffdbba" : {
-    "message" : "Basic Authentication Failed using keyboard events.",
-    "category" : "infra-related-issues",
-    "sub_category" : "basic-auth-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "e654c09f0886eb76799c458240baffd7cc2860add2d62ccbd22f7231d7ecd2ad" : {
-    "message" : "Dynamic Content test failed as static messages are not same after page refresh",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "e445bf7c69ac0f60188391041c6b923b3122f40feb02cde11394a13fc9269d12" : {
-    "message" : "Text box enable failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "951cfde13aa454810e40c05bf10d7bc80be17c02d8eeb433fc2b70cd84dbd431" : {
-    "message" : "Form logout failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "c921acd05ebebc7e89f7d75db64785546022f76f48f52e884579b7643a1eeb54" : {
-    "message" : "Schema validation failed for %s logs from %s. Errors: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "api-response-schema-validation-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "93a0c6b5f8a77779b9363972da20990247144473a356706e4edd31dfc9c69977" : {
-    "message" : "Mismatch found in %s. Expected URL: %s but got URL: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9126b1f7b7dfa9dca01bc1ef9dc2d75fa9ccd80f0b1d20b2f61c3af78f9c3e26" : {
-    "message" : "LT login page is not displayed, cache is not cleared in the machine.",
-    "category" : "infra-related-issues",
-    "sub_category" : "cache-not-cleared-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "359d5f181b53cf089c1907c736bf6f5660e804f1383e8d37926045147ea883ce" : {
-    "message" : "Verification data for Network logs are invalid",
-    "category" : "test-artefacts-ui-script-side-issue",
-    "sub_category" : "network-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "4979cbb9e4c2044781f4fec472cfe82c8654875dc747ddd5dd09b5ed4bcecc75" : {
-    "message" : "The tunnel with name: %s is in running state. But expected state is: %s",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8b7929dd46fef8b04f6d42ce753f4af323a80d4868d69a46b85604a80b1a647d" : {
-    "message" : "GeoLocation didn't match. Expected: %s Actual: %s",
-    "category" : "infra-related-issues",
-    "sub_category" : "geo-location-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "335ce9b655c79c800289481d86a18bfc1e5bbc7fc8f1b1d41713298ab374f372" : {
-    "message" : "Unable to fetch lighthouse reports. Status: %s, Message: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p1",
-    "isKnown" : "true"
-  },
-  "8941afda4d8385f327f507afd1195dc040638b8b821c332f4a50271f10789375" : {
-    "message" : "Video verification is not valid. Please check from UI and review the script.",
-    "category" : "test-artefacts-ui-script-side-issue",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8ced0e99c71449ef5cecdce00ac6e0cbaf286b6d19ed9b3c026b734a65f637d4" : {
-    "message" : "Form login is not successful",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "df24992742be91de64efd6f04c8b1b9d52a24036ad5e1e5ece85185fb698e3f6" : {
-    "message" : "Some Locators are not found in command logs. Missing locators: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "4a8fc190b9e244578d2f783f6c09ff038a7d272ead5fcc9ccf37c1fa421c853b" : {
-    "message" : "Session creation log with correct session ID missing. Expected logs: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "dbeb4e076915c2f5a61603cd6a5ebb1c81a3351b94dd226dcc7ef5aca5d09646" : {
-    "message" : "Test video duration is greater than the expected video duration [1min + test execution time]. Expected duration: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "2389f34de9a0b9b5b0418016159ac2497e6ff4b474e7c58dbed541cd230a2642" : {
-    "message" : "Checkboxes are not selected",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "74f37fd1bd56e42614bdc2138ced1d07ff840e18a5f8db17a60a0d823ea64b22" : {
-    "message" : "Console logs not found in UI",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9474721300536753d85998b72e2fe935c9e6079ed823dd2cffb3bc601d739207" : {
-    "message" : "Unable to open command logs tab",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8d84624e0d023ab0da3cbafe5d3feaa3d7088aa01981ac83b63efb768b7622f1" : {
-    "message" : "System logs are not generated.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c73125e9ecd1db7c807c2c445695811a0ca10276da6477d91afddf2771d8ef68" : {
-    "message" : "Unsupported log type: %s",
-    "category" : "test-artefacts-ui-script-side-issue",
-    "sub_category" : "script-side-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "ff9dc53a57122f084a834b38d6b6ac27d67bcd1f1f023eb7dd5922a6a965b62f" : {
-    "message" : "Basic Authentication Failed",
-    "category" : "infra-related-issues",
-    "sub_category" : "basic-auth-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "5b95e7e684ae17206cfbc7e8e76ab07b5c03ac74580bf0d8ec3df3baee0c1c6a" : {
-    "message" : "Some URLs are not found in Network logs. Missing URLs: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "network-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "6fd360de9c7ca5271b4961ed750a3ac8b16a14ebefa622ad495415770927c431" : {
-    "message" : "Expected port number is %s for Selenium Driver. But used port is %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "9b01b43bcc7a1a354f154ebc23169f64b6d56e0d62352fd1884265b3c96f29d2" : {
-    "message" : "allowHosts flag is not working. %s should be resolved in tunnel client as allowHosts='*lambda*' flag is used, but unable to open it.",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8fb38729a026a9e2ab88fd044c4743641ece0da86ae65b03f7bebc6b99980c06" : {
-    "message" : "Expected Selenium version is %s but found %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "977335c33ec922c1a2bbc8768d9ff5bb4e91b87e57bdd728cc7273a696cd0d32" : {
-    "message" : "There is no running tunnel with name: %s",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "1c80355f98a43afc268bf0fcdddeff540439db7d36debfbf7815589ca3c77786" : {
-    "message" : "With webdriver mode, expected port number is %s. But used port is %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "61775d99a672e9ceb38c7378aa1ac6f5688f10aa90440b78f7c365cebd9c7999" : {
-    "message" : "Unable to stop session with test stop api. Status: %s , Message: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "test-stop-api-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "97ff618ad35996114d8e75c8e85be15fcea2b81103060425c7ee5ee7ab5c94c4" : {
-    "message" : "Error message of not supported browser for console logs is incorrect. Actual Message: %s, Expected Message: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p3",
-    "isKnown" : "false"
-  },
-  "d78aa6af327b98feb61d289fe3ce3b107bc772966b270005b407eda34bd7e7dd" : {
-    "message" : "Heroku app web page keyboard log in failed, Expected: You logged into a secure area but Received: %s",
-    "category" : "infra-related-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "af7007685c49d9c3ee5cc1a2b0ae09b2464e74402ea34c7cb7de37dbed067149" : {
-    "message" : "Unable to retrieve artefacts API download URL from API V2. Message: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "artefacts-api-v2-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "a542f09da7abcb2b726f95bb5f70178bd39beb73b675bf3e621564db11359439" : {
-    "message" : "Test performance report is not displayed in the UI.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p2",
-    "isKnown" : "true"
-  },
-  "7b8a61e0f55b06adfb6f4bd06fac52104c80e999b3578fc3575dc5f8a6d8df26" : {
-    "message" : "Test performance report is not generated.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p2",
-    "isKnown" : "true"
-  },
-  "c9eb488bad06bf92d41fcbe08dd2405e16831e5d51906a8a56801fa41972bd34" : {
-    "message" : "Add element test verification failed",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "45197ecf37853fd2f3003db168f12501c54a6ddd3503be24e8744352ffb4114b" : {
-    "message" : "Command count should be greater than 0. Current count is %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d76eb50a13c848d0ce10f1f0af4c8b6b36184a28e83f83c2124e7fbe12cd251d" : {
-    "message" : "Public websites are not resolved in expected location for tunnel flag %s. Expected: %s, Actual: %s, Fetched IP: %s, Fetched location: %s",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "e7dbad4bbf14b004c67436e5e42d7b120bf7852e3f372a5786b12b4dcc9591ca" : {
-    "message" : "Extension not working, or might be tab not switched",
-    "category" : "infra-related-issues",
-    "sub_category" : "browser-extension-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "83d01e365bcb765c6adac55836e5b7d7492f5f7caed4025ff72110aa8e9a6b77" : {
-    "message" : "Video duration is less than 10 seconds. Duration: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9a59b5a15340d64a1afed3bf0182dc95482774fccd539f2851da6555770861ef" : {
-    "message" : "Unable to download console log file from UI",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d6142287bb4ac780ab1dc8f550aa033d077cac4cfc4463ebd182eff819a54189" : {
-    "message" : "Unable to verify port number. Received API response: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "73db7d8c13e43fc3f08b071b785f2de06e904b67c1d0248129087b2883009d6b" : {
-    "message" : "Stop tunnel failed with tunnel id: %s, Status: %s",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "cd02fbd6e690be70cb03277de15981e598185b9e3e970965c44b68e1a5fd45d6" : {
-    "message" : "Build status doesn't match. Expected: %s , Actual: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "build-status-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "45065dec0828d561de901462d3ca405b37c47940b02ec5314775844671e2cd15" : {
-    "message" : "Unable to download Lighthouse report (JSON). Status: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "lighthouse-report-issues",
-    "priority" : "p1",
-    "isKnown" : "true"
-  },
-  "b78fae2c6654fb2191a4a53dd903b8df26da0f9e76e108c10da090a22d9ddcad" : {
-    "message" : "Text box disable failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "171bc63a530a7f4dc8e47b4a1c2333ed889ae934ea0b1406cd926f7a830c0893" : {
-    "message" : "Selenium %s logs are incomplete.",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "14995d87a2ccf8c2383e09afa9d60383279a9048b0e12528ac08d4c91de49e3d" : {
-    "message" : "Unable to open system logs tab",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "55eae8de22e5ed4a81fdff1ed345a7ca338134d4b75530b0c04348be87b79d59" : {
-    "message" : "First and last commands were not displayed in the UI.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "3d9f8cbbd87a9c3f916955669668446f11a28928c176cdc85699f9a47887a250" : {
-    "message" : "%s logs are not displayed in new tab.",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "open-logs-in-new-tab-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "8af0f7245dfaf3097dc9dde25a80c4875d767d2223eb7d179d44729ba9d8ded8" : {
-    "message" : "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "91b1ec6951afb8574ea6db883ff905f1853822b89ce73c2179090274799f4ac3" : {
-    "message" : "Debug level logs are missing for Selenium version %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "c0c3953ae1f17ab234be3fccdc14f9d88994658eb5ce36f7cc2b81b5ccf8c567" : {
-    "message" : "Self-signed site not open. There might be a certificate issue or website didn't open.",
-    "category" : "infra-related-issues",
-    "sub_category" : "mitm-certificate-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "122284649a6f0e4b80a6e97a9046542e4617a915428293e4a2d2f1a5af76bb12" : {
-    "message" : "Broken Images are not displayed",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "d30294e78b7bbf0f6a66a8d72fece0522e53029b84753ab37bd2e340111f9315" : {
-    "message" : "Verification data for Command logs are invalid",
-    "category" : "test-artefacts-ui-script-side-issue",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "6728f08e3b2b00bff2f9b9bab9d2738736b2a7a95a9b4356c55b4212578494ba" : {
-    "message" : "Expected terminal logs data is empty, please upload terminal logs before verifying terminal logs",
-    "category" : "test-artefacts-api-verification-failures-script-side-issue",
-    "sub_category" : "terminal-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c352c04d82a5dd0c280c09fcfa373c63adcb7d686120b0141a7a6ac83adbec2a" : {
-    "message" : "Local Url Not Displayed",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "de152c143d830a5f239e51948e604af375c600f3d1299bd396c5c0cb6f3e6ae7" : {
-    "message" : "Video share url is not valid. Url: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9595de00048aae4d2fa756c34b18e68fdbbafaa9745a1427fa53e842c1718026" : {
-    "message" : "A/B Test Variation failed.",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "82369dd0a6d2985d4cbd2845feb730e1be3ac8d697c66e5764f76d87499248dc" : {
-    "message" : "Unable to download video file for the session with name: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c9c5f32cab73731cb085de1569eca08d5128d79040b49420d9ccc5dd1120492a" : {
-    "message" : "Unable to open And verify %s logs in New Tab",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "open-logs-in-new-tab-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "c1bcd2b2e9271541a132885ba9b3ba35bfb9b74fd166b82020168044a2b3f222" : {
-    "message" : "allowHosts flag is not working. %s should be resolved in the DC or Tunnel Server not in Tunnel Client",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "248a06bf8c41b4521487619472cd1cabfe8ccb0337dd898a3d55d8a4932f6cb0" : {
-    "message" : "Some console logs are missing. Missing console logs: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "3b5a7d47f49a0e493cba8cff93127a23ac4d21b1be1699a61194df8778a11969" : {
-    "message" : "Expected logs to verify console logs are missing.",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "console-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "bb8476af2b3a95d5e01c3be48c0511a27ed62a32c34c1d831fedd7a197d57f77" : {
-    "message" : "Unable to open network logs tab",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "network-logs-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "37f2970e61be473f499c27995142402b2f90007904547e7ed218724de5958b6d" : {
-    "message" : "Terminal logs data doesn't match for the logs data fetched from API version: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "terminal-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "87edc7d2fb29d9d7c44bd448d6540546af4e23b8345dd75ef2ed46b50498eaaf" : {
-    "message" : "Unable to fetch %s logs from API. Received API response: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "swagger-api-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "f3aff4d04d7b6bee5d20b476c16c5bf26c8ac098be8a1100084908fbd3b47319" : {
-    "message" : "Expected session log missing or incorrect session ID: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "f6649225e78b8eac6fb9d9727b51a0290af71ea3df1d44b475e56a45f1e34a13" : {
-    "message" : "Distributor session creation log with correct session ID missing. Expected logs: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "a354982334ef570c550eb034772e75b1d560f45c07433173ef033cb5f0449b0b" : {
-    "message" : "Entered text doesn't match. Expected: %s Actual: %s",
-    "category" : "third-party-website-issues",
-    "sub_category" : "IHA-issues",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "b898e61139d7c014ef0d33e0e97b5e6e17aa82955249aadbef475ff06a72ce24" : {
-    "message" : "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9a0266d6f1085736a378150545537073ca0524bace5f200dde366af363f1b280" : {
-    "message" : "Extracted video metadata is null. Possible cause: Downloaded video file is corrupted.",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "video-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "7f0478fa94757c250ba7dd96868819ff7701bce39786e37359d8a1998859b851" : {
-    "message" : "Expected log 'Started Selenium Standalone' missing for Selenium %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "system-logs-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "b63e06efb03827a1ccf56ba267fedc1ceb70da3cedbda38af8618405b0f9c84c" : {
-    "message" : "Unable to download network logs from UI",
-    "category" : "test-artefacts-ui-verification-failures",
-    "sub_category" : "network-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "56f46aa0524699979a1cf0c94e7697b61c040183921036a93726e4fbeb033c28" : {
-    "message" : "Failed to login to LT website, cache verification will not be valid for next sessions.",
-    "category" : "script-side-issues",
-    "sub_category" : "lt-dashboard-login-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "3f43831320fd92882771600378d2ba76e15e02a09f000eb674945ef330245d4f" : {
-    "message" : "bypassHosts flag is not working. %s should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "4ac0c58e70bba72595157306071bc83052aca2999b08a10b19066fda98968ff3" : {
-    "message" : "Number of urls present in the %s logs are not same. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "0a5b0aef544eeaa1ac69c5d1e9fd4b811a3a395b54758e34aa831a30becbeac4" : {
-    "message" : "%s logs count fetched from %s doesn't match. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "b556fa23afbe19de4d27938b527b2a17c5f2de5a3b1a6ae4501e896c19444b5e" : {
-    "message" : "Unable to initiate stop test as the test is not in Running state. Current state: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "test-status-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "27b15f9630fa660fe159e5df4c107e61d63a1681e9474a3282a249639e2163bb" : {
-    "message" : "Unable to open test home page",
-    "category" : "lt-dashboard-issues",
-    "sub_category" : "unable-login-to-lt-dashboard",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "2845cc64bdad5de1a1f2c6ba423f4f5935892ca56706ecdf2fc6332d883ddcd2" : {
-    "message" : "Unable to initiate build stop as the build is not in Running state. Current state: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "build-status-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "045ee701aec3a63e140c0fb45688c07dfa052460ab5d161a8ba7f5f444b7cb5a" : {
-    "message" : "Test status verification failed after %d attempts. Expected: %s, Actual: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "test-status-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "ff7d933bbe3bfd15578acae98cdd47caa798925d76ce5a9aa499b6af94c599ca" : {
-    "message" : "Unable to open %s url",
-    "category" : "third-party-website-issues",
-    "sub_category" : "unable-to-open-url",
-    "priority" : "p4",
-    "isKnown" : "false"
-  },
-  "88c4a942ad87c46d82f970f34b17591529f5e064c6e8175fec1415e8fded242f" : {
-    "message" : "Auto-heal is not working for %s locator",
-    "category" : "auto-heal",
-    "sub_category" : "locator-is-not-auto-healed",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "e6fc241225f95cf77b89e87e66f564853ade633d0ea1ef78735bec2e95b97f6b" : {
-    "message" : "Unable to set baseline for auto heal test: %s.",
-    "category" : "auto-heal",
-    "sub_category" : "baseline-capture-failed-for-auto-heal-test",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "26ad3a68e8a23be02b3c3b741f4b47df64e76af7a69c18b1ade6986d55bd5fc3" : {
-    "message" : "Auto-healed locator for %s is locating some other element than expected. Expected: %s, Actual: %s",
-    "category" : "auto-heal",
-    "sub_category" : "auto-healed-locator-is-not-locating-expected-element",
-    "priority" : "p3",
-    "isKnown" : "true"
-  },
-  "d69ad5a170f8b47524996cdf3fbf8fa8de7cb5f4591b7755736e4793b8076d5d" : {
-    "message" : "Base line capture failed for auto-heal test, so this action will be skipped",
-    "category" : "auto-heal",
-    "sub_category" : "baseline-capture-failed-for-auto-heal-test",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "3bb4e76f7ffb1cc069dab51bcfe732bd6b3d10689dcc1ffa6a35bc56f9dbd9fd" : {
-    "message" : "Number of pages in command logs does not match. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8387004446b4e4462ad6b9604a0276ab700d20f184dd0de703b9532c61e89837" : {
-    "message" : "Command logs page start time is null or empty for page: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "42de1523142c8ceb3cb8aafcf513341e55ca846109e66a1136800e52a7da37ef" : {
-    "message" : "Received null or empty response for %s API. Response: %s",
-    "category" : "api-related-issues",
-    "sub_category" : "api-response-is-null-or-empty",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "4db6bbdfd69cbc4cfe25ed33ddecdb5abba394362deef048a6186e6e5fc743c5" : {
-    "message" : "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s",
-    "category" : "test-artefacts-api-verification-failures",
-    "sub_category" : "command-logs-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d33e70891734c4a2ddd2de21ab8086cc5c242b258e044d4eebef9b577a7eeeee" : {
-    "message" : "Tunnel is not using the expected %s. Expected: %s, Actual: %s",
-    "category" : "tunnel-issues",
-    "sub_category" : "tunnel-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "d251b936f5be24b08d55809aa731049c59a62f2642035981af91f4ef32e038ef" : {
-    "message" : "Unable to open LambdaTest page.",
-    "category" : "lt-dashboard-issues",
-    "sub_category" : "lt-page-down",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "6423841d225a140473612057ce9954ab533592b7f7ddb15426bc2a943cbfc481" : {
-    "message" : "%s logs are not present in share page",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-test-artefacts-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "1eea1c583cade52f7a5fc2cbcf5e8167d3d69d62d778eae844fd95b7fed11c4b" : {
-    "message" : "Video is not present in share page",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-test-artefacts-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "8f152c2f35f158e67f565ae6a1e26b116d829494d236ba8bc64edc2549902c0e" : {
-    "message" : "Test name mismatch in %s. Expected: %s, Actual: %s",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-test-details-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "825ddaa119ce23f2e7f88ee39ddc7195786beb8bb9ddb4379d486b0dbc3541ec" : {
-    "message" : "Build name mismatch in %s. Expected: %s, Actual: %s",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-build-details-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "b3d9cad6240f18c2b9cda1d8d23b0031b6e23c830aebdfc8b6df3f9f117047fb" : {
-    "message" : "Build share page tests list mismatch",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-build-details-mismatch-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "9c92286c68dc11bed7e807bdb16773ed8e9ad5bf00e414901905668027d8a758" : {
-    "message" : "Unable to open %s share page. Link: %s",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-not-opening-issue",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "5286974e40f67410dddfa077751f54b7016470a1d256ad28254a47d43330602b" : {
-    "message" : "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s",
-    "category" : "share-link-issues",
-    "sub_category" : "share-page-not-opening-issue",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "095d8eb341c49c8b388373a58bcb8c133c4c9b8c21e9a53f90e4091fb5348f96" : {
-    "message" : "File not updated in Lambda Storage. File type: %s, File name: %s, Last updated time: %s, Expected last updated time: %s",
-    "category" : "lambda-api-issues",
-    "sub_category" : "file-not-updated-in-lambda-storage",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "88d14c380a034dfbf99b62abbf997a1ef04d3e6910d5201aa4065f4edcdb516c" : {
-    "message" : "User is unable to use chrome profile from s3 url. Used chrome profile name does not match with expected profile name. Expected: %s, Actual: %s",
-    "category" : "browser-profile-issues",
-    "sub_category" : "chrome-profile-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "4651156705e895c172a366fc8c8f45d710844939b0db8f16c8e81ba1e21dbddc" : {
-    "message" : "File not present in the lambda storage. File type: %s, File name: %s",
-    "category" : "lambda-api-issues",
-    "sub_category" : "chrome-profile-upload-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "c62ece482b002b15374914874017de2a5c33ac0aaf1e2088ab77d14e1a6621f8" : {
-    "message" : "Firefox profile is not working via Firefox options",
-    "category" : "browser-profile-issues",
-    "sub_category" : "firefox-profile-issues",
-    "priority" : "p1",
-    "isKnown" : "false"
-  },
-  "7c577133c2d1975e7cb344d3ba9aa87c97a4f947f5f3a425bc0472bc39a5b5c3" : {
-    "message" : "Unable to upload %s file to Lambda Storage. Status: %s, Message: %s, Error: %s",
-    "category" : "lambda-api-issues",
-    "sub_category" : "file-upload-to-lambda-storage-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "2814ba08963dcfa38cda0888e78ea4d90e263ee01ae0d8f4e1701c6682cd9dfb" : {
-    "message" : "Unable to delete %s file from Lambda Storage. Status: %s, Message: %s",
-    "category" : "lambda-api-issues",
-    "sub_category" : "file-delete-from-lambda-storage-issues",
-    "priority" : "p0",
-    "isKnown" : "false"
-  },
-  "f45972e24316b2406ce46080be07a448357dbb8debaaebba603dd13ed9e6a2c3" : {
-    "message" : "%s tags verification failed. Expected: %s, Actual: %s",
-    "category" : "tags-verification-issues",
-    "sub_category" : "test-and-build-tags-issues",
-    "priority" : "p2",
-    "isKnown" : "false"
-  },
-  "68c89a830e40c27a6a59ca213a41805a3a1d6851af97a254b8a08ca021809c22" : {
-    "message" : "Command log annotations verification failed. Missing annotations: %s",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "c1d3ba724cc5760e8ef4e5a03bee50a1b8605ca8c4707968017e6cf5b0c85133": {
+    "message": "Browser version doesn't match. Expected: %s, Actual: %s",
+    "category": "infra-related-issues",
+    "sub_category": "browser-mismatch",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "a183881b3d0173e3127605bd291f0ade305b17850f5f5cb60fab1294ced063dc": {
+    "message": "System logs size is lesser than expected %s.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "b3d63f5716fd568e5eb9f40adb8367ef4f33cd47d64ef6e18c7b84d26aaef0f4": {
+    "message": "Second swap failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "d268c749b65e73f87e5ece43b61987e66f979bd0071139b533b91ee5dfd5f49e": {
+    "message": "%s is not present in the %s logs.",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "missing-logs",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c772d3a5587f8bd1206b22dff16f46ba163a8d378887c83d4e3ca9d0fccb117e": {
+    "message": "Unable to open Heroku Login Page",
+    "category": "infra-related-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "00134a74b782555af58c0f1980929ca84dea32063e7e183bb6b5c8dbd5d426df": {
+    "message": "Unable to download Lighthouse report (HTML). Status: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p1",
+    "isKnown": "true"
+  },
+  "4503d4fa9705b509105c9c3640d7703ae1b21ec6229027b94eb553c59b8ac6d7": {
+    "message": "Selenium logs does not contain %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "7e162494cc230e20e44c466b74d7aee6fb07d478460df64574ccf61f062a0e52": {
+    "message": "Expected log: %s is missing from the console logs fetched from API version: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c830c81b79047bf534a8c4894ac7de1557623e6c12fddcce721d96d2c7078c2b": {
+    "message": "%s is not displayed",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "704a6ff0bf9e382b71062af79e260351f1cae0b1afb17003cb959d8120f4d325": {
+    "message": "Unable to open performance report tab. Please check if you have passed capability performance true or UI is breaking.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4d4bd53d2ec03d61cc24b040935d23d645f89332c38f9208188f4e1cea3aee7f": {
+    "message": "Some URLs are not found in command logs. Missing URLs: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "08115e55b1763b720ed3c60a0de4ceabde2a478961e6bdbaabdbcb2d323c5183": {
+    "message": "First swap failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "6ac610b51fd04650cde361afb5bc3cfeaf904cfd5c830f3085cd29aac0a6e60f": {
+    "message": "bypassHosts flag is not working. %s should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened.",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "8590c9c9a19e7e9239a791c717021c78ec04c42cfa82986294bb0519e07c80fe": {
+    "message": "Unable to open console logs tab",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "fd49f5d747382afbbf78d1f1c2d645d8977651b7bf345dde59a58c20480d2eae": {
+    "message": "Actual video width is not greater than expected width. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "8c2345fe7f7880b57a52cd531b6f2a49eaaa33216b4a5e989f602f5771070de0": {
+    "message": "Timezone is not set correctly. Current timezone is: %s expected: %s",
+    "category": "infra-related-issues",
+    "sub_category": "timezone-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "8fd7219f139b38535bcbed086f5013a4f6e4098d0c3c9aa79c76d39f591310cf": {
+    "message": "Browser name doesn't match. Expected: %s, Actual: %s",
+    "category": "infra-related-issues",
+    "sub_category": "browser-mismatch",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d916b0822ae71717d04c919e4d0a5f446a148f04eb6ce8f90b965118a643c56a": {
+    "message": "Info level logs are missing for Selenium version %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d4b4351eb7c8ba5cfa208453c5d3254c98a8c20c7e1b653f7aa7636ab5310ec7": {
+    "message": "Unable to download system logs from UI",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "fd6b225d0d74a4593c576bd37c97f7376d8a74caee5afec2e1e949815cc6c26a": {
+    "message": "Unable to extract video urls from API response. Status: %s Message: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "bbd67ed39c69df29adb70a0f8b44e70e4d2af88d12fd9a7cdf25db4c2f72f614": {
+    "message": "Unable to upload file",
+    "category": "infra-related-issues",
+    "sub_category": "file-upload-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "ae1a1e193964cca53421b426ac4e97f8471caba6a3b219ab42e15be479879e29": {
+    "message": "Video verification failed from UI. Video is generated.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "11b3a3dbe468a902bb2ae868f5ca9d1c7d05f983e14591c062d699146fb3a416": {
+    "message": "Failed to upload terminal logs",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "terminal-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "82e15e54993a993e5d36c4fbee07300485411c356df0803b210133f9b5026133": {
+    "message": "User is not logged in",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "lt-dashboard-login-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "57fd22f3353687e56cb9be73134e7fcdba3d2df26f45b44612efbd86abb78d87": {
+    "message": "Unable to fetch %s logs from API %s. Received API response: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "lt-dashboard-login-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "800bbc3fb055fa5afb13c12000b8d1be6abb57d618ccb769baac324895fa6a8b": {
+    "message": "Actual video height is not greater than expected height. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "9fdd79efa1a92aa499b0aa89ce0ffcb4b9721657a0965c579d5d74621243a0d3": {
+    "message": "Expected port number is not present in the Selenium logs. Expected port number is: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "3a442d3ae53137ba4d90a435338e94aa6799ee8f4a8d70bf1ef16f475fffdbba": {
+    "message": "Basic Authentication Failed using keyboard events.",
+    "category": "infra-related-issues",
+    "sub_category": "basic-auth-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "e654c09f0886eb76799c458240baffd7cc2860add2d62ccbd22f7231d7ecd2ad": {
+    "message": "Dynamic Content test failed as static messages are not same after page refresh",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "e445bf7c69ac0f60188391041c6b923b3122f40feb02cde11394a13fc9269d12": {
+    "message": "Text box enable failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "951cfde13aa454810e40c05bf10d7bc80be17c02d8eeb433fc2b70cd84dbd431": {
+    "message": "Form logout failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "c921acd05ebebc7e89f7d75db64785546022f76f48f52e884579b7643a1eeb54": {
+    "message": "Schema validation failed for %s logs from %s. Errors: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "api-response-schema-validation-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "93a0c6b5f8a77779b9363972da20990247144473a356706e4edd31dfc9c69977": {
+    "message": "Mismatch found in %s. Expected URL: %s but got URL: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9126b1f7b7dfa9dca01bc1ef9dc2d75fa9ccd80f0b1d20b2f61c3af78f9c3e26": {
+    "message": "LT login page is not displayed, cache is not cleared in the machine.",
+    "category": "infra-related-issues",
+    "sub_category": "cache-not-cleared-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "359d5f181b53cf089c1907c736bf6f5660e804f1383e8d37926045147ea883ce": {
+    "message": "Verification data for Network logs are invalid",
+    "category": "test-artefacts-ui-script-side-issue",
+    "sub_category": "network-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4979cbb9e4c2044781f4fec472cfe82c8654875dc747ddd5dd09b5ed4bcecc75": {
+    "message": "The tunnel with name: %s is in running state. But expected state is: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8b7929dd46fef8b04f6d42ce753f4af323a80d4868d69a46b85604a80b1a647d": {
+    "message": "GeoLocation didn't match. Expected: %s Actual: %s",
+    "category": "infra-related-issues",
+    "sub_category": "geo-location-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "335ce9b655c79c800289481d86a18bfc1e5bbc7fc8f1b1d41713298ab374f372": {
+    "message": "Unable to fetch lighthouse reports. Status: %s, Message: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p1",
+    "isKnown": "true"
+  },
+  "8941afda4d8385f327f507afd1195dc040638b8b821c332f4a50271f10789375": {
+    "message": "Video verification is not valid. Please check from UI and review the script.",
+    "category": "test-artefacts-ui-script-side-issue",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8ced0e99c71449ef5cecdce00ac6e0cbaf286b6d19ed9b3c026b734a65f637d4": {
+    "message": "Form login is not successful",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "df24992742be91de64efd6f04c8b1b9d52a24036ad5e1e5ece85185fb698e3f6": {
+    "message": "Some Locators are not found in command logs. Missing locators: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4a8fc190b9e244578d2f783f6c09ff038a7d272ead5fcc9ccf37c1fa421c853b": {
+    "message": "Session creation log with correct session ID missing. Expected logs: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "dbeb4e076915c2f5a61603cd6a5ebb1c81a3351b94dd226dcc7ef5aca5d09646": {
+    "message": "Test video duration is greater than the expected video duration [1min + test execution time]. Expected duration: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "2389f34de9a0b9b5b0418016159ac2497e6ff4b474e7c58dbed541cd230a2642": {
+    "message": "Checkboxes are not selected",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "74f37fd1bd56e42614bdc2138ced1d07ff840e18a5f8db17a60a0d823ea64b22": {
+    "message": "Console logs not found in UI",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9474721300536753d85998b72e2fe935c9e6079ed823dd2cffb3bc601d739207": {
+    "message": "Unable to open command logs tab",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8d84624e0d023ab0da3cbafe5d3feaa3d7088aa01981ac83b63efb768b7622f1": {
+    "message": "System logs are not generated.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c73125e9ecd1db7c807c2c445695811a0ca10276da6477d91afddf2771d8ef68": {
+    "message": "Unsupported log type: %s",
+    "category": "test-artefacts-ui-script-side-issue",
+    "sub_category": "script-side-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "ff9dc53a57122f084a834b38d6b6ac27d67bcd1f1f023eb7dd5922a6a965b62f": {
+    "message": "Basic Authentication Failed",
+    "category": "infra-related-issues",
+    "sub_category": "basic-auth-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "5b95e7e684ae17206cfbc7e8e76ab07b5c03ac74580bf0d8ec3df3baee0c1c6a": {
+    "message": "Some URLs are not found in Network logs. Missing URLs: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "network-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "6fd360de9c7ca5271b4961ed750a3ac8b16a14ebefa622ad495415770927c431": {
+    "message": "Expected port number is %s for Selenium Driver. But used port is %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "9b01b43bcc7a1a354f154ebc23169f64b6d56e0d62352fd1884265b3c96f29d2": {
+    "message": "allowHosts flag is not working. %s should be resolved in tunnel client as allowHosts='*lambda*' flag is used, but unable to open it.",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8fb38729a026a9e2ab88fd044c4743641ece0da86ae65b03f7bebc6b99980c06": {
+    "message": "Expected Selenium version is %s but found %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "977335c33ec922c1a2bbc8768d9ff5bb4e91b87e57bdd728cc7273a696cd0d32": {
+    "message": "There is no running tunnel with name: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "1c80355f98a43afc268bf0fcdddeff540439db7d36debfbf7815589ca3c77786": {
+    "message": "With webdriver mode, expected port number is %s. But used port is %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "61775d99a672e9ceb38c7378aa1ac6f5688f10aa90440b78f7c365cebd9c7999": {
+    "message": "Unable to stop session with test stop api. Status: %s , Message: %s",
+    "category": "api-related-issues",
+    "sub_category": "test-stop-api-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "97ff618ad35996114d8e75c8e85be15fcea2b81103060425c7ee5ee7ab5c94c4": {
+    "message": "Error message of not supported browser for console logs is incorrect. Actual Message: %s, Expected Message: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p3",
+    "isKnown": "false"
+  },
+  "d78aa6af327b98feb61d289fe3ce3b107bc772966b270005b407eda34bd7e7dd": {
+    "message": "Heroku app web page keyboard log in failed, Expected: You logged into a secure area but Received: %s",
+    "category": "infra-related-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "af7007685c49d9c3ee5cc1a2b0ae09b2464e74402ea34c7cb7de37dbed067149": {
+    "message": "Unable to retrieve artefacts API download URL from API V2. Message: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "artefacts-api-v2-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "a542f09da7abcb2b726f95bb5f70178bd39beb73b675bf3e621564db11359439": {
+    "message": "Test performance report is not displayed in the UI.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p2",
+    "isKnown": "true"
+  },
+  "7b8a61e0f55b06adfb6f4bd06fac52104c80e999b3578fc3575dc5f8a6d8df26": {
+    "message": "Test performance report is not generated.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p2",
+    "isKnown": "true"
+  },
+  "c9eb488bad06bf92d41fcbe08dd2405e16831e5d51906a8a56801fa41972bd34": {
+    "message": "Add element test verification failed",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "45197ecf37853fd2f3003db168f12501c54a6ddd3503be24e8744352ffb4114b": {
+    "message": "Command count should be greater than 0. Current count is %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d76eb50a13c848d0ce10f1f0af4c8b6b36184a28e83f83c2124e7fbe12cd251d": {
+    "message": "Public websites are not resolved in expected location for tunnel flag %s. Expected: %s, Actual: %s, Fetched IP: %s, Fetched location: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "e7dbad4bbf14b004c67436e5e42d7b120bf7852e3f372a5786b12b4dcc9591ca": {
+    "message": "Extension not working, or might be tab not switched",
+    "category": "infra-related-issues",
+    "sub_category": "browser-extension-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "83d01e365bcb765c6adac55836e5b7d7492f5f7caed4025ff72110aa8e9a6b77": {
+    "message": "Video duration is less than 10 seconds. Duration: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9a59b5a15340d64a1afed3bf0182dc95482774fccd539f2851da6555770861ef": {
+    "message": "Unable to download console log file from UI",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d6142287bb4ac780ab1dc8f550aa033d077cac4cfc4463ebd182eff819a54189": {
+    "message": "Unable to verify port number. Received API response: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "73db7d8c13e43fc3f08b071b785f2de06e904b67c1d0248129087b2883009d6b": {
+    "message": "Stop tunnel failed with tunnel id: %s, Status: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "cd02fbd6e690be70cb03277de15981e598185b9e3e970965c44b68e1a5fd45d6": {
+    "message": "Build status doesn't match. Expected: %s , Actual: %s",
+    "category": "api-related-issues",
+    "sub_category": "build-status-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "45065dec0828d561de901462d3ca405b37c47940b02ec5314775844671e2cd15": {
+    "message": "Unable to download Lighthouse report (JSON). Status: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "lighthouse-report-issues",
+    "priority": "p1",
+    "isKnown": "true"
+  },
+  "b78fae2c6654fb2191a4a53dd903b8df26da0f9e76e108c10da090a22d9ddcad": {
+    "message": "Text box disable failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "171bc63a530a7f4dc8e47b4a1c2333ed889ae934ea0b1406cd926f7a830c0893": {
+    "message": "Selenium %s logs are incomplete.",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "14995d87a2ccf8c2383e09afa9d60383279a9048b0e12528ac08d4c91de49e3d": {
+    "message": "Unable to open system logs tab",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "55eae8de22e5ed4a81fdff1ed345a7ca338134d4b75530b0c04348be87b79d59": {
+    "message": "First and last commands were not displayed in the UI.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "3d9f8cbbd87a9c3f916955669668446f11a28928c176cdc85699f9a47887a250": {
+    "message": "%s logs are not displayed in new tab.",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "open-logs-in-new-tab-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "8af0f7245dfaf3097dc9dde25a80c4875d767d2223eb7d179d44729ba9d8ded8": {
+    "message": "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "91b1ec6951afb8574ea6db883ff905f1853822b89ce73c2179090274799f4ac3": {
+    "message": "Debug level logs are missing for Selenium version %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "c0c3953ae1f17ab234be3fccdc14f9d88994658eb5ce36f7cc2b81b5ccf8c567": {
+    "message": "Self-signed site not open. There might be a certificate issue or website didn't open.",
+    "category": "infra-related-issues",
+    "sub_category": "mitm-certificate-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "122284649a6f0e4b80a6e97a9046542e4617a915428293e4a2d2f1a5af76bb12": {
+    "message": "Broken Images are not displayed",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "d30294e78b7bbf0f6a66a8d72fece0522e53029b84753ab37bd2e340111f9315": {
+    "message": "Verification data for Command logs are invalid",
+    "category": "test-artefacts-ui-script-side-issue",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "6728f08e3b2b00bff2f9b9bab9d2738736b2a7a95a9b4356c55b4212578494ba": {
+    "message": "Expected terminal logs data is empty, please upload terminal logs before verifying terminal logs",
+    "category": "test-artefacts-api-verification-failures-script-side-issue",
+    "sub_category": "terminal-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c352c04d82a5dd0c280c09fcfa373c63adcb7d686120b0141a7a6ac83adbec2a": {
+    "message": "Local Url Not Displayed",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "de152c143d830a5f239e51948e604af375c600f3d1299bd396c5c0cb6f3e6ae7": {
+    "message": "Video share url is not valid. Url: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9595de00048aae4d2fa756c34b18e68fdbbafaa9745a1427fa53e842c1718026": {
+    "message": "A/B Test Variation failed.",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "82369dd0a6d2985d4cbd2845feb730e1be3ac8d697c66e5764f76d87499248dc": {
+    "message": "Unable to download video file for the session with name: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c9c5f32cab73731cb085de1569eca08d5128d79040b49420d9ccc5dd1120492a": {
+    "message": "Unable to open And verify %s logs in New Tab",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "open-logs-in-new-tab-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "c1bcd2b2e9271541a132885ba9b3ba35bfb9b74fd166b82020168044a2b3f222": {
+    "message": "allowHosts flag is not working. %s should be resolved in the DC or Tunnel Server not in Tunnel Client",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "248a06bf8c41b4521487619472cd1cabfe8ccb0337dd898a3d55d8a4932f6cb0": {
+    "message": "Some console logs are missing. Missing console logs: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "3b5a7d47f49a0e493cba8cff93127a23ac4d21b1be1699a61194df8778a11969": {
+    "message": "Expected logs to verify console logs are missing.",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "console-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "bb8476af2b3a95d5e01c3be48c0511a27ed62a32c34c1d831fedd7a197d57f77": {
+    "message": "Unable to open network logs tab",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "network-logs-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "37f2970e61be473f499c27995142402b2f90007904547e7ed218724de5958b6d": {
+    "message": "Terminal logs data doesn't match for the logs data fetched from API version: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "terminal-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "87edc7d2fb29d9d7c44bd448d6540546af4e23b8345dd75ef2ed46b50498eaaf": {
+    "message": "Unable to fetch %s logs from API. Received API response: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "swagger-api-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "f3aff4d04d7b6bee5d20b476c16c5bf26c8ac098be8a1100084908fbd3b47319": {
+    "message": "Expected session log missing or incorrect session ID: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "f6649225e78b8eac6fb9d9727b51a0290af71ea3df1d44b475e56a45f1e34a13": {
+    "message": "Distributor session creation log with correct session ID missing. Expected logs: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "a354982334ef570c550eb034772e75b1d560f45c07433173ef033cb5f0449b0b": {
+    "message": "Entered text doesn't match. Expected: %s Actual: %s",
+    "category": "third-party-website-issues",
+    "sub_category": "IHA-issues",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "b898e61139d7c014ef0d33e0e97b5e6e17aa82955249aadbef475ff06a72ce24": {
+    "message": "Video is not playable. Video current time stamp after clicking on video play button and waiting for 10 secs: %s",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9a0266d6f1085736a378150545537073ca0524bace5f200dde366af363f1b280": {
+    "message": "Extracted video metadata is null. Possible cause: Downloaded video file is corrupted.",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "video-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "7f0478fa94757c250ba7dd96868819ff7701bce39786e37359d8a1998859b851": {
+    "message": "Expected log 'Started Selenium Standalone' missing for Selenium %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "system-logs-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "b63e06efb03827a1ccf56ba267fedc1ceb70da3cedbda38af8618405b0f9c84c": {
+    "message": "Unable to download network logs from UI",
+    "category": "test-artefacts-ui-verification-failures",
+    "sub_category": "network-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "56f46aa0524699979a1cf0c94e7697b61c040183921036a93726e4fbeb033c28": {
+    "message": "Failed to login to LT website, cache verification will not be valid for next sessions.",
+    "category": "script-side-issues",
+    "sub_category": "lt-dashboard-login-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "3f43831320fd92882771600378d2ba76e15e02a09f000eb674945ef330245d4f": {
+    "message": "bypassHosts flag is not working. %s should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it.",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4ac0c58e70bba72595157306071bc83052aca2999b08a10b19066fda98968ff3": {
+    "message": "Number of urls present in the %s logs are not same. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "0a5b0aef544eeaa1ac69c5d1e9fd4b811a3a395b54758e34aa831a30becbeac4": {
+    "message": "%s logs count fetched from %s doesn't match. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "b556fa23afbe19de4d27938b527b2a17c5f2de5a3b1a6ae4501e896c19444b5e": {
+    "message": "Unable to initiate stop test as the test is not in Running state. Current state: %s",
+    "category": "api-related-issues",
+    "sub_category": "test-status-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "27b15f9630fa660fe159e5df4c107e61d63a1681e9474a3282a249639e2163bb": {
+    "message": "Unable to open test home page",
+    "category": "lt-dashboard-issues",
+    "sub_category": "unable-login-to-lt-dashboard",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "2845cc64bdad5de1a1f2c6ba423f4f5935892ca56706ecdf2fc6332d883ddcd2": {
+    "message": "Unable to initiate build stop as the build is not in Running state. Current state: %s",
+    "category": "api-related-issues",
+    "sub_category": "build-status-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "045ee701aec3a63e140c0fb45688c07dfa052460ab5d161a8ba7f5f444b7cb5a": {
+    "message": "Test status verification failed after %d attempts. Expected: %s, Actual: %s",
+    "category": "api-related-issues",
+    "sub_category": "test-status-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "ff7d933bbe3bfd15578acae98cdd47caa798925d76ce5a9aa499b6af94c599ca": {
+    "message": "Unable to open %s url",
+    "category": "third-party-website-issues",
+    "sub_category": "unable-to-open-url",
+    "priority": "p4",
+    "isKnown": "false"
+  },
+  "88c4a942ad87c46d82f970f34b17591529f5e064c6e8175fec1415e8fded242f": {
+    "message": "Auto-heal is not working for %s locator",
+    "category": "auto-heal",
+    "sub_category": "locator-is-not-auto-healed",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "e6fc241225f95cf77b89e87e66f564853ade633d0ea1ef78735bec2e95b97f6b": {
+    "message": "Unable to set baseline for auto heal test: %s.",
+    "category": "auto-heal",
+    "sub_category": "baseline-capture-failed-for-auto-heal-test",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "26ad3a68e8a23be02b3c3b741f4b47df64e76af7a69c18b1ade6986d55bd5fc3": {
+    "message": "Auto-healed locator for %s is locating some other element than expected. Expected: %s, Actual: %s",
+    "category": "auto-heal",
+    "sub_category": "auto-healed-locator-is-not-locating-expected-element",
+    "priority": "p3",
+    "isKnown": "true"
+  },
+  "d69ad5a170f8b47524996cdf3fbf8fa8de7cb5f4591b7755736e4793b8076d5d": {
+    "message": "Base line capture failed for auto-heal test, so this action will be skipped",
+    "category": "auto-heal",
+    "sub_category": "baseline-capture-failed-for-auto-heal-test",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "3bb4e76f7ffb1cc069dab51bcfe732bd6b3d10689dcc1ffa6a35bc56f9dbd9fd": {
+    "message": "Number of pages in command logs does not match. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8387004446b4e4462ad6b9604a0276ab700d20f184dd0de703b9532c61e89837": {
+    "message": "Command logs page start time is null or empty for page: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "42de1523142c8ceb3cb8aafcf513341e55ca846109e66a1136800e52a7da37ef": {
+    "message": "Received null or empty response for %s API. Response: %s",
+    "category": "api-related-issues",
+    "sub_category": "api-response-is-null-or-empty",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "4db6bbdfd69cbc4cfe25ed33ddecdb5abba394362deef048a6186e6e5fc743c5": {
+    "message": "Number of pages in command logs does not match with total number of commands: %s and commands per page: %s. Expected: %s, Actual: %s",
+    "category": "test-artefacts-api-verification-failures",
+    "sub_category": "command-logs-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d33e70891734c4a2ddd2de21ab8086cc5c242b258e044d4eebef9b577a7eeeee": {
+    "message": "Tunnel is not using the expected %s. Expected: %s, Actual: %s",
+    "category": "tunnel-issues",
+    "sub_category": "tunnel-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "d251b936f5be24b08d55809aa731049c59a62f2642035981af91f4ef32e038ef": {
+    "message": "Unable to open LambdaTest page.",
+    "category": "lt-dashboard-issues",
+    "sub_category": "lt-page-down",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "6423841d225a140473612057ce9954ab533592b7f7ddb15426bc2a943cbfc481": {
+    "message": "%s logs are not present in share page",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-artefacts-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "1eea1c583cade52f7a5fc2cbcf5e8167d3d69d62d778eae844fd95b7fed11c4b": {
+    "message": "Video is not present in share page",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-artefacts-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "8f152c2f35f158e67f565ae6a1e26b116d829494d236ba8bc64edc2549902c0e": {
+    "message": "Test name mismatch in %s. Expected: %s, Actual: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-test-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "825ddaa119ce23f2e7f88ee39ddc7195786beb8bb9ddb4379d486b0dbc3541ec": {
+    "message": "Build name mismatch in %s. Expected: %s, Actual: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-build-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "b3d9cad6240f18c2b9cda1d8d23b0031b6e23c830aebdfc8b6df3f9f117047fb": {
+    "message": "Build share page tests list mismatch",
+    "category": "share-link-issues",
+    "sub_category": "share-page-build-details-mismatch-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "9c92286c68dc11bed7e807bdb16773ed8e9ad5bf00e414901905668027d8a758": {
+    "message": "Unable to open %s share page. Link: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-not-opening-issue",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "5286974e40f67410dddfa077751f54b7016470a1d256ad28254a47d43330602b": {
+    "message": "%s share link verification failed. Expected status code: 200, Actual: %s\nShare Link: %s",
+    "category": "share-link-issues",
+    "sub_category": "share-page-not-opening-issue",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "095d8eb341c49c8b388373a58bcb8c133c4c9b8c21e9a53f90e4091fb5348f96": {
+    "message": "File not updated in Lambda Storage. File type: %s, File name: %s, Last updated time: %s, Expected last updated time: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-not-updated-in-lambda-storage",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "88d14c380a034dfbf99b62abbf997a1ef04d3e6910d5201aa4065f4edcdb516c": {
+    "message": "User is unable to use chrome profile from s3 url. Used chrome profile name does not match with expected profile name. Expected: %s, Actual: %s",
+    "category": "browser-profile-issues",
+    "sub_category": "chrome-profile-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "4651156705e895c172a366fc8c8f45d710844939b0db8f16c8e81ba1e21dbddc": {
+    "message": "File not present in the lambda storage. File type: %s, File name: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "chrome-profile-upload-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "c62ece482b002b15374914874017de2a5c33ac0aaf1e2088ab77d14e1a6621f8": {
+    "message": "Firefox profile is not working via Firefox options",
+    "category": "browser-profile-issues",
+    "sub_category": "firefox-profile-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "7c577133c2d1975e7cb344d3ba9aa87c97a4f947f5f3a425bc0472bc39a5b5c3": {
+    "message": "Unable to upload %s file to Lambda Storage. Status: %s, Message: %s, Error: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-upload-to-lambda-storage-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "2814ba08963dcfa38cda0888e78ea4d90e263ee01ae0d8f4e1701c6682cd9dfb": {
+    "message": "Unable to delete %s file from Lambda Storage. Status: %s, Message: %s",
+    "category": "lambda-api-issues",
+    "sub_category": "file-delete-from-lambda-storage-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "f45972e24316b2406ce46080be07a448357dbb8debaaebba603dd13ed9e6a2c3": {
+    "message": "%s tags verification failed. Expected: %s, Actual: %s",
+    "category": "tags-verification-issues",
+    "sub_category": "test-and-build-tags-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "68c89a830e40c27a6a59ca213a41805a3a1d6851af97a254b8a08ca021809c22": {
+    "message": "Command log annotations verification failed. Missing annotations: %s",
+    "category": "api-related-issues",
+    "sub_category": "command-logs-annotation-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "dd25a5faadcafe8271ad0dfa63b1c570e108d09128a9cbc01f9ce2af3f7e4970": {
+    "message": "Project name verification failed. Expected: %s, Actual: %s",
+    "category": "project-related-issues",
+    "sub_category": "project-name-mismatch",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }
