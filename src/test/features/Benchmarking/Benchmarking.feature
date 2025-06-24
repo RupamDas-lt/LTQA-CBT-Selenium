@@ -7,8 +7,17 @@ Feature: Run Benchmarking tests on LambdaTest, SauceLabs and BrowserStack and co
     Then I set test actions repeat count to <testActionsRepeatCount>
     Then I start session with driver quit on <cloudPlatform> to test herokuAppAllTests,networkLog with <capabilities>
 
+    @browserStackBenchMarking
+    Examples:
+      | capabilities                                                                                         | cloudPlatform | testActionsRepeatCount |
+      | os=Windows,osVersion=10,browserName=Chrome,browserVersion=latest,buildName=CBT-Selenium-Benchmarking | browserstack  | 5                      |
+
+    @sauceLabsBenchMarking
     Examples:
       | capabilities                                                                                                 | cloudPlatform | testActionsRepeatCount |
-      | os=Windows,osVersion=10,browserName=Chrome,browserVersion=latest,buildName=CBT-Selenium-Benchmarking         | browserstack  | 5                      |
       | platform=Windows 10,browserName=Chrome,version=latest,build=CBT-Selenium-Benchmarking,extendedDebugging=true | saucelab      | 5                      |
-      | browserName=chrome,platform=win10,version=latest,build=CBT-Selenium-Benchmarking                             | lambdatest    | 5                      |
+
+    @lambdatestBenchMarking
+    Examples:
+      | capabilities                                                                     | cloudPlatform | testActionsRepeatCount |
+      | browserName=chrome,platform=win10,version=latest,build=CBT-Selenium-Benchmarking | lambdatest    | 5                      |

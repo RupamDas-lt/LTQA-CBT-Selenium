@@ -129,7 +129,7 @@ public class MultipleAutomationSessionsHelper extends BaseClass {
     restoreThreadLocalSnapshot(mainThreadContext);
 
     try {
-      automationHelper.startSessionWithSpecificCapabilities(quitTestDriver, testCapability, testActions);
+      automationHelper.startSessionWithSpecificCapabilities(quitTestDriver, testCapability, testActions, true);
       String sessionId = EnvSetup.TEST_SESSION_ID.get();
       if (sessionId != null) {
         results.put(sessionId, new HashMap<>(EnvSetup.TEST_VERIFICATION_DATA.get()));

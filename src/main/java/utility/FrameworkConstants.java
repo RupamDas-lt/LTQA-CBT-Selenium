@@ -193,6 +193,7 @@ public class FrameworkConstants extends BaseClass {
   public static final String LAMBDA_TEST_TAGS = "lambda-test-tags";
   public static final String LAMBDA_TEST_CASE_START = "lambda-testCase-start";
   public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
+  public static final String LAMBDA_TEST_EXECUTOR_HOOK = "lambdatest_executor";
 
   // Lambda keyboard events
   public static final String LAMBDA_KEYBOARD_PASTE = "^v";
@@ -371,6 +372,16 @@ public class FrameworkConstants extends BaseClass {
 
   public static final String MAC_USER_DATA_DIRECTORY_PATH = "/Users/ltuser";
   public static final String WINDOWS_USER_DATA_DIRECTORY_PATH = "C:\\Users\\ltuser";
+
+  public static final Map<String, List<String>> TEST_ACTIONS_TO_ANNOTATIONS_MAP = Map.of("annotationWithLambdaTestCase",
+    List.of("lambda-testCase hooks execution :-1", "lambda-testCase hooks execution :-2",
+      "lambda-testCase hooks execution :-3", "lambda-testCase hooks execution :-4",
+      "lambda-testCase hooks execution :-5",
+      "lambda-testCase hooks execution with special char except for some specific #@$%^-+_=<>./!*()"),
+    "annotationWithStepContext",
+    List.of("stepContext hooks execution level info:-1", "stepContext hooks execution level warn:-2",
+      "stepContext hooks execution level error:-3", "stepContext hooks execution level debug:-4",
+      "stepContext hooks execution level info with special char except for some specific #@$%^-+_=<>./!*()", ""));
 
   // JavaScripts
   public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";

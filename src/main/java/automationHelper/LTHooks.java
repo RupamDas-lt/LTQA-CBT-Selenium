@@ -15,6 +15,14 @@ public class LTHooks extends FrameworkConstants {
     driverManager.executeScript(LAMBDA_TEST_CASE_END + "=" + stepName);
   }
 
+  public static void startStepContextWithLambdaTestExecutor(DriverManager driverManager, String stepName,
+    String level) {
+    String script = String.format(
+      "%s: {\"action\": \"stepcontext\", \"arguments\": {\"data\": \"%s\", \"level\": \"%s\"}}",
+      LAMBDA_TEST_EXECUTOR_HOOK, stepName, level);
+    driverManager.executeScript(script);
+  }
+
   public static void performKeyboardEvent(DriverManager driverManager, String keyboardEvent) {
     driverManager.executeScript(LAMBDA_PERFORM_KEYBOARD_EVENTS + ":" + keyboardEvent);
   }

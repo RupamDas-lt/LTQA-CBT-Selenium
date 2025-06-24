@@ -64,7 +64,8 @@ import lombok.Getter;
     "allowHosts flag is not working. %s should be resolved in the DC or Tunnel Server not in Tunnel Client"), BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_1(
     "bypassHosts flag is not working. %s should be resolved in tunnel server or DC not in Tunnel Client as bypassHosts='*lambda*' flag is used, and it shouldn't be opened."), BYPASS_HOSTS_TUNNEL_FLAG_NOT_WORKING_ERROR_MESSAGE_2(
     "bypassHosts flag is not working. %s should be resolved in tunnel client as bypassHosts='*lambda*' flag is used, but unable to open it."), LOCAL_URL_NOT_WORKING_WITH_TUNNEL_ERROR_MESSAGE(
-    "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client"),
+    "Unable to open %s with tunnel. Tunnel is not working as expected. Private websites should be resolved in Tunnel Client"), COMMAND_LOG_ANNOTATIONS_VERIFICATION_FAILURE_ERROR_MESSAGE(
+    "Command log annotations verification failed. Missing annotations: %s"),
 
   // TEST Artefacts api verification error messages
   UNABLE_TO_GET_LOGS_DOWNLOAD_URL_FROM_API_V2_ERROR_MESSAGE(

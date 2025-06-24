@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static factory.SoftAssertionMessages.*;
 import static utility.EnvSetup.*;
@@ -390,6 +392,25 @@ public class AutomationAPIHelper extends ApiManager {
     String testId = fetchTestDetails(session_id).get(testIdKeyInTestDetailsAPI).asText();
     ltLogger.info("Retrieved test ID: {}", testId);
     return testId;
+  }
+
+  public List<String> getTestAnnotationsFromSessionID(String session_id) {
+    final String annotationsKeyInTestDetailsAPI = "annotations";
+    JsonNode annotationsNode = fetchTestDetails(session_id).get(annotationsKeyInTestDetailsAPI);
+
+    if (annotationsNode == null || !annotationsNode.isArray()) {
+      ltLogger.warn("Annotations data is not an array or is null.");
+      return Collections.emptyList();
+    }
+
+    List<String> annotations = StreamSupport.stream(annotationsNode.spliterator(), false)
+      .filter(annotation -> annotation.has("name")).map(annotation -> annotation.get("name").asText())
+      .collect(Collectors.toList());
+
+    annotations.forEach(annotation -> ltLogger.debug("Found annotation: {}", annotation));
+    ltLogger.info("Retrieved {} annotations", annotations.size());
+
+    return annotations;
   }
 
   private JsonNode fetchFeatureFlagDetailsOfSpecificSession(String session_id) {

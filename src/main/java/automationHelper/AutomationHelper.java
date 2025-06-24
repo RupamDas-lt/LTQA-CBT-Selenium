@@ -86,7 +86,8 @@ public class AutomationHelper extends BaseClass {
     return runTestAction;
   }
 
-  private void runTestActions(String actionName) {
+  private void runTestActions(String actionName, boolean... setTestContextBasedOnActionsCustomValue) {
+    boolean setTestContextBasedOnActions = setTestContextBasedOnActionsCustomValue.length == 0 || setTestContextBasedOnActionsCustomValue[0];
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
 
     boolean runTestAction = checkIfValidTestAction(actionName);
@@ -98,7 +99,9 @@ public class AutomationHelper extends BaseClass {
 
     ltLogger.info("Executing test action: {}", actionName);
 
-    LTHooks.startStepContext(driverManager, actionName);
+    if (setTestContextBasedOnActions) {
+      LTHooks.startStepContext(driverManager, actionName);
+    }
     try {
       switch (actionName) {
       case "local":
@@ -188,6 +191,12 @@ public class AutomationHelper extends BaseClass {
       case "firefoxProfile":
         verifyFirefoxProfile();
         break;
+      case "annotationWithLambdaTestCase":
+        addAnnotationWithLambdaTestCase();
+        break;
+      case "annotationWithStepContext":
+        addAnnotationWithStepContext();
+        break;
       case "networkLog":
       default:
         baseTest();
@@ -197,7 +206,7 @@ public class AutomationHelper extends BaseClass {
       EnvSetup.TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
       throw new RuntimeException("Test action " + actionName + " failed", e);
     }
-    if (!actionName.toLowerCase().contains("timeout")) {
+    if (!actionName.toLowerCase().contains("timeout") && setTestContextBasedOnActions) {
       LTHooks.endStepContext(driverManager, actionName);
     }
     EnvSetup.SOFT_ASSERT.set(softAssert);
@@ -236,6 +245,7 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  @SuppressWarnings("unchecked")
   private void addConsoleLogs() {
     driverManager.getURL(GOOGLE_URL);
     consoleLogs.keySet().forEach(consoleLogLevel -> {
@@ -458,9 +468,9 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
-  private void baseTest() {
+  private void baseTest(String... customText) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-    String sampleText = "Let's add it to list";
+    String sampleText = customText.length > 0 ? customText[0] : "Let's add it to list";
     driverManager.getURL(TODO_APP_URL);
     driverManager.click(todoListItem1);
     driverManager.click(todoListItem2);
@@ -644,7 +654,7 @@ public class AutomationHelper extends BaseClass {
   }
 
   public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions,
-    String... cloudPlatformName) {
+    boolean setTestContextBasedOnActions, String... cloudPlatformName) {
     String startTime = getCurrentTimeIST();
     createTestSession(testCapability, cloudPlatformName);
 
@@ -659,7 +669,7 @@ public class AutomationHelper extends BaseClass {
       driverManager.switchToTab(0);
     }
     for (String testAction : testActionsArray) {
-      runTestActions(testAction);
+      runTestActions(testAction, setTestContextBasedOnActions);
     }
     stopWatch.stop();
     EnvSetup.TEST_REPORT.get().put(TEST_EXECUTION_TIME, String.valueOf(stopWatch.getTime() / 1000.00));
@@ -669,7 +679,7 @@ public class AutomationHelper extends BaseClass {
       try {
         driverManager.quit();
       } catch (Exception e) {
-        e.printStackTrace();
+        ltLogger.warn("Unable to quit test driver: {}", e.getMessage());
       }
       stopWatch.stop();
       String stopTime = getCurrentTimeIST();
@@ -784,6 +794,7 @@ public class AutomationHelper extends BaseClass {
 
   }
 
+  @SuppressWarnings("unchecked")
   private boolean areLogsVerificationRequired(String logs, Map<String, Object> testCaps) {
     Map<String, Object> requiredCaps = testArtefactsToCapsMap.getOrDefault(logs, Collections.emptyMap());
     if (requiredCaps.isEmpty()) {
@@ -1190,6 +1201,7 @@ public class AutomationHelper extends BaseClass {
         autoHealImdbFavListItem.value(), sampleImdbSearch, favListText));
   }
 
+  @SuppressWarnings("unchecked")
   private void autoHealWithNewLocators() {
     final String expectedHeading = "Challenging DOM";
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
@@ -1522,9 +1534,7 @@ public class AutomationHelper extends BaseClass {
   public void verifyFileInLambdaStorage(String type, String fileName) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     switch (type.toLowerCase()) {
-    case "browser profile" -> {
-      verifyBrowserProfileUpload(type, fileName, softAssert);
-    }
+    case "browser profile" -> verifyBrowserProfileUpload(type, fileName, softAssert);
     case "extension" -> {
       //      apiHelper.verifyExtensionInLambdaStorage(fileName);
     }
@@ -1535,9 +1545,7 @@ public class AutomationHelper extends BaseClass {
   public void deleteFileFromLambdaStorage(String type, String fileName) {
     CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
     switch (type.toLowerCase()) {
-    case "browser profile" -> {
-      apiHelper.deleteBrowserProfile(fileName);
-    }
+    case "browser profile" -> apiHelper.deleteBrowserProfile(fileName);
     case "extension" -> {
       //      apiHelper.deleteExtension(fileName);
       //      softAssert.assertTrue(apiHelper.isExtensionDeleted(fileName),
@@ -1616,4 +1624,65 @@ public class AutomationHelper extends BaseClass {
     EnvSetup.SOFT_ASSERT.set(softAssert);
   }
 
+  private void addAnnotationWithLambdaTestCase() {
+    List<String> annotationsList = TEST_ACTIONS_TO_ANNOTATIONS_MAP.get("annotationWithLambdaTestCase");
+    for (String annotation : annotationsList) {
+      LTHooks.startStepContext(driverManager, annotation);
+      ltLogger.info("Adding annotation with LambdaTest case: {}", annotation);
+      baseTest(annotation);
+      LTHooks.endStepContext(driverManager, annotation);
+    }
+  }
+
+  private String extractLevelFromAnnotation(String annotation) {
+    // Extract the level from the annotation string, assuming it's in the format "level <level>:"
+    String regex = "level (\\w+)";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(annotation);
+    if (matcher.find()) {
+      return matcher.group(1); // Return the captured level
+    }
+    ltLogger.warn("No level found in annotation: {}", annotation);
+    return "info"; // Default level if not found
+  }
+
+  private void addAnnotationWithStepContext() {
+    List<String> annotationsList = TEST_ACTIONS_TO_ANNOTATIONS_MAP.get("annotationWithStepContext");
+    for (String annotation : annotationsList) {
+      String info = extractLevelFromAnnotation(annotation);
+      LTHooks.startStepContextWithLambdaTestExecutor(driverManager, annotation, info);
+      ltLogger.info("Adding annotation with step context: {}", annotation);
+      baseTest(annotation);
+    }
+  }
+
+  public void verifyCommandLogAnnotationsViaAPI(String sessionID) {
+    CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+    List<String> usedAnnotationsFromTestAPIResponse = apiHelper.getTestAnnotationsFromSessionID(sessionID);
+    List<String> missingAnnotations = new ArrayList<>();
+
+    TEST_ACTIONS_TO_ANNOTATIONS_MAP.forEach((annotationType, expectedAnnotations) -> {
+      if (expectedAnnotations == null || expectedAnnotations.isEmpty()) {
+        ltLogger.warn("No annotations found for type: {}", annotationType);
+        return;
+      }
+
+      expectedAnnotations.stream().filter(annotation -> !annotation.isEmpty()).forEach(expectedAnnotation -> {
+        boolean annotationFound = usedAnnotationsFromTestAPIResponse.stream()
+          .anyMatch(annotation -> annotation.contains(expectedAnnotation));
+
+        if (annotationFound) {
+          ltLogger.info("Annotation found in API response: {}", expectedAnnotation);
+        } else {
+          missingAnnotations.add(expectedAnnotation);
+        }
+      });
+    });
+
+    softAssert.assertTrue(missingAnnotations.isEmpty(),
+      softAssertMessageFormat(COMMAND_LOG_ANNOTATIONS_VERIFICATION_FAILURE_ERROR_MESSAGE,
+        missingAnnotations.toString()));
+
+    EnvSetup.SOFT_ASSERT.set(softAssert);
+  }
 }
