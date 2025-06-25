@@ -69,13 +69,19 @@ public class ClientAutomationHelper extends BaseClass {
 
   private String constructNetworkLogsFileName(Map<String, Object> capabilities) {
     /// CBT_Selenium_Test_2025-04-23-browserName=chrome,platform=sonoma,version=._,performance=true,resolution=._,network=true,visual=true,tunnel=true,console=true-network-logs.har
-    final String postFixForNetworkLogsWithExtension = "network-logs.har";
+    final String postFixForNetworkLogs = "network-logs";
+    final String extension = ".har";
     String buildName = (String) capabilities.get(BUILD_NAME);
     String testName = (String) capabilities.get(TEST_NAME);
-    String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogsWithExtension)
+    String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogs)
       .replace("*", "_");
-    ltLogger.info("Network logs file name: {}", finalNetworkLogsFileName);
-    return finalNetworkLogsFileName;
+    if (finalNetworkLogsFileName.length() > 213) {
+      ltLogger.warn("Network logs file name is too long: {}. Truncating to 213 characters.", finalNetworkLogsFileName);
+      finalNetworkLogsFileName = finalNetworkLogsFileName.substring(0, 213);
+    }
+    String finalNetworkLogsFileNameWithExtension = finalNetworkLogsFileName + extension;
+    ltLogger.info("Network logs file name: {}", finalNetworkLogsFileNameWithExtension);
+    return finalNetworkLogsFileNameWithExtension;
   }
 
   private String constructSystemLogsFileName(String testID) {
