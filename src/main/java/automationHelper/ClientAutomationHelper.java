@@ -75,9 +75,11 @@ public class ClientAutomationHelper extends BaseClass {
     String testName = (String) capabilities.get(TEST_NAME);
     String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogs)
       .replace("*", "_");
-    if (finalNetworkLogsFileName.length() > 213) {
-      ltLogger.warn("Network logs file name is too long: {}. Truncating to 213 characters.", finalNetworkLogsFileName);
-      finalNetworkLogsFileName = finalNetworkLogsFileName.substring(0, 213);
+    if (finalNetworkLogsFileName.length() > MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER) {
+      ltLogger.warn("Network logs file name is too long: {}. Truncating to {} characters.", finalNetworkLogsFileName,
+        MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER);
+      finalNetworkLogsFileName = finalNetworkLogsFileName.substring(0,
+        MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER);
     }
     String finalNetworkLogsFileNameWithExtension = finalNetworkLogsFileName + extension;
     ltLogger.info("Network logs file name: {}", finalNetworkLogsFileNameWithExtension);
