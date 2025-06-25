@@ -929,5 +929,19 @@
     "sub_category": "test-and-build-tags-issues",
     "priority": "p2",
     "isKnown": "false"
+  },
+  "68c89a830e40c27a6a59ca213a41805a3a1d6851af97a254b8a08ca021809c22": {
+    "message": "Command log annotations verification failed. Missing annotations: %s",
+    "category": "api-related-issues",
+    "sub_category": "command-logs-annotation-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "dd25a5faadcafe8271ad0dfa63b1c570e108d09128a9cbc01f9ce2af3f7e4970": {
+    "message": "Project name verification failed. Expected: %s, Actual: %s",
+    "category": "project-related-issues",
+    "sub_category": "project-name-mismatch",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

@@ -21,7 +21,15 @@ public class AutomationSetupDefinitions {
 
   @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
   public void startSessionAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
-    automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions);
+    automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions,
+      true);
+  }
+
+  @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit and without setting default test contexts to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
+  public void startSessionAndPerformActivityWithoutDefaultTestContext(String quitDriverStatus, String testActions,
+    String capability) {
+    automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions,
+      false);
   }
 
   @Then("^I start ([0-9]+) sessions ([a-zA-Z0-9_=,: ]+) driver quit to test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
@@ -35,7 +43,7 @@ public class AutomationSetupDefinitions {
   public void startSessionOnSpecificCloudPlatformAndPerformActivity(String quitDriverStatus, String cloudPlatform,
     String testActions, String capability) {
     automationHelper.startSessionWithSpecificCapabilities(!quitDriverStatus.equals("without"), capability, testActions,
-      cloudPlatform);
+      false, cloudPlatform);
   }
 
   @Given("Setup user details")
@@ -151,10 +159,18 @@ public class AutomationSetupDefinitions {
     case "build tags":
       automationHelper.verifyBuildTags();
       break;
+    case "project name":
+      automationHelper.verifyProjectName();
+      break;
     default:
       ltLogger.error("Unknown Details to verify: {}", detailsToVerify);
       throw new IllegalArgumentException("Unknown Details to verify: " + detailsToVerify);
     }
+  }
+
+  @Then("I verify command log Annotations via API")
+  public void iVerifyCommandLogAnnotationsViaAPI() {
+    automationHelper.verifyCommandLogAnnotationsViaAPI(TEST_SESSION_ID.get());
   }
 
   /// --------------------------------- Client test related step definitions ---------------------------------
