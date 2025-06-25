@@ -7,6 +7,7 @@
 - [ ] Caps `tunnel`, `network`, `geoLocation` should work with Tosca
 - [ ] Cancelled tests should have correct remarks
 - [ ] Tunnel tests coverage
+- [ ] network.mask
 
 ## Refactoring:
 

@@ -69,13 +69,21 @@ public class ClientAutomationHelper extends BaseClass {
 
   private String constructNetworkLogsFileName(Map<String, Object> capabilities) {
     /// CBT_Selenium_Test_2025-04-23-browserName=chrome,platform=sonoma,version=._,performance=true,resolution=._,network=true,visual=true,tunnel=true,console=true-network-logs.har
-    final String postFixForNetworkLogsWithExtension = "network-logs.har";
+    final String postFixForNetworkLogs = "network-logs";
+    final String extension = ".har";
     String buildName = (String) capabilities.get(BUILD_NAME);
     String testName = (String) capabilities.get(TEST_NAME);
-    String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogsWithExtension)
+    String finalNetworkLogsFileName = String.format("%s-%s-%s", buildName, testName, postFixForNetworkLogs)
       .replace("*", "_");
-    ltLogger.info("Network logs file name: {}", finalNetworkLogsFileName);
-    return finalNetworkLogsFileName;
+    if (finalNetworkLogsFileName.length() > MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER) {
+      ltLogger.warn("Network logs file name is too long: {}. Truncating to {} characters.", finalNetworkLogsFileName,
+        MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER);
+      finalNetworkLogsFileName = finalNetworkLogsFileName.substring(0,
+        MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER);
+    }
+    String finalNetworkLogsFileNameWithExtension = finalNetworkLogsFileName + extension;
+    ltLogger.info("Network logs file name: {}", finalNetworkLogsFileNameWithExtension);
+    return finalNetworkLogsFileNameWithExtension;
   }
 
   private String constructSystemLogsFileName(String testID) {
