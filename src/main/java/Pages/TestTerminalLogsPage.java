@@ -4,11 +4,11 @@ import TestManagers.DriverManager;
 
 public class TestTerminalLogsPage extends LTDashboardCommonActions {
 
-  DriverManager driver;
+    DriverManager driver;
 
-  public TestTerminalLogsPage(String testId, DriverManager driverManager) {
-    super(testId, driverManager);
-    driver = driverManager;
-  }
+    public TestTerminalLogsPage(String testId, DriverManager driverManager) {
+        super(testId, driverManager);
+        driver = driverManager;
+    }
 
 }

@@ -1,5 +1,5 @@
 package factory;
 
 public enum BrowserType {
-  CHROME, FIREFOX, EDGE, SAFARI
+    CHROME, FIREFOX, EDGE, SAFARI
 }
