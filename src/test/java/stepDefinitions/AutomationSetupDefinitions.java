@@ -46,6 +46,12 @@ public class AutomationSetupDefinitions {
                 false, cloudPlatform);
     }
 
+    @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to check session creation and test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
+    public void startSessionToVerifySessionCreationAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
+        automationHelper.startSessionAmdCheckForSessionCreationError(!quitDriverStatus.equals("without"), capability, testActions,
+                true);
+    }
+
     @Given("Setup user details")
     public void setupUserDetails() {
         testUserName.set(getPropertyOrDefault(CUSTOM_USER_NAME, USER_NAME));
@@ -171,6 +177,12 @@ public class AutomationSetupDefinitions {
     @Then("I verify command log Annotations via API")
     public void iVerifyCommandLogAnnotationsViaAPI() {
         automationHelper.verifyCommandLogAnnotationsViaAPI(TEST_SESSION_ID.get());
+    }
+
+    @Then("^I verify session creation status is (.+)$")
+    public void iVerifySessionCreationStatusIsExpected_status(String expectedStatus) {
+        String actualStatus = TEST_VERIFICATION_DATA.get().getOrDefault(testVerificationDataKeys.SESSION_CREATION_ERROR_MESSAGE, "passed").toString();
+        automationHelper.verifySessionErrorMessageIsExpected(expectedStatus, actualStatus);
     }
 
     /// --------------------------------- Client test related step definitions ---------------------------------
