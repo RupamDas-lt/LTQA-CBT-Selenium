@@ -653,7 +653,7 @@ public class AutomationHelper extends BaseClass {
         return testActions;
     }
 
-    public void startSessionAmdCheckForSessionCreationError(boolean quitTestDriver, String testCapability, String testActions,
+    public void startSessionAndCheckForSessionCreationError(boolean quitTestDriver, String testCapability, String testActions,
                                                             boolean setTestContextBasedOnActions, String... cloudPlatformName) {
         String errorMessage = "passed";
         try {

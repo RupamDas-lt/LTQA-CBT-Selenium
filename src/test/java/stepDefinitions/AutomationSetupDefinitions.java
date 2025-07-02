@@ -48,7 +48,7 @@ public class AutomationSetupDefinitions {
 
     @Then("^I start session ([a-zA-Z0-9_=,: ]+) driver quit to check session creation and test ([a-zA-Z0-9_=,: ]+) with ([^\"]*)$")
     public void startSessionToVerifySessionCreationAndPerformActivity(String quitDriverStatus, String testActions, String capability) {
-        automationHelper.startSessionAmdCheckForSessionCreationError(!quitDriverStatus.equals("without"), capability, testActions,
+        automationHelper.startSessionAndCheckForSessionCreationError(!quitDriverStatus.equals("without"), capability, testActions,
                 true);
     }
 
