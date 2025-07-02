@@ -118,6 +118,10 @@ public enum SoftAssertionMessages {
     FIREFOX_PROFILE_NOT_WORKING_ERROR_MESSAGE("Firefox profile is not working via Firefox options"),
     TAGS_VERIFICATION_FAILURE_ERROR_MESSAGE("%s tags verification failed. Expected: %s, Actual: %s"),
     PROJECT_NAME_VERIFICATION_FAILURE_ERROR_MESSAGE("Project name verification failed. Expected: %s, Actual: %s"),
+    UNABLE_TO_VERIFY_CROSS_SITE_BLOCKING_STATUS_ERROR_MESSAGE("Unable to verify cross-site blocking status. Error message: %s"),
+    CROSS_SITE_BLOCKING_STATUS_VERIFICATION_FAILURE_ERROR_MESSAGE("Cross-site blocking status verification failed. Expected: %s, Actual: %s"),
+    FAKE_MEDIA_CHECK_WEB_CAM_BLOCKED_VERIFICATION_FAILURE_ERROR_MESSAGE("Fake media verification failed, web cam access is blocked"),
+    FAKE_MEDIA_VERIFICATION_FAILURE_ERROR_MESSAGE("Fake media verification failed, selected webCam is not matched. Expected: %s, actual: %s"),
 
     //  CLIENT side error messages
     USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE("User is not logged in"),

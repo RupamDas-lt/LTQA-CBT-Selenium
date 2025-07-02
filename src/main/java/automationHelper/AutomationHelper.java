@@ -197,6 +197,12 @@ public class AutomationHelper extends BaseClass {
                 case "annotationWithStepContext":
                     addAnnotationWithStepContext();
                     break;
+                case "crossSiteTracking":
+                    crossSiteTrackingCheck();
+                    break;
+                case "fakeMedia":
+                    fakeMediaCheck();
+                    break;
                 case "networkLog":
                 default:
                     baseTest();
@@ -1699,6 +1705,56 @@ public class AutomationHelper extends BaseClass {
                 softAssertMessageFormat(COMMAND_LOG_ANNOTATIONS_VERIFICATION_FAILURE_ERROR_MESSAGE,
                         missingAnnotations.toString()));
 
+        EnvSetup.SOFT_ASSERT.set(softAssert);
+    }
+
+    private void crossSiteTrackingCheck() {
+        CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+        driverManager.getURL(CROSS_SITE_BLOCKING_CHECK_URL);
+        boolean isPageOpened = driverManager.isDisplayed(crossSiteBlockingCheckHeading) && driverManager.getText(crossSiteBlockingCheckHeading)
+                .equalsIgnoreCase("Test if Third-Party Cookies are Enabled");
+        CustomAssert.assertTrue(isPageOpened, softAssertMessageFormat(
+                UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, CROSS_SITE_BLOCKING_CHECK_URL));
+
+        Map<String, Object> testCaps = TEST_CAPS_MAP.get();
+        boolean isPreventCrossSiteTrackingEnabled = true;
+        if (testCaps.containsKey(PREVENT_CROSS_SITE_TRACKING)) {
+            isPreventCrossSiteTrackingEnabled = EnvSetup.TEST_CAPS_MAP.get().getOrDefault(
+                    PREVENT_CROSS_SITE_TRACKING, "true").toString().equalsIgnoreCase("true");
+        } else if (testCaps.containsKey(ENABLE_CROSS_SITE_BLOCKING)) {
+            isPreventCrossSiteTrackingEnabled = EnvSetup.TEST_CAPS_MAP.get().getOrDefault(
+                    ENABLE_CROSS_SITE_BLOCKING, "false").toString().equalsIgnoreCase("false");
+        }
+        String expectedStatus = isPreventCrossSiteTrackingEnabled ?
+                "Third party cookies appear to be disabled." :
+                "Third party cookies are functioning in your browser.";
+        if (driverManager.isDisplayed(crossSiteBlockingResult)) {
+            String actualStatus = driverManager.getText(crossSiteBlockingResult);
+            softAssert.assertTrue(actualStatus.equalsIgnoreCase(expectedStatus),
+                    softAssertMessageFormat(CROSS_SITE_BLOCKING_STATUS_VERIFICATION_FAILURE_ERROR_MESSAGE,
+                            expectedStatus, actualStatus));
+        } else {
+            String error = driverManager.getText(crossSiteBlockingError);
+            softAssert.fail(softAssertMessageFormat(
+                    UNABLE_TO_VERIFY_CROSS_SITE_BLOCKING_STATUS_ERROR_MESSAGE, error));
+        }
+        EnvSetup.SOFT_ASSERT.set(softAssert);
+    }
+
+    private void fakeMediaCheck() {
+        CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+        driverManager.getURL(FAKE_MEDIA_CHECK_URL);
+        CustomAssert.assertTrue(driverManager.waitForElementToDisappear(fakeMediaCheckPageLoadingState, 30),
+                softAssertMessageFormat(UNABLE_TO_NAVIGATE_TO_PUBLIC_URL_MESSAGE, FAKE_MEDIA_CHECK_URL));
+        boolean isWebcamBlocked = driverManager.isDisplayed(webcamAccessBlockedNotification, 10);
+        if (!isWebcamBlocked) {
+            String firstSelectedCamOption = driverManager.getAllSelectedOptionFromDropdown(webcamSelectorDropDown).getFirst();
+            ltLogger.info("First selected webcam option: {}", firstSelectedCamOption);
+            softAssert.assertTrue(firstSelectedCamOption.equalsIgnoreCase("fake_device_0"),
+                    softAssertMessageFormat(FAKE_MEDIA_VERIFICATION_FAILURE_ERROR_MESSAGE, "fake_device_0", firstSelectedCamOption));
+        } else {
+            softAssert.fail(softAssertMessageFormat(FAKE_MEDIA_CHECK_WEB_CAM_BLOCKED_VERIFICATION_FAILURE_ERROR_MESSAGE));
+        }
         EnvSetup.SOFT_ASSERT.set(softAssert);
     }
 }

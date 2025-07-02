@@ -110,6 +110,16 @@ public class UrlsAndLocators {
     public static final Locator fileInLtUserDirectoryLocatorFormat = new Locator(LocatorTypes.CSS,
             "td[sortable-data*='%s']");
 
+    public static final String CROSS_SITE_BLOCKING_CHECK_URL = "https://alanhogan.github.io/web-experiments/3rd/third-party-cookies.html";
+    public static final Locator crossSiteBlockingCheckHeading = new Locator(LocatorTypes.TAG_NAME, "h1");
+    public static final Locator crossSiteBlockingResult = new Locator(LocatorTypes.ID, "3rd_party_cookie_test_results");
+    public static final Locator crossSiteBlockingError = new Locator(LocatorTypes.ID, "3rd_party_cookie_test_error");
+
+    public static final String FAKE_MEDIA_CHECK_URL = "https://webcamtests.com/check";
+    public static final Locator fakeMediaCheckPageLoadingState = new Locator(LocatorTypes.XPATH, "//ul//li[contains(text(),'Detecting your media devices. Please wait...')]");
+    public static final Locator webcamAccessBlockedNotification = new Locator(LocatorTypes.CLASS_NAME, "notice-injected");
+    public static final Locator webcamSelectorDropDown = new Locator(LocatorTypes.ID, "webcam-selecter");
+
     /// ---- Auto heal tests urls and locators, BaseLine locators are the original which will be mocked ----
     public static final String CHALLENGING_DOM_PAGE_URL = "https://the-internet.herokuapp.com/challenging_dom";
     public static final Locator challengingDomPageHeading = new Locator(LocatorTypes.CSS, ".example>h3");
