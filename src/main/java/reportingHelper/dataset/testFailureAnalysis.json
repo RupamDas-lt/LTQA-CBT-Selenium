@@ -943,5 +943,12 @@
     "sub_category": "project-name-mismatch",
     "priority": "p0",
     "isKnown": "false"
+  },
+  "e5f21e84df14dd90288e7bfdd4ea26759dd5d56e19fcec053a81d2fe7420c440": {
+    "message": "Session error message verification failed. Expected: %s, Actual: %s",
+    "category": "session-related-issues",
+    "sub_category": "incorrect-session-error-message",
+    "priority": "p3",
+    "isKnown": "false"
   }
 }

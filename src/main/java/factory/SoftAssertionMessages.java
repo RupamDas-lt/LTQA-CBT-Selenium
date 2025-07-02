@@ -118,6 +118,7 @@ public enum SoftAssertionMessages {
     FIREFOX_PROFILE_NOT_WORKING_ERROR_MESSAGE("Firefox profile is not working via Firefox options"),
     TAGS_VERIFICATION_FAILURE_ERROR_MESSAGE("%s tags verification failed. Expected: %s, Actual: %s"),
     PROJECT_NAME_VERIFICATION_FAILURE_ERROR_MESSAGE("Project name verification failed. Expected: %s, Actual: %s"),
+    SESSION_ERROR_MESSAGE_VERIFICATION_FAILURE_ERROR_MESSAGE("Session error message verification failed. Expected: %s, Actual: %s"),
 
     //  CLIENT side error messages
     USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE("User is not logged in"),

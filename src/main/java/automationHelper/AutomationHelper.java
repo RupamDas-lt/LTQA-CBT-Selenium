@@ -653,6 +653,18 @@ public class AutomationHelper extends BaseClass {
         return testActions;
     }
 
+    public void startSessionAndCheckForSessionCreationError(boolean quitTestDriver, String testCapability, String testActions,
+                                                            boolean setTestContextBasedOnActions, String... cloudPlatformName) {
+        String errorMessage = "passed";
+        try {
+            startSessionWithSpecificCapabilities(quitTestDriver, testCapability, testActions, setTestContextBasedOnActions, cloudPlatformName);
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+            ltLogger.error("Automation session error: {}", e.getMessage());
+        }
+        TEST_VERIFICATION_DATA.get().put(testVerificationDataKeys.SESSION_CREATION_ERROR_MESSAGE, errorMessage);
+    }
+
     public void startSessionWithSpecificCapabilities(boolean quitTestDriver, String testCapability, String testActions,
                                                      boolean setTestContextBasedOnActions, String... cloudPlatformName) {
         String startTime = getCurrentTimeIST();
@@ -1699,6 +1711,14 @@ public class AutomationHelper extends BaseClass {
                 softAssertMessageFormat(COMMAND_LOG_ANNOTATIONS_VERIFICATION_FAILURE_ERROR_MESSAGE,
                         missingAnnotations.toString()));
 
+        EnvSetup.SOFT_ASSERT.set(softAssert);
+    }
+
+    public void verifySessionErrorMessageIsExpected(String expectedMessage, String actualMessage) {
+        CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+        ltLogger.info("Verifying session error message. Expected: {}, Actual: {}", expectedMessage, actualMessage);
+        softAssert.assertTrue(actualMessage.contains(expectedMessage),
+                softAssertMessageFormat(SESSION_ERROR_MESSAGE_VERIFICATION_FAILURE_ERROR_MESSAGE, expectedMessage, actualMessage));
         EnvSetup.SOFT_ASSERT.set(softAssert);
     }
 }
