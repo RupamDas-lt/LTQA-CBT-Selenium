@@ -1885,10 +1885,10 @@ public class AutomationHelper extends BaseClass {
     }
 
     public void verifySessionErrorMessageIsExpected(String expectedMessage, String actualMessage) {
-        CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+        CustomSoftAssert softAssert = SOFT_ASSERT.get();
         ltLogger.info("Verifying session error message. Expected: {}, Actual: {}", expectedMessage, actualMessage);
         softAssert.assertTrue(actualMessage.contains(expectedMessage),
                 softAssertMessageFormat(SESSION_ERROR_MESSAGE_VERIFICATION_FAILURE_ERROR_MESSAGE, expectedMessage, actualMessage));
-        EnvSetup.SOFT_ASSERT.set(softAssert);
+        SOFT_ASSERT.set(softAssert);
     }
 }
