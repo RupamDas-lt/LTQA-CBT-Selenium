@@ -3,6 +3,7 @@ package automationHelper;
 import TestManagers.DriverManager;
 import utility.FrameworkConstants;
 
+import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 public class LTHooks extends FrameworkConstants {
@@ -56,4 +57,8 @@ public class LTHooks extends FrameworkConstants {
         return fileFound;
     }
 
+    public static String getFileContent(DriverManager driverManager, String fileNameWithExtension) {
+        Object content = driverManager.executeScriptAndFetchValue(String.format("%s=%s", LAMBDA_FILE_CONTENT, fileNameWithExtension));
+        return content == null ? null : new String(Base64.getDecoder().decode((String) content));
+    }
 }

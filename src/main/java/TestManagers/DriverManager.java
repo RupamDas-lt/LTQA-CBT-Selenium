@@ -200,6 +200,13 @@ public class DriverManager extends BaseClass {
         putValueToVerificationData(testVerificationDataKeys.URL, url);
     }
 
+    public void getURLInNewTab(String url) {
+        ltLogger.info("Opening URL in new tab: {}", url);
+        String script = "window.open('" + url + "', '_blank');";
+        executeScript(script);
+        ltLogger.info("New tab opened with URL: {}", url);
+    }
+
     ///  Use this method to open URL using JavaScript, this wouldn't block the driver while navigating to the URL.
     public void getURLUsingJs(String url) {
         ltLogger.info("Opening URL using JS: {}", url);
@@ -534,5 +541,19 @@ public class DriverManager extends BaseClass {
         }
         ltLogger.info("Found {} options in dropdown with locator: {}", optionTexts.size(), locator);
         return optionTexts;
+    }
+
+    public void scrollElementIntoView(Locator locator) {
+        ltLogger.info("Scrolling element into view with locator: {}", locator);
+        WebElement element = waitForElementToBeVisible(locator, 5);
+        executeJavaScriptOnSpecificElement(jsToScrollElementIntoView, element);
+        ltLogger.info("Scrolled element with locator {} into view.", locator);
+    }
+
+    public String getPageSource() {
+        ltLogger.info("Getting page source.");
+        String pageSource = driver.getPageSource();
+        ltLogger.info("Page source retrieved successfully.");
+        return pageSource;
     }
 }

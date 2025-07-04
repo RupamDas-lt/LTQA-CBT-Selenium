@@ -213,6 +213,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
     public static final String SAMPLE_TERMINAL_LOGS_FILE_PATH = "src/test/resources/TestFiles/sample_terminal_logs.txt";
     public static final String TEST_LOGS_DOWNLOAD_DIRECTORY = "logs/testLogsFromSwaggerV2/";
+    public static final String OTHER_FILES_DOWNLOAD_DIRECTORY = "logs/others/";
     public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
     public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
     public static final String BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING = "Utility/Bash/UpdateHostEntry.sh";
@@ -282,7 +283,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String UTC_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     public enum testVerificationDataKeys {
-        URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK, BROWSER_PROFILE_S3_URL, BROWSER_PROFILE_LAST_UPDATED_TIME
+        URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK, BROWSER_PROFILE_S3_URL, BROWSER_PROFILE_LAST_UPDATED_TIME, CUSTOM_DATA
     }
 
     @Getter
@@ -401,6 +402,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
     public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
     public static final String jsToNavigateToUrl = "window.open('%s')";
+    public static final String jsToScrollElementIntoView = "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });";
 
     /// Runtime constants
     public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();
