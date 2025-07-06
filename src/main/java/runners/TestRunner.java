@@ -16,8 +16,8 @@ import static java.lang.System.setProperty;
 import static utility.FrameworkConstants.*;
 
 @CucumberOptions(features = {"src/test/features"}, glue = {"stepDefinitions", "Hooks"}, plugin = {"pretty",
-        "rerun:rerun/failed_scenarios.txt", "json:target/cucumber-reports/CucumberTestReport.json"})
-// Add RP back once the issue with RP is resolved in the plugin "com.epam.reportportal.cucumber.ScenarioReporter"
+        "rerun:rerun/failed_scenarios.txt", "json:target/cucumber-reports/CucumberTestReport.json",
+        "com.epam.reportportal.cucumber.ScenarioReporter"})
 
 public class TestRunner extends AbstractTestNGCucumberTests {
     public TestRunner() {
