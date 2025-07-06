@@ -84,6 +84,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String REQUEST_BODY_CONTENT_TYPE_TEXT = "text/plain";
 
     /// ENV variables
+    public static final String ENV = "ENV";
     public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";
     public static final String CUSTOM_USER_KEY = "CUSTOM_USER_KEY";
     public static final String CUSTOM_USER_EMAIL = "CUSTOM_USER_EMAIL";
@@ -217,6 +218,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
     public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
     public static final String BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING = "Utility/Bash/UpdateHostEntry.sh";
+    public static final String BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY = "Utility/Bash/SetupTunnelBinary.sh";
 
     /// ffprobe commands to extract video data
     public static final String[] VIDEO_INFO_COMMAND = {"ffmpeg", "-v", "error", "-i"};

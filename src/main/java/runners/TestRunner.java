@@ -1,10 +1,12 @@
 package runners;
 
+import TestManagers.TunnelManager;
 import automationHelper.AutomationAPIHelper;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import utility.BaseClass;
 import utility.ScenarioUtils;
 
 import java.io.IOException;
@@ -45,6 +47,10 @@ public class TestRunner extends AbstractTestNGCucumberTests {
 
         if (getProperty(TEST_PREREQUISITES, "true").equals("true"))
             setPrerequisite();
+
+        if (System.getProperty(ENV, "").toLowerCase().contains("stage") || System.getProperty(ENV, "").toLowerCase().contains("prod")) {
+            downloadTunnelBinary();
+        }
     }
 
     private void initializeReportPortalParameters() {
@@ -69,5 +75,16 @@ public class TestRunner extends AbstractTestNGCucumberTests {
     private void setPrerequisite() {
         AutomationAPIHelper automationAPIHelper = new AutomationAPIHelper();
         automationAPIHelper.fetchAllGeoLocationsFromCapsGeneratorAndStoreInJsonFile();
+    }
+
+    private void downloadTunnelBinary() {
+        BaseClass baseClass = new BaseClass();
+        final String tunnelBinaryPath = TunnelManager.getTunnelBinaryPath();
+        boolean isBinaryAlreadyExists = baseClass.fileExists(tunnelBinaryPath, 5, 5);
+        if (!isBinaryAlreadyExists) {
+            TunnelManager.downloadTunnelBinary(System.getProperty(ENV));
+        } else {
+            System.out.println("Tunnel binary already exists at: " + tunnelBinaryPath);
+        }
     }
 }
