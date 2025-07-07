@@ -7,6 +7,7 @@ import factory.Locator;
 import factory.LocatorTypes;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Keys;
@@ -1535,21 +1536,14 @@ public class AutomationHelper extends BaseClass {
     }
 
     private String downloadSampleFile(String fileType) {
-        String url;
-        String fileName;
-        switch (fileType.toLowerCase()) {
-            case "docx": {
-                url = DOWNLOAD_SAMPLE_DOC_FILE_URL;
-                fileName = "sample1.docx";
-                break;
-            }
-            case "txt":
-            default: {
-                url = DOWNLOAD_SAMPLE_TXT_FILE_URL;
-                fileName = "sample-text-file.txt";
-                break;
-            }
-        }
+        Map<String, Pair<String, String>> fileTypeToDetails = Map.of(
+                "docx", Pair.of(DOWNLOAD_SAMPLE_DOC_FILE_URL, "sample1.docx"),
+                "txt", Pair.of(DOWNLOAD_SAMPLE_TXT_FILE_URL, "sample-text-file.txt")
+        );
+        Pair<String, String> fileDetails = fileTypeToDetails.getOrDefault(fileType.toLowerCase(),
+                Pair.of(DOWNLOAD_SAMPLE_TXT_FILE_URL, "sample-text-file.txt"));
+        String url = fileDetails.getLeft();
+        String fileName = fileDetails.getRight();
         driverManager.getURLUsingJs(url);
         waitForTime(5);
         TEST_VERIFICATION_DATA.get().put(CUSTOM_DATA, Map.of("downloadedFileDetails", Map.of("fileName", fileName, "url", url)));
