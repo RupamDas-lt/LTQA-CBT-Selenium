@@ -43,7 +43,7 @@ public class ManualAccessibilityDashboardPage {
         } else
             driver.getURL(stage_manual_accessibility_dashboard_url);
 
-        if (driver.waitForElementToBeVisible(SCANNED_REPORT_HEADING, 5).isDisplayed())
+        if (driver.waitForElementToBeVisible(SCANNED_REPORT_HEADING, 10).isDisplayed())
             ltLogger.info("Accessibility Manual Dashboard Opened");
 
         driver.click(APP_TAB);

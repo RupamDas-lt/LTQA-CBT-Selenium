@@ -60,7 +60,7 @@ public class ManualAccessibilitySessionPage {
         ltLogger.info("Device screen is up.");
         driver.waitForElementToBeVisible(APP_ACCESSIBILITY_SCANNER_HEADING, 20);
         ltLogger.info("Test is Started for Accessibility Testing. Wait for app to install ...");
-        if (driver.waitForElementToBeInvisible(APP_INSTALLING, 20) || driver.findElement(START_SCAN_BUTTON).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
+        if (driver.waitForElementToDisappear(APP_INSTALLING, 20) || driver.findElement(START_SCAN_BUTTON).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
             ltLogger.info("App is installed and ready to use.");
         } else {
             ltLogger.info("App is not getting installed.");
@@ -78,7 +78,7 @@ public class ManualAccessibilitySessionPage {
         driver.click(HOME_BUTTON);
         driver.waitForTime(3);
         driver.click(SCAN_VIEWPORT_BUTTON);
-        if (driver.waitForExactText(NUMBER_OF_PAGES, "View 2 of 2", 10) && driver.waitForElementToBeInvisible(SCANNING_IN_PROGRESS, 10)) {
+        if (driver.waitForExactText(NUMBER_OF_PAGES, "View 2 of 2", 10) && driver.waitForElementToDisappear(SCANNING_IN_PROGRESS, 10)) {
             ltLogger.info("Verification scan also happened. It means scanning is working properly");
         } else {
             ltLogger.info("Accessibility scan is not happening.");
@@ -89,7 +89,7 @@ public class ManualAccessibilitySessionPage {
         driver.click(SAVE_TEST_BUTTON);
         TestName = driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim();
         driver.click(SAVE_REPORT_BUTTON, 2);
-        if (driver.waitForElementToBeInvisible(SAVE_TEST_BUTTON, 10)) {
+        if (driver.waitForElementToDisappear(SAVE_TEST_BUTTON, 10)) {
             ltLogger.info("Test has been saved.");
         } else {
             ltLogger.info("Test Save feature is not working");
@@ -113,7 +113,7 @@ public class ManualAccessibilitySessionPage {
         driver.waitForElementToBeVisible(SAMPLE_APP, 5).click();
         driver.waitForElementToBeVisible(APP_INSTALLING, 10);
         ltLogger.info("Second App started installing");
-        if (driver.waitForElementToBeInvisible(APP_INSTALLING, 15)) {
+        if (driver.waitForElementToDisappear(APP_INSTALLING, 15)) {
             ltLogger.info("Second App is installed");
         } else {
             ltLogger.info("Second App is not installing. Check the app if it is compatible with the Android version.");
@@ -141,7 +141,7 @@ public class ManualAccessibilitySessionPage {
         driver.click(START_RECORDING);
         driver.waitForTime(5);
         driver.click(STOP_RECORDING);
-        driver.waitForElementToBeInvisible(VIDEO_RECORDING_CARD, 15);
+        driver.waitForElementToDisappear(VIDEO_RECORDING_CARD, 15);
         driver.waitForTime(5);
         driver.click(GALLERY);
 

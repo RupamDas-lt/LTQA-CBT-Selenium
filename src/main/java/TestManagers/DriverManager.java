@@ -106,7 +106,8 @@ public class DriverManager extends BaseClass {
             setImplicitWait = Duration.ofSeconds(10);
         }
 
-        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0)
+        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0));
+
         boolean isElementGone;
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
@@ -123,7 +124,7 @@ public class DriverManager extends BaseClass {
         return isElementGone;
     }
 
-        public boolean waitForExactText(Locator locator, String expectedText, int timeoutSeconds) {
+    public boolean waitForExactText(Locator locator, String expectedText, int timeoutSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
         By byLocator = toBy(locator);
         return wait.until(driver -> {
@@ -135,7 +136,7 @@ public class DriverManager extends BaseClass {
             }
         });
     }
-                                                  
+
     public void createTestDriver() {
         capabilities = EnvSetup.TEST_CAPS.get();
         ltLogger.info("Test caps used passed by user: {}", capabilities.asMap().toString());
