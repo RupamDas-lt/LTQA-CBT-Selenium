@@ -950,5 +950,68 @@
     "sub_category": "incorrect-session-error-message",
     "priority": "p3",
     "isKnown": "false"
+  },
+  "fbeb8bb5a63fded85d698912ba808132ce9bfa3b62c7766c466b1138a85d0b39": {
+    "message": "Content of the file: %s, received using Lambda file-content hook doesn't match",
+    "category": "lambda-hooks-error",
+    "sub_category": "lambda-hooks-error",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "9656754666155eb55d14f7cae03dcaf8821bbb5d99f57b46bad6c478e593ddbf": {
+    "message": "Unable to switch from %s to %s tab. Expected current url: %s, Actual current url: %s",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "tab-switching-issues",
+    "priority": "p0",
+    "isKnown": "false"
+  },
+  "04b837d35605f21523adb876c6ca700077aa30f85e74578e1e930c91204c0734": {
+    "message": "SSE verification failed. Expected status: %s, Actual status: %s",
+    "category": "network-related-issues",
+    "sub_category": "sse-event-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "465e6768b7382c42ee446f7d76b0d9a9b0eff8b044a109ecb3e6f6a94c3e84ba": {
+    "message": "Fake media verification failed, selected webCam is not matched. Expected: %s, actual: %s",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "fake-media-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "887a37af2e3ec7dd7dd1662f0a10161cf4b962424aa526758bf53cc809a0121d": {
+    "message": "SSE verification failed. Expected message to be present: %s",
+    "category": "network-related-issues",
+    "sub_category": "sse-event-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "3bf9123dd2f8937978312a88cb3172109a84acbeb50c0c7f6c68a07d5677683d": {
+    "message": "Browser language verification failed. Expected: %s, Actual: %s",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "browser-language-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "58e360ec7994a9a599fe18e9e012180a4446823dd8ab8e876e8579800166d82e": {
+    "message": "Fake media verification failed, web cam access is blocked",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "fake-media-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "2d759dba03c5c2f6d6038193628bb0e35165aedd7e508e8c5a38daa3ca9d1c70": {
+    "message": "Unable to verify cross-site blocking status. Error message: %s",
+    "category": "infra-related-issues",
+    "sub_category": "safari-cross-site-blocking-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "031252b1d31f984df946bcc59cebf3cd717a40f4aa60fa0803c354d0b0eac827": {
+    "message": "Cross-site blocking status verification failed. Expected: %s, Actual: %s",
+    "category": "infra-related-issues",
+    "sub_category": "safari-cross-site-blocking-issues",
+    "priority": "p1",
+    "isKnown": "false"
   }
 }

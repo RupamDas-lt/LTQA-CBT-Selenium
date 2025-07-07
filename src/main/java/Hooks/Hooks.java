@@ -37,7 +37,7 @@ public class Hooks extends BaseClass {
 
     @Before(order = 1)
     public void beforeScenario(Scenario scenario) {
-        if (System.getProperty("ENV") == null)
+        if (System.getProperty(ENV) == null)
             throw new RuntimeException("ENV not set");
         TEST_SCENARIO_NAME.set(scenario.getName());
     }

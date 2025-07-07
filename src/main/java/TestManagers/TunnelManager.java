@@ -54,10 +54,20 @@ public class TunnelManager extends BaseClass implements Runnable {
         }
     }
 
-    private static String getTunnelBinaryPath() {
+    public static String getTunnelBinaryPath() {
         String osKey = System.getProperty(OS_NAME).toLowerCase();
         return TUNNEL_BINARY_PATHS.entrySet().stream().filter(entry -> osKey.contains(entry.getKey()))
                 .map(Map.Entry::getValue).findFirst().orElseThrow(() -> new IllegalStateException("Unsupported OS: " + osKey));
+    }
+
+    public static void downloadTunnelBinary(String env) {
+        BaseClass baseClass = new BaseClass();
+        String tunnelEnv = env.toLowerCase().contains("stage") ? "stage" : "prod";
+        if (tunnelEnv.equals("stage")) {
+            baseClass.runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY, false, "-env stage");
+        } else {
+            baseClass.runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY, false);
+        }
     }
 
     private String constructTunnelRunCommand(String params) {
