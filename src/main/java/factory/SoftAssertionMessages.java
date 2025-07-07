@@ -119,6 +119,15 @@ public enum SoftAssertionMessages {
     TAGS_VERIFICATION_FAILURE_ERROR_MESSAGE("%s tags verification failed. Expected: %s, Actual: %s"),
     PROJECT_NAME_VERIFICATION_FAILURE_ERROR_MESSAGE("Project name verification failed. Expected: %s, Actual: %s"),
     SESSION_ERROR_MESSAGE_VERIFICATION_FAILURE_ERROR_MESSAGE("Session error message verification failed. Expected: %s, Actual: %s"),
+    UNABLE_TO_VERIFY_CROSS_SITE_BLOCKING_STATUS_ERROR_MESSAGE("Unable to verify cross-site blocking status. Error message: %s"),
+    CROSS_SITE_BLOCKING_STATUS_VERIFICATION_FAILURE_ERROR_MESSAGE("Cross-site blocking status verification failed. Expected: %s, Actual: %s"),
+    FAKE_MEDIA_CHECK_WEB_CAM_BLOCKED_VERIFICATION_FAILURE_ERROR_MESSAGE("Fake media verification failed, web cam access is blocked"),
+    FAKE_MEDIA_VERIFICATION_FAILURE_ERROR_MESSAGE("Fake media verification failed, selected webCam is not matched. Expected: %s, actual: %s"),
+    UNABLE_TO_SWITCH_TO_NEW_TAB_ERROR_MESSAGE("Unable to switch from %s to %s tab. Expected current url: %s, Actual current url: %s"),
+    BROWSER_LANGUAGE_VERIFICATION_FAILURE_ERROR_MESSAGE("Browser language verification failed. Expected: %s, Actual: %s"),
+    SSE_VERIFICATION_FAILURE_ERROR_MESSAGE_1("SSE verification failed. Expected status: %s, Actual status: %s"),
+    SSE_VERIFICATION_FAILURE_ERROR_MESSAGE_2("SSE verification failed. Expected message to be present: %s"),
+    CONTENT_MISMATCH_FOR_DOWNLOADED_FILE_ERROR_MESSAGE("Content of the file: %s, received using Lambda file-content hook doesn't match"),
 
     //  CLIENT side error messages
     USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE("User is not logged in"),

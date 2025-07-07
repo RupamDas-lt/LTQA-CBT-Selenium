@@ -16,7 +16,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String LOCAL_HOST_URL = "http://127.0.0.1:";
     public static final String DASHLANE_EXTENSION_PUBLIC_URL = "https://stage-lambda-devops-use-only.lambdatestinternal.com/magicleap/qa/dashlane-extension-latest.zip";
 
-    // Cloud platform specs
+    /// Cloud platform specs
     public enum cloudPlatforms {
         LAMBDATEST, SAUCELAB, BROWSERSTACK
     }
@@ -24,7 +24,7 @@ public class FrameworkConstants extends BaseClass {
     public static final Map<cloudPlatforms, String> cloudPlatformsToCapabilityRootsMap = Map.of(cloudPlatforms.LAMBDATEST,
             LT_OPTIONS, cloudPlatforms.BROWSERSTACK, "bstack:options", cloudPlatforms.SAUCELAB, "sauce:options");
 
-    // API Constants
+    /// API Constants
     public static final Map<String, String> AUTH_API_BASE = Map.of("prod", "auth.lambdatest.com", "stage",
             "stage-auth.lambdatestinternal.com");
     public static final String TUNNEL_INFO_API_PATH = "/api/v1.0/info";
@@ -83,7 +83,8 @@ public class FrameworkConstants extends BaseClass {
     public static final String REQUEST_BODY_CONTENT_TYPE_JSON = "application/json";
     public static final String REQUEST_BODY_CONTENT_TYPE_TEXT = "text/plain";
 
-    // ENV variables
+    /// ENV variables
+    public static final String ENV = "ENV";
     public static final String CUSTOM_USER_NAME = "CUSTOM_USER_NAME";
     public static final String CUSTOM_USER_KEY = "CUSTOM_USER_KEY";
     public static final String CUSTOM_USER_EMAIL = "CUSTOM_USER_EMAIL";
@@ -107,10 +108,10 @@ public class FrameworkConstants extends BaseClass {
     public static final String JOB_PURPOSE = "JOB_PURPOSE";
     public static final String RESTORE_EXISTING_AUTO_HEAL_BASELINES = "RESTORE_EXISTING_AUTO_HEAL_BASELINES";
 
-    // RP keys
+    /// RP keys
     public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
 
-    // Test Meta data
+    /// Test Meta data
     public static final String CLOUD_PLATFORM_NAME = "cloud_platform_name";
     public static final String TEST_SETUP_TIME = "test_setup_time";
     public static final String TEST_EXECUTION_TIME = "test_execution_time";
@@ -120,7 +121,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String TEST_START_TIMESTAMP = "test_start_timestamp";
     public static final String TEST_END_TIMESTAMP = "test_end_timestamp";
 
-    // Test Status
+    /// Test Status
     public static final String COMPLETED = "completed";
     public static final String RUNNING = "running";
     public static final String STOPPED = "stopped";
@@ -130,7 +131,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String PASSED = "passed";
     public static final String SKIPPED = "skipped";
 
-    // Test caps
+    /// Test caps
     public static final String BROWSER_NAME = "browserName";
     public static final String BROWSER_VERSION = "version";
     public static final String PLATFORM_NAME = "platform";
@@ -167,8 +168,12 @@ public class FrameworkConstants extends BaseClass {
     public static final String SAFARI_OPTIONS = "safari.options";
     public static final String PROFILE_INSIDE_BROWSER_OPTIONS = "profile";
     public static final String PROJECT_NAME = "projectName";
+    public static final String ENABLE_CROSS_SITE_BLOCKING = "enableCrossSiteBlocking";
+    public static final String PREVENT_CROSS_SITE_TRACKING = "preventCrossSiteTracking";   // Both enableCrossSiteBlocking and preventCrossSiteTracking does the same thing, but preventCrossSiteTracking=true is equivalent to enableCrossSiteBlocking=false
 
-    // Lambda hooks [Ref: https://www.lambdatest.com/support/docs/lambda-hooks/]
+    /**
+     * Lambda hooks - [Reference: https://www.lambdatest.com/support/docs/lambda-hooks/]
+     */
     public static final String LAMBDA_STATUS = "lambda-status";
     public static final String LAMBDA_FILE_EXIST = "lambda-file-exists";
     public static final String LAMBDA_FILE_STATS = "lambda-file-stats";
@@ -195,12 +200,12 @@ public class FrameworkConstants extends BaseClass {
     public static final String LAMBDA_TEST_CASE_END = "lambda-testCase-end";
     public static final String LAMBDA_TEST_EXECUTOR_HOOK = "lambdatest_executor";
 
-    // Lambda keyboard events
+    /// Lambda keyboard events
     public static final String LAMBDA_KEYBOARD_PASTE = "^v";
     public static final String LAMBDA_KEYBOARD_TAB = "{TAB}";
     public static final String LAMBDA_KEYBOARD_ENTER = "{ENTER}";
 
-    // File paths
+    /// File paths
     public static final String GEOLOCATION_DATA_PATH = "src/test/resources/TestData/geoLocations.json";
     public static final String GEOLOCATIONS_FOR_SMOKE_DATA_PATH = "src/test/resources/TestData/geoLocationsForSmoke.json";
     public static final String RESOLUTION_DATA_PATH = "src/test/resources/TestData/resolutions.json";
@@ -209,11 +214,13 @@ public class FrameworkConstants extends BaseClass {
     public static final String SAMPLE_TXT_FILE_PATH = "src/test/resources/TestFiles/LambdaTest.txt";
     public static final String SAMPLE_TERMINAL_LOGS_FILE_PATH = "src/test/resources/TestFiles/sample_terminal_logs.txt";
     public static final String TEST_LOGS_DOWNLOAD_DIRECTORY = "logs/testLogsFromSwaggerV2/";
+    public static final String OTHER_FILES_DOWNLOAD_DIRECTORY = "logs/others/";
     public static final String COMMAND_LOGS_API_V1_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV1.json";
     public static final String COMMAND_LOGS_API_V2_SCHEMA = "src/test/resources/TestData/jsonSchemas/commandLogsAPIV2.json";
     public static final String BASH_SCRIPT_PATH_FOR_UPDATE_LOCAL_HOSTS_MAPPING = "Utility/Bash/UpdateHostEntry.sh";
+    public static final String BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY = "Utility/Bash/SetupTunnelBinary.sh";
 
-    // ffprobe commands to extract video data
+    /// ffprobe commands to extract video data
     public static final String[] VIDEO_INFO_COMMAND = {"ffmpeg", "-v", "error", "-i"};
 
     public static final String[] DURATION_COMMAND = {"ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
@@ -231,7 +238,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String[] BITRATE_COMMAND = {"ffprobe", "-v", "error", "-show_entries", "format=bit_rate", "-of",
             "default=noprint_wrappers=1:nokey=1"};
 
-    // Test execution data
+    /// Test execution data
     public static final Set<String> validSelfSignedValues = new HashSet<>() {{
         add("self-signed.\nbadssl.com");
         add("untrusted-root.\nbadssl.com");
@@ -278,7 +285,7 @@ public class FrameworkConstants extends BaseClass {
     public static final String UTC_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     public enum testVerificationDataKeys {
-        URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK, BROWSER_PROFILE_S3_URL, BROWSER_PROFILE_LAST_UPDATED_TIME, SESSION_CREATION_ERROR_MESSAGE
+        URL, LOCATORS, JAVA_SCRIPTS, BROWSER_VERSION, ACTUAL_BROWSER_VERSION, BROWSER_VERSION_ID, GEO_LOCATION, RESOLUTION, CONSOLE_LOG, TERMINAL_LOG, EXCEPTION_LOG, AUTO_HEAL_DATA, TEST_SHARE_LINK, BUILD_SHARE_LINK, BROWSER_PROFILE_S3_URL, BROWSER_PROFILE_LAST_UPDATED_TIME, SESSION_CREATION_ERROR_MESSAGE, CUSTOM_DATA
     }
 
     @Getter
@@ -390,15 +397,16 @@ public class FrameworkConstants extends BaseClass {
 
     public static final int MAX_FILE_NAME_LENGTH_FOR_DOWNLOADS_WITH_SELENIUM_WEB_DRIVER = 213;
 
-    // JavaScripts
+    /// JavaScripts
     public static final String jsForFetchBrowserDetails = "const browserData = navigator.userAgentData || {}; " + "const userAgent = navigator.userAgent.toLowerCase(); " + "let browserName = ''; " + "let browserVersion = ''; " + "if (userAgent.includes('firefox')) { " + "  browserName = 'firefox'; " + "} else if (userAgent.includes('edg')) { " + "  browserName = 'edge'; " + "} else if (userAgent.includes('chrome') && !userAgent.includes('chromium')) { " + "  browserName = 'chrome'; " + "} else if (userAgent.includes('safari')) { " + "  browserName = 'safari'; " + "} else if (userAgent.includes('opera') || userAgent.includes('opr')) { " + "  browserName = 'opera'; " + "} else if (userAgent.includes('chromium')) { " + "  browserName = 'chromium'; " + "} else { " + "  browserName = browserData.brands?.find(b => b.brand)?.brand || navigator.appName; " + "} " + "if (browserData.brands) { " + "  browserVersion = browserData.brands.find(b => b.brand)?.version || ''; " + "} else { " + "  const versionMatch = userAgent.match(/(firefox|edg|chrome|safari|opera|opr|chromium)[\\/ ]([\\d.]+)/i); " + "  browserVersion = versionMatch ? versionMatch[2] : navigator.appVersion; " + "} " + "return { name: browserName.toLowerCase(), version: browserVersion.trim() };";
     public static final String jsForScrollCertainHeightOnSpecificElement = "arguments[0].scrollTop += arguments[1];";
     public static final String jsForSettingDocumentCookies = "document.cookie = ";
     public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
     public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
     public static final String jsToNavigateToUrl = "window.open('%s')";
+    public static final String jsToScrollElementIntoView = "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });";
 
-    // Runtime constants
+    /// Runtime constants
     public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();
 
 }

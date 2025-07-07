@@ -104,11 +104,33 @@ public class UrlsAndLocators {
     public static final String FIREFOX_BROWSER_VERSION_DETAILS_URL = "about:profiles";
     public static final Locator chromeBrowserProfilePath = new Locator(LocatorTypes.CSS, "#profile_path");
 
-    public static final String DOWNLOAD_SAMPLE_FILE_URL = "https://filesamples.com/samples/document/docx/sample1.docx";
+    public static final String DOWNLOAD_SAMPLE_DOC_FILE_URL = "https://filesamples.com/samples/document/docx/sample1.docx";
+    public static final String DOWNLOAD_SAMPLE_TXT_FILE_URL = "https://www.learningcontainer.com/download/sample-text-file/?wpdmdl=1669&refresh=61abbc77584a51638644855";
     public static final String MAC_LT_USER_DIRECTORY_URL_FORMAT = "file:///Users/ltuser/%s";
     public static final String WIN_LT_USER_DIRECTORY_URL_FORMAT = "file:///C:/Users/ltuser/%s";
     public static final Locator fileInLtUserDirectoryLocatorFormat = new Locator(LocatorTypes.CSS,
             "td[sortable-data*='%s']");
+
+    public static final String CROSS_SITE_BLOCKING_CHECK_URL = "https://alanhogan.github.io/web-experiments/3rd/third-party-cookies.html";
+    public static final Locator crossSiteBlockingCheckHeading = new Locator(LocatorTypes.TAG_NAME, "h1");
+    public static final Locator crossSiteBlockingResult = new Locator(LocatorTypes.ID, "3rd_party_cookie_test_results");
+    public static final Locator crossSiteBlockingError = new Locator(LocatorTypes.ID, "3rd_party_cookie_test_error");
+
+    public static final String FAKE_MEDIA_CHECK_URL = "https://webcamtests.com/check";
+    public static final Locator fakeMediaCheckPageLoadingState = new Locator(LocatorTypes.XPATH, "//ul//li[contains(text(),'Detecting your media devices. Please wait...')]");
+    public static final Locator webcamAccessBlockedNotification = new Locator(LocatorTypes.CLASS_NAME, "notice-injected");
+    public static final Locator webcamSelectorDropDown = new Locator(LocatorTypes.ID, "webcam-selecter");
+
+    public static final String BROWSER_LANGUAGE_CHECK_URL = "https://manytools.org/http-html-text/browser-language/";
+    public static final Locator browserLanguage = new Locator(LocatorTypes.CSS, "tr:nth-of-type(2) td:nth-of-type(1)");
+
+    public static final String CHECK_WSS_URL = "https://www.piesocket.com/websocket-tester";
+    public static final Locator checkWssPageAcceptConsentButton = new Locator(LocatorTypes.CSS, "button[aria-label='Consent']");
+    public static final Locator checkWssConnectDisconnectButton = new Locator(LocatorTypes.CSS, "[type='submit']");
+    public static final Locator checkWssConnectionInputField = new Locator(LocatorTypes.CSS, "[name='email']");
+    public static final Locator checkWssConnectionSendMessageButton = new Locator(LocatorTypes.XPATH, "(//button[@type='submit'])[1]");
+    public static final Locator checkWssConnectionStatusText = new Locator(LocatorTypes.CSS, ".text-lg.text-white span");
+    public static final Locator checkWssConnectionConsoleLog = new Locator(LocatorTypes.ID, "consoleLog");
 
     /// ---- Auto heal tests urls and locators, BaseLine locators are the original which will be mocked ----
     public static final String CHALLENGING_DOM_PAGE_URL = "https://the-internet.herokuapp.com/challenging_dom";

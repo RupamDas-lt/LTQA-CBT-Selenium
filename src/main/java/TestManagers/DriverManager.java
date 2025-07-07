@@ -18,6 +18,7 @@ import org.openqa.selenium.remote.http.ClientConfig;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utility.BaseClass;
 import utility.EnvSetup;
@@ -61,6 +62,7 @@ public class DriverManager extends BaseClass {
         return LOCATOR_MAP.get(locator.type()).apply(locator.value());
     }
 
+    @SuppressWarnings("unchecked")
     private void putValueToVerificationData(testVerificationDataKeys key, String value) {
         if (!putDriverActionsToTestVerificationData) {
             return;
@@ -92,6 +94,33 @@ public class DriverManager extends BaseClass {
         } finally {
             driver.manage().timeouts().implicitlyWait(setImplicitWait);
         }
+    }
+
+    public boolean waitForElementToDisappear(Locator locator, int timeout) {
+        ltLogger.info("Waiting for element to disappear via, using ['{}', '{}']", locator.type(), locator.value());
+        Duration setImplicitWait;
+        try {
+            setImplicitWait = driver.manage().timeouts().getImplicitWaitTimeout();
+        } catch (Exception ignore) {
+            setImplicitWait = Duration.ofSeconds(10);
+        }
+
+        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0));
+
+        boolean isElementGone;
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+            By byLocator = toBy(locator);
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(byLocator));
+            isElementGone = true;
+        } catch (Exception e) {
+            ltLogger.error("Element with locator ['{}', '{}'] did not disappear within {} seconds. Error: {}",
+                    locator.type(), locator.value(), timeout, e.getMessage());
+            isElementGone = false;
+        } finally {
+            driver.manage().timeouts().implicitlyWait(setImplicitWait);
+        }
+        return isElementGone;
     }
 
     public void createTestDriver() {
@@ -169,6 +198,13 @@ public class DriverManager extends BaseClass {
         ltLogger.info("Opening URL: {}", url);
         driver.get(url);
         putValueToVerificationData(testVerificationDataKeys.URL, url);
+    }
+
+    public void getURLInNewTab(String url) {
+        ltLogger.info("Opening URL in new tab: {}", url);
+        String script = "window.open('" + url + "', '_blank');";
+        executeScript(script);
+        ltLogger.info("New tab opened with URL: {}", url);
     }
 
     ///  Use this method to open URL using JavaScript, this wouldn't block the driver while navigating to the URL.
@@ -479,5 +515,45 @@ public class DriverManager extends BaseClass {
             ltLogger.error("Error checking if element with locator '{}' is clickable: {}", locator, e.getMessage());
             return false;
         }
+    }
+
+    public List<String> getAllSelectedOptionFromDropdown(Locator locator) {
+        ltLogger.info("Getting selected option from dropdown with locator: {}", locator);
+        WebElement dropdownElement = waitForElementToBeVisible(locator, 5);
+        Select dropdown = new Select(dropdownElement);
+        List<WebElement> options = dropdown.getAllSelectedOptions();
+        List<String> selectedOptions = new ArrayList<>();
+        for (WebElement option : options) {
+            selectedOptions.add(option.getText());
+        }
+        ltLogger.info("Selected options from dropdown with locator {} : {}", locator, selectedOptions);
+        return selectedOptions;
+    }
+
+    public List<String> getAllOptionsFromDropdown(Locator locator) {
+        ltLogger.info("Getting all options from dropdown with locator: {}", locator);
+        WebElement dropdownElement = waitForElementToBeVisible(locator, 5);
+        Select dropdown = new Select(dropdownElement);
+        List<WebElement> options = dropdown.getOptions();
+        List<String> optionTexts = new ArrayList<>();
+        for (WebElement option : options) {
+            optionTexts.add(option.getText());
+        }
+        ltLogger.info("Found {} options in dropdown with locator: {}", optionTexts.size(), locator);
+        return optionTexts;
+    }
+
+    public void scrollElementIntoView(Locator locator) {
+        ltLogger.info("Scrolling element into view with locator: {}", locator);
+        WebElement element = waitForElementToBeVisible(locator, 5);
+        executeJavaScriptOnSpecificElement(jsToScrollElementIntoView, element);
+        ltLogger.info("Scrolled element with locator {} into view.", locator);
+    }
+
+    public String getPageSource() {
+        ltLogger.info("Getting page source.");
+        String pageSource = driver.getPageSource();
+        ltLogger.info("Page source retrieved successfully.");
+        return pageSource;
     }
 }
