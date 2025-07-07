@@ -304,4 +304,96 @@ public class ClientAutomationHelper extends BaseClass {
                 throw new RuntimeException("Unsupported link type: " + linkType);
         }
     }
+
+    public void runTestActions(String testAction) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        switch (testAction) {
+            case "appControls" -> {
+                manualAccessibilitySessionPage.verifyAppControls();
+            }
+            case "screenshot" -> {
+                manualAccessibilitySessionPage.screenshot();
+            }
+            case "recordSession" -> {
+                manualAccessibilitySessionPage.recordSession();
+            }
+            case "rotate" -> {
+                manualAccessibilitySessionPage.rotate();
+            }
+
+            default -> {
+                CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
+
+                System.out.println("The action " + testAction + " is not recognized and does not match any case within the switch statement, thus executing the default case.");
+
+                softAssert.assertFalse(true, String.format(
+                        "The action '%s' is not recognized and does not match any case within the switch statement, thus executing the default case.",
+                        testAction));
+                EnvSetup.SOFT_ASSERT.set(softAssert);
+            }
+        }
+    }
+
+    public void openManualAccessibilityPage() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+
+        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager, clientSoftAssert);
+        manualAccessibilityPage.navigateToManualAccessibilityPage();
+
+    }
+
+    public void iSelectAppAndDevice(String OS) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager, clientSoftAssert);
+        manualAccessibilityPage.iSelectAppAndDevice(OS);
+
+    }
+
+    public void iVerifyTestStartedOrNot() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        manualAccessibilitySessionPage.verifyTestStartedOrNot();
+    }
+
+    public void verifyScanHappeningAndTestSavingOrNot() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        manualAccessibilitySessionPage.verifyScanHappeningOrNot();
+        manualAccessibilitySessionPage.verifyTestSavingOrNot();
+    }
+
+    public void verifyIssueTabAndImages() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        manualAccessibilitySessionPage.verifyIssueTabAndImages();
+    }
+
+    public void iVerifyLeftNavbar(String testActions) {
+        String[] testActionsArray = testActions.split(",");
+        for (String testAction : testActionsArray) {
+            runTestActions(testAction);
+        }
+    }
+
+    public void iStopAccessibilityTest() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        manualAccessibilitySessionPage.iStopAccessibilityTest();
+    }
+
+    public void iOpenManualDashboard() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
+        manualAccessibilityDashboardPage.iOpenManualDashboard();
+        manualAccessibilityDashboardPage.iSearchForTheTest();
+    }
+
+    public void iValidateA11yReportAllIssuesAndMobileView() {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
+        manualAccessibilityDashboardPage.iValidateAccessibilityReport();
+        manualAccessibilityDashboardPage.iValidateAllIssuesTab();
+        manualAccessibilityDashboardPage.iValidateMobileView();
+    }
 }

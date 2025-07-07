@@ -23,6 +23,7 @@ import utility.BaseClass;
 import utility.EnvSetup;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -93,6 +94,60 @@ public class DriverManager extends BaseClass {
             driver.manage().timeouts().implicitlyWait(setImplicitWait);
         }
     }
+
+    public boolean waitForElementToBeInvisible(Locator locator, int timeout) {
+        ltLogger.info("Waiting for element to become invisible via ['{}', '{}']", locator.type(), locator.value());
+        Duration setImplicitWait;
+        try {
+            setImplicitWait = driver.manage().timeouts().getImplicitWaitTimeout();
+        } catch (Exception ignore) {
+            setImplicitWait = Duration.ofSeconds(10);
+        }
+
+        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0));
+
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+            By byLocator = toBy(locator);
+            return wait.until(ExpectedConditions.invisibilityOfElementLocated(byLocator));
+        } finally {
+            driver.manage().timeouts().implicitlyWait(setImplicitWait);
+        }
+    }
+
+    public boolean waitForExactText(Locator locator, String expectedText, int timeoutSeconds) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+        By byLocator = toBy(locator);
+        return wait.until(driver -> {
+            try {
+                String actualText = driver.findElement(byLocator).getText();
+                return expectedText.equals(actualText);
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        });
+    }
+
+//    public boolean isElementEnabledAfterWait(Locator locator, String attribute, int timeoutSeconds) {
+//        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+//        By by = toBy(locator);
+//
+//        try {
+//            return wait.until(driver -> {
+//                try {
+//                    WebElement element = driver.findElement(by);
+//                    String ariaDisabled = element.getDomAttribute(attribute);
+//                    boolean hasDisabledAttr = element.getDomAttribute("disabled") != null;
+//                    return !"true".equalsIgnoreCase(ariaDisabled) && !hasDisabledAttr;
+//                } catch (NoSuchElementException e) {
+//                    return false;
+//                }
+//            });
+//        } catch (TimeoutException e) {
+//            return false;
+//        }
+//    }
+
 
     public void createTestDriver() {
         capabilities = EnvSetup.TEST_CAPS.get();
