@@ -176,6 +176,7 @@
     </dependencies>
 
     <profiles>
+        <!-- TODO: ISSUE-RP -> Move these dependencies out of specific profile once the RP issues are resolved -->
         <profile>
             <id>reportportal</id>
             <dependencies>

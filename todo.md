@@ -12,3 +12,7 @@
 ## Refactoring:
 
 - [ ] Fetch test and build details, move them to some centralised place
+
+## Need to add back:
+
+- *ISSUE-RP* - Integrate `ReportPortal` back once it is stable. ISSUE-RP
