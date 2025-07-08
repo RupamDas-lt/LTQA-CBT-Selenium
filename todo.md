@@ -15,4 +15,4 @@
 
 ## Need to add back:
 
-- *ISSUE-RP* - Integrate `ReportPortal` back once it is stable. ISSUE-RP
+- *ISSUE-RP* - Integrate `ReportPortal` back once it is stable.
