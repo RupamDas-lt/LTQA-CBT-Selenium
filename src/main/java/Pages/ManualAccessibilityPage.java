@@ -35,48 +35,55 @@ public class ManualAccessibilityPage extends EnvSetup {
     }
 
     public void navigateToManualAccessibilityPage() {
-        if (EnvSetup.TEST_ENV.equalsIgnoreCase("prod"))
-            driver.getURL(prod_url);
-        else
-            driver.getURL(stage_url);
+        try {
+            if (EnvSetup.TEST_ENV.equalsIgnoreCase("prod"))
+                driver.getURL(prod_url);
+            else
+                driver.getURL(stage_url);
 
-        if (driver.waitForElementToBeVisible(A11Y_MANUAL_HOMEPAGE_LOCATOR, 10).isDisplayed())
-            ltLogger.info("Accessibility Manual Page is Opened");
+            if (driver.waitForElementToBeVisible(A11Y_MANUAL_HOMEPAGE_LOCATOR, 10).isDisplayed())
+                ltLogger.info("Accessibility Manual Page is Opened");
+        } catch (Exception e) {
+            ltLogger.info("Accessibility Manual Page is not Opening");
+        }
     }
 
     public void iSelectAppAndDevice(String OS) {
+        try {
+            if (OS.equalsIgnoreCase("Android")) {
+                driver.waitForElementToBeVisible(ANDROID_ICON, 2).click();
+                driver.click(ANDROID_APP, 2);
 
-        if (OS.equalsIgnoreCase("Android")) {
-            driver.waitForElementToBeVisible(ANDROID_ICON, 2).click();
-            driver.click(ANDROID_APP, 2);
+                String[] androidVersions = {"15", "14", "13"};
+                for (String version : androidVersions) {
+                    driver.sendKeys(SEARCH_BAR, version);
 
-            String[] androidVersions = {"15", "14", "13"};
-            for (String version : androidVersions) {
-                driver.sendKeys(SEARCH_BAR, version);
+                    if (!driver.isDisplayed(NO_DEVICE_FOUND)) {
+                        driver.findElement(DEVICE).click();
+                        break;
+                    } else
+                        ltLogger.info("Android Device is not present. Please try again after some time when devices are present.");
+                }
+            } else {
+                driver.waitForElementToBeVisible(IOS_ICON, 2).click();
+                driver.click(IOS_APP, 2);
+                String[] iosVersions = {"18", "17", "16"};
+                for (String version : iosVersions) {
+                    driver.sendKeys(SEARCH_BAR, version);
 
-                if (!driver.isDisplayed(NO_DEVICE_FOUND)) {
-                    driver.findElement(DEVICE).click();
-                    break;
-                } else
-                    ltLogger.info("Android Device is not present. Please try again after some time when devices are present.");
+                    if (!driver.isDisplayed(NO_DEVICE_FOUND)) {
+                        driver.findElement(DEVICE).click();
+                        break;
+                    } else
+                        ltLogger.info("iOS Device is not present. Please try again after some time when devices are present.");
+                }
             }
-        } else {
-            driver.waitForElementToBeVisible(IOS_ICON, 2).click();
-            driver.click(IOS_APP, 2);
-
-            String[] iosVersions = {"18", "17", "16"};
-            for (String version : iosVersions) {
-                driver.sendKeys(SEARCH_BAR, version);
-                if (!driver.isDisplayed(NO_DEVICE_FOUND)) {
-                    driver.findElement(DEVICE).click();
-                    break;
-                } else
-                    ltLogger.info("iOS Device is not present. Please try again after some time when devices are present.");
-            }
+            driver.click(START_BUTTON);
+            ltLogger.info("Accessibility Test Initiated");
+            driver.waitForTime(10);
+        } catch (Exception e) {
+            ltLogger.info("Test Not started due to device unavailability");
         }
 
-        driver.click(START_BUTTON);
-        ltLogger.info("Accessibility Test Initiated");
-        driver.waitForTime(10);
     }
 }

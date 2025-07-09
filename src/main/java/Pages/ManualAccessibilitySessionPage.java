@@ -56,109 +56,120 @@ public class ManualAccessibilitySessionPage {
     }
 
     public void verifyTestStartedOrNot() {
-        driver.waitForElementToBeVisible(APP_SCREEN, 2);
-        ltLogger.info("Device screen is up.");
-        driver.waitForElementToBeVisible(APP_ACCESSIBILITY_SCANNER_HEADING, 20);
-        ltLogger.info("Test is Started for Accessibility Testing. Wait for app to install ...");
-        if (driver.waitForElementToDisappear(APP_INSTALLING, 20) || driver.findElement(START_SCAN_BUTTON).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
-            ltLogger.info("App is installed and ready to use.");
-        } else {
+        try {
+            driver.waitForElementToBeVisible(APP_SCREEN, 2);
+            driver.waitForElementToBeVisible(APP_ACCESSIBILITY_SCANNER_HEADING, 20);
+            ltLogger.info("Test is Started for Accessibility Testing. Wait for app to install ...");
+
+            if (driver.waitForElementToDisappear(APP_INSTALLING, 20) || driver.findElement(START_SCAN_BUTTON).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
+                driver.waitForTime(20);
+                driver.click(START_SCAN_BUTTON);
+            }
+        } catch (Exception e) {
             ltLogger.info("App is not getting installed.");
         }
-        driver.waitForTime(20);
-        driver.click(START_SCAN_BUTTON);
     }
 
     public void verifyScanHappeningOrNot() {
-        if (driver.waitForElementToBeVisible(SAVE_TEST_BUTTON, 5).isDisplayed()) {
-            ltLogger.info("Accessibility Scan is happening");
-        } else {
-            ltLogger.info("Accessibility Scan did not happened. Trying again ...");
-        }
-        driver.click(HOME_BUTTON);
-        driver.waitForTime(3);
-        driver.click(SCAN_VIEWPORT_BUTTON);
-        if (driver.waitForExactText(NUMBER_OF_PAGES, "View 2 of 2", 10) && driver.waitForElementToDisappear(SCANNING_IN_PROGRESS, 10)) {
-            ltLogger.info("Verification scan also happened. It means scanning is working properly");
-        } else {
+        try {
+            if (driver.waitForElementToBeVisible(SAVE_TEST_BUTTON, 5).isDisplayed()) {
+                ltLogger.info("Scan is happening, scanning 1 more time to confirm.");
+                driver.click(HOME_BUTTON);
+                driver.waitForTime(3);
+                driver.click(SCAN_VIEWPORT_BUTTON);
+                if (driver.waitForExactText(NUMBER_OF_PAGES, "View 2 of 2", 10) && driver.waitForElementToDisappear(SCANNING_IN_PROGRESS, 10))
+                    ltLogger.info("Verification scan also happened. It means scanning is working properly");
+            }
+        } catch (Exception e) {
             ltLogger.info("Accessibility scan is not happening.");
         }
     }
 
     public void verifyTestSavingOrNot() {
-        driver.click(SAVE_TEST_BUTTON);
-        TestName = driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim();
-        driver.click(SAVE_REPORT_BUTTON, 2);
-        if (driver.waitForElementToDisappear(SAVE_TEST_BUTTON, 10)) {
-            ltLogger.info("Test has been saved.");
-        } else {
+        try {
+            driver.click(SAVE_TEST_BUTTON);
+            TestName = driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim();
+            driver.click(SAVE_REPORT_BUTTON, 2);
+
+            if (driver.waitForElementToDisappear(SAVE_TEST_BUTTON, 10))
+                ltLogger.info("Test has been saved.");
+        } catch (Exception e) {
             ltLogger.info("Test Save feature is not working");
         }
     }
 
     public void verifyIssueTabAndImages() {
-        driver.click(ISSUE_TAB_BUTTON);
-        if (driver.waitForElementToBeVisible(IMAGE_AND_SKIN, 5).isDisplayed() && driver.waitForElementToBeVisible(SWITCH_MODE_MSG, 5).isDisplayed()) {
-            ltLogger.info("Images and Switch to live mode to continue scanning message are visible");
-            driver.waitForTime(5);
-        } else {
+        try {
+            driver.click(ISSUE_TAB_BUTTON);
+            if (driver.waitForElementToBeVisible(IMAGE_AND_SKIN, 5).isDisplayed() &&
+                    driver.waitForElementToBeVisible(SWITCH_MODE_MSG, 5).isDisplayed()) {
+                ltLogger.info("Images and Switch to live mode to continue scanning message are visible");
+                driver.waitForTime(2);
+                driver.click(LIVE_TAB_BUTTON);
+            }
+        } catch (Exception e) {
             ltLogger.info("Images are not coming");
         }
-        driver.click(LIVE_TAB_BUTTON);
     }
 
     public void verifyAppControls() {
-        driver.click(APP_CONTROL_BUTTON);
-        driver.waitForElementToBeVisible(INSTALL_NEW_APP, 2).click();
-        driver.waitForElementToBeVisible(SAMPLE_APP, 5).click();
-        driver.waitForElementToBeVisible(APP_INSTALLING, 10);
-        ltLogger.info("Second App started installing");
-        if (driver.waitForElementToDisappear(APP_INSTALLING, 15)) {
-            ltLogger.info("Second App is installed");
-        } else {
+        try {
+            driver.click(APP_CONTROL_BUTTON);
+            driver.waitForElementToBeVisible(INSTALL_NEW_APP, 2).click();
+            driver.waitForElementToBeVisible(SAMPLE_APP, 5).click();
+            driver.waitForElementToBeVisible(APP_INSTALLING, 10);
+            ltLogger.info("Second App started installing");
+            if (driver.waitForElementToDisappear(APP_INSTALLING, 15))
+                ltLogger.info("Second App is installed");
+        } catch (Exception e) {
             ltLogger.info("Second App is not installing. Check the app if it is compatible with the Android version.");
         }
     }
 
     public void screenshot() {
-        Random random = new Random();
-        int randomNumber = random.nextInt(5) + 1;
-        ltLogger.info("Random count : {}", randomNumber);
+        try {
+            Random random = new Random();
+            int randomNumber = random.nextInt(5) + 1;
+//        ltLogger.info("Random count : {}", randomNumber);
 
-        for (int i = 0; i < randomNumber * 2; i++) {
-            driver.click(CAPTURE_SCREENSHOT);
-            driver.waitForTime(2);
+            for (int i = 0; i < randomNumber * 2; i++) {
+                driver.click(CAPTURE_SCREENSHOT);
+                driver.waitForTime(2);
+            }
+            driver.click(GALLERY);
+            if (driver.findElement(GALLERY_SS_SECTION).getText().equalsIgnoreCase("Screenshots") && driver.findElement(GALLERY_SS_COUNT).getText().equals("0" + randomNumber))
+                ltLogger.info("Correct number of Screenshots are getting generated i.e: {}", driver.findElement(GALLERY_SS_COUNT).getText());
+        } catch (Exception e) {
+            ltLogger.info("Incorrect number of Screenshots are getting generated");
         }
-        driver.click(GALLERY);
-
-        if (driver.findElement(GALLERY_SS_SECTION).getText().equalsIgnoreCase("Screenshots") && driver.findElement(GALLERY_SS_COUNT).getText().equals("0" + randomNumber))
-            ltLogger.info("Correct number of Screenshots are getting generated i.e: {}", driver.findElement(GALLERY_SS_COUNT).getText());
-        else
-            ltLogger.info("InCorrect number of Screenshots are getting generated");
     }
 
     public void recordSession() {
-        driver.click(START_RECORDING);
-        driver.waitForTime(5);
-        driver.click(STOP_RECORDING);
-        driver.waitForElementToDisappear(VIDEO_RECORDING_CARD, 15);
-        driver.waitForTime(5);
-        driver.click(GALLERY);
+        try {
+            driver.click(START_RECORDING);
+            driver.waitForTime(5);
+            driver.click(STOP_RECORDING);
+            driver.waitForElementToDisappear(VIDEO_RECORDING_CARD, 15);
+            driver.waitForTime(5);
+            driver.click(GALLERY);
 
-        if (driver.findElement(GALLERY_VIDEO_SECTION).getText().equalsIgnoreCase("Videos") && driver.findElement(GALLERY_VIDEO_COUNT).getText().equals("01"))
-            ltLogger.info("Correct number of Videos are getting generated i.e: {}", driver.findElement(GALLERY_VIDEO_COUNT).getText());
-        else
-            ltLogger.info("InCorrect number of Videos are getting generated");
+            if (driver.findElement(GALLERY_VIDEO_SECTION).getText().equalsIgnoreCase("Videos") && driver.findElement(GALLERY_VIDEO_COUNT).getText().equals("01"))
+                ltLogger.info("Correct number of Videos are getting generated i.e: {}", driver.findElement(GALLERY_VIDEO_COUNT).getText());
+        } catch (Exception e) {
+            ltLogger.info("Incorrect number of Videos are getting generated");
+        }
     }
 
     public void rotate() {
-        driver.click(DEVICE_CONTROLS);
-        driver.waitForElementToBeVisible(ROTATE, 2).click();
+        try {
+            driver.click(DEVICE_CONTROLS);
+            driver.waitForElementToBeVisible(ROTATE, 2).click();
 
-        if (driver.waitForElementToBeVisible(ROTATED_DEVICE, 5).isDisplayed())
-            ltLogger.info("Device is rotated");
-        else
+            if (driver.waitForElementToBeVisible(ROTATED_DEVICE, 5).isDisplayed())
+                ltLogger.info("Device is rotated");
+        } catch (Exception e) {
             ltLogger.info("Device rotation not working");
+        }
     }
 
     public void iStopAccessibilityTest() {

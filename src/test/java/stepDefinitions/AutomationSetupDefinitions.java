@@ -366,8 +366,8 @@ public class AutomationSetupDefinitions {
         clientAutomationHelper.iOpenManualDashboard();
     }
 
-    @Then("I validate the Manual Accessibility report, All Issues tab and Mobile View")
-    public void iValidateAccessibilityReport() {
-        clientAutomationHelper.iValidateA11yReportAllIssuesAndMobileView();
+    @Then("^I validate the ([a-zA-Z0-9_=,: ]+)$")
+    public void iVerifyLeftManualDashboardReport(String testActions) {
+        clientAutomationHelper.iVerifyLeftManualDashboardReport(testActions);
     }
 }

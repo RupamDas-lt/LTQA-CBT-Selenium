@@ -15,7 +15,7 @@ Feature: Android & iOS A11y App Manual on Real Device
     Then I verify the Left Navbar features like screenshot,recordSession,rotate
     Then I stop the Manual Accessibility test
     Then I open the Manual Accessibility Dashboard to verify test Entry
-    Then I validate the Manual Accessibility report, All Issues tab and Mobile View
+    Then I validate the accessibilityReport,allIssuesTab,mobileView
     Then I stop client test session
 
     Examples:

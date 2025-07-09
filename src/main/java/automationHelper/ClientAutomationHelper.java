@@ -308,6 +308,7 @@ public class ClientAutomationHelper extends BaseClass {
     public void runTestActions(String testAction) {
         CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
         ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
         switch (testAction) {
             case "appControls" -> {
                 manualAccessibilitySessionPage.verifyAppControls();
@@ -320,6 +321,15 @@ public class ClientAutomationHelper extends BaseClass {
             }
             case "rotate" -> {
                 manualAccessibilitySessionPage.rotate();
+            }
+            case "accessibilityReport" -> {
+                manualAccessibilityDashboardPage.iValidateAccessibilityReport();
+            }
+            case "allIssuesTab" -> {
+                manualAccessibilityDashboardPage.iValidateAllIssuesTab();
+            }
+            case "mobileView" -> {
+                manualAccessibilityDashboardPage.iValidateMobileView();
             }
 
             default -> {
@@ -389,11 +399,10 @@ public class ClientAutomationHelper extends BaseClass {
         manualAccessibilityDashboardPage.iSearchForTheTest();
     }
 
-    public void iValidateA11yReportAllIssuesAndMobileView() {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
-        manualAccessibilityDashboardPage.iValidateAccessibilityReport();
-        manualAccessibilityDashboardPage.iValidateAllIssuesTab();
-        manualAccessibilityDashboardPage.iValidateMobileView();
+    public void iVerifyLeftManualDashboardReport(String testActions) {
+        String[] testActionsArray = testActions.split(",");
+        for (String testAction : testActionsArray) {
+            runTestActions(testAction);
+        }
     }
 }
