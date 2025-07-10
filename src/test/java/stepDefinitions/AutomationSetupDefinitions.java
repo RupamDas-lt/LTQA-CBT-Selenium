@@ -326,48 +326,25 @@ public class AutomationSetupDefinitions {
         automationHelper.getBuildIdFromSessionIdAndStoreItToEnvVar(sessionId);
     }
 
-    @Then("I open Accessibility Manual Home page")
-    public void iOpenAccessibilityManualPage() {
-        clientAutomationHelper.openManualAccessibilityPage();
+    /// --------------------------------- Accessibility related step definitions ---------------------------------
+
+    @Then("I open Accessibility Manual Home page and select the App and the device to start the Manual Accessibility test on ([^\"]*)$")
+    public void iOpenAccessibilityManualPage(String OS) {
+        clientAutomationHelper.openManualAccessibilityPage(OS);
     }
 
-    @Then("^I select the App and the device to start the Manual Accessibility test on ([^\"]*)$")
-    public void iSelectAppAndDevice(String OS) {
-        clientAutomationHelper.iSelectAppAndDevice(OS);
-    }
-
-    @Then("I verify that the test is started and app is installed for accessibility testing")
-    public void iVerifyTestStartedOrNot() {
-        clientAutomationHelper.iVerifyTestStartedOrNot();
-    }
-
-    @Then("I verify Scan is happening and test is getting saved or not")
-    public void iVerifyScanHappeningOrNot() {
-        clientAutomationHelper.verifyScanHappeningAndTestSavingOrNot();
-    }
-
-    @Then("I check the Issue tab for Screenshots of the pages")
-    public void iCheckIssueTab() {
-        clientAutomationHelper.verifyIssueTabAndImages();
+    @Then("^I verify that ([a-zA-Z0-9_=,: ]+)$")
+    public void iVerifyManualAccessibility(String a11yManualTestActions) {
+        clientAutomationHelper.iVerifyManualAccessibility(a11yManualTestActions);
     }
 
     @Then("^I verify the Left Navbar features like ([a-zA-Z0-9_=,: ]+)$")
-    public void iVerifyLeftNavbar(String testActions) {
-        clientAutomationHelper.iVerifyLeftNavbar(testActions);
-    }
-
-    @Then("I stop the Manual Accessibility test")
-    public void iStopAccessibilityTest() {
-        clientAutomationHelper.iStopAccessibilityTest();
-    }
-
-    @Then("I open the Manual Accessibility Dashboard to verify test Entry")
-    public void iOpenManualDashboard() {
-        clientAutomationHelper.iOpenManualDashboard();
+    public void iVerifyLeftNavbar(String lefNavbarTestActions) {
+        clientAutomationHelper.iVerifyLeftNavbar(lefNavbarTestActions);
     }
 
     @Then("^I validate the ([a-zA-Z0-9_=,: ]+)$")
-    public void iVerifyLeftManualDashboardReport(String testActions) {
-        clientAutomationHelper.iVerifyLeftManualDashboardReport(testActions);
+    public void iVerifyManualDashboardReport(String manualDashboardTestActions) {
+        clientAutomationHelper.iVerifyManualDashboardReport(manualDashboardTestActions);
     }
 }

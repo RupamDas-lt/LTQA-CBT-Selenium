@@ -305,104 +305,84 @@ public class ClientAutomationHelper extends BaseClass {
         }
     }
 
-    public void runTestActions(String testAction) {
+    public void a11yManualRunTestActions(String testAction) {
         CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
         ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
-        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
         switch (testAction) {
-            case "appControls" -> {
-                manualAccessibilitySessionPage.verifyAppControls();
+            case "testStartedAndAppInstalled" -> manualAccessibilitySessionPage.verifyTestStartedOrNot();
+            case "scanHappeningAndTestGettingSaved" -> {
+                manualAccessibilitySessionPage.verifyScanHappeningOrNot();
+                manualAccessibilitySessionPage.verifyTestSavingOrNot();
             }
-            case "screenshot" -> {
-                manualAccessibilitySessionPage.screenshot();
-            }
-            case "recordSession" -> {
-                manualAccessibilitySessionPage.recordSession();
-            }
-            case "rotate" -> {
-                manualAccessibilitySessionPage.rotate();
-            }
-            case "accessibilityReport" -> {
-                manualAccessibilityDashboardPage.iValidateAccessibilityReport();
-            }
-            case "allIssuesTab" -> {
-                manualAccessibilityDashboardPage.iValidateAllIssuesTab();
-            }
-            case "mobileView" -> {
-                manualAccessibilityDashboardPage.iValidateMobileView();
-            }
-
+            case "issueTab" -> manualAccessibilitySessionPage.verifyIssueTabAndImages();
             default -> {
-                CustomSoftAssert softAssert = EnvSetup.SOFT_ASSERT.get();
-
-                System.out.println("The action " + testAction + " is not recognized and does not match any case within the switch statement, thus executing the default case.");
-
-                softAssert.assertFalse(true, String.format(
-                        "The action '%s' is not recognized and does not match any case within the switch statement, thus executing the default case.",
+                CustomAssert.fail(String.format(
+                        "The action '%s' is not recognized and does not match any case within the switch statement.",
                         testAction));
-                EnvSetup.SOFT_ASSERT.set(softAssert);
             }
         }
     }
 
-    public void openManualAccessibilityPage() {
+    public void lefNavbarTestActions(String testAction) {
         CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        switch (testAction) {
+            case "appControls" -> manualAccessibilitySessionPage.verifyAppControls();
+            case "screenshot" -> manualAccessibilitySessionPage.screenshot();
+            case "recordSession" -> manualAccessibilitySessionPage.recordSession();
+            case "rotate" -> manualAccessibilitySessionPage.rotate();
+            case "stopTest" -> manualAccessibilitySessionPage.iStopAccessibilityTest();
+            default -> {
+                CustomAssert.fail(String.format(
+                        "The action '%s' is not recognized and does not match any case within the switch statement.",
+                        testAction));
+            }
+        }
+    }
 
+    public void runDashboardTestActions(ManualAccessibilityDashboardPage manualAccessibilityDashboardPage, String testAction) {
+        switch (testAction) {
+            case "accessibilityReport" -> manualAccessibilityDashboardPage.iValidateAccessibilityReport();
+            case "allIssuesTab" -> manualAccessibilityDashboardPage.iValidateAllIssuesTab();
+            case "mobileView" -> manualAccessibilityDashboardPage.iValidateMobileView();
+            default -> {
+                CustomAssert.fail(String.format(
+                        "The action '%s' is not recognized and does not match any case within the switch statement.",
+                        testAction));
+            }
+        }
+    }
+
+    public void openManualAccessibilityPage(String OS) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
         ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager, clientSoftAssert);
         manualAccessibilityPage.navigateToManualAccessibilityPage();
-
-    }
-
-    public void iSelectAppAndDevice(String OS) {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager, clientSoftAssert);
         manualAccessibilityPage.iSelectAppAndDevice(OS);
-
     }
 
-    public void iVerifyTestStartedOrNot() {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
-        manualAccessibilitySessionPage.verifyTestStartedOrNot();
-    }
-
-    public void verifyScanHappeningAndTestSavingOrNot() {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
-        manualAccessibilitySessionPage.verifyScanHappeningOrNot();
-        manualAccessibilitySessionPage.verifyTestSavingOrNot();
-    }
-
-    public void verifyIssueTabAndImages() {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
-        manualAccessibilitySessionPage.verifyIssueTabAndImages();
-    }
-
-    public void iVerifyLeftNavbar(String testActions) {
-        String[] testActionsArray = testActions.split(",");
-        for (String testAction : testActionsArray) {
-            runTestActions(testAction);
+    public void iVerifyManualAccessibility(String a11yManualTestActions) {
+        String[] testActionsArray = a11yManualTestActions.split(",");
+        for (String a11yManualTestAction : testActionsArray) {
+            a11yManualRunTestActions(a11yManualTestAction);
         }
     }
 
-    public void iStopAccessibilityTest() {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
-        manualAccessibilitySessionPage.iStopAccessibilityTest();
+    public void iVerifyLeftNavbar(String leftNavbarTestActions) {
+        String[] testActionsArray = leftNavbarTestActions.split(",");
+        for (String testAction : testActionsArray) {
+            lefNavbarTestActions(testAction);
+        }
     }
 
-    public void iOpenManualDashboard() {
+    public void iVerifyManualDashboardReport(String dashboardTestActions) {
         CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
         ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
         manualAccessibilityDashboardPage.iOpenManualDashboard();
         manualAccessibilityDashboardPage.iSearchForTheTest();
-    }
 
-    public void iVerifyLeftManualDashboardReport(String testActions) {
-        String[] testActionsArray = testActions.split(",");
+        String[] testActionsArray = dashboardTestActions.split(",");
         for (String testAction : testActionsArray) {
-            runTestActions(testAction);
+            runDashboardTestActions(manualAccessibilityDashboardPage, testAction);
         }
     }
 }
