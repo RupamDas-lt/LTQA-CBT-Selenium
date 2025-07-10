@@ -130,7 +130,6 @@ public class ManualAccessibilitySessionPage {
         try {
             Random random = new Random();
             int randomNumber = random.nextInt(5) + 1;
-//        ltLogger.info("Random count : {}", randomNumber);
 
             for (int i = 0; i < randomNumber * 2; i++) {
                 driver.click(CAPTURE_SCREENSHOT);

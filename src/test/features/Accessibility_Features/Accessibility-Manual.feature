@@ -9,7 +9,7 @@ Feature: Android & iOS A11y App Manual on Real Device
     Then I open Accessibility Manual Home page
     Then I select the App and the device to start the Manual Accessibility test on <OS>
     Then I verify that the test is started and app is installed for accessibility testing
-    Then I verify Scan is happening and test is getting saved of not
+    Then I verify Scan is happening and test is getting saved or not
     Then I check the Issue tab for Screenshots of the pages
 #    Then I verify the Left Navbar features like appControls,screenshot,recordSession,rotate
     Then I verify the Left Navbar features like screenshot,recordSession,rotate

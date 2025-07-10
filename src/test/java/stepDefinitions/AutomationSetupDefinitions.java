@@ -341,7 +341,7 @@ public class AutomationSetupDefinitions {
         clientAutomationHelper.iVerifyTestStartedOrNot();
     }
 
-    @Then("I verify Scan is happening and test is getting saved of not")
+    @Then("I verify Scan is happening and test is getting saved or not")
     public void iVerifyScanHappeningOrNot() {
         clientAutomationHelper.verifyScanHappeningAndTestSavingOrNot();
     }
