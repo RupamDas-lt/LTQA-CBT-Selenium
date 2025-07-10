@@ -144,17 +144,6 @@
             <artifactId>rest-assured</artifactId>
             <version>${rest.assured.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.epam.reportportal</groupId>
-            <artifactId>agent-java-cucumber6</artifactId>
-            <version>${rp.java.cucumber.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.epam.reportportal/logger-java-log4j -->
-        <dependency>
-            <groupId>com.epam.reportportal</groupId>
-            <artifactId>logger-java-log4j</artifactId>
-            <version>${rp.epam.log4j.version}</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -185,6 +174,26 @@
             <version>1.0.13</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <!-- TODO: ISSUE-RP -> Move these dependencies out of specific profile once the RP issues are resolved -->
+        <profile>
+            <id>reportportal</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.epam.reportportal</groupId>
+                    <artifactId>agent-java-cucumber6</artifactId>
+                    <version>${rp.java.cucumber.version}</version>
+                </dependency>
+                <!-- https://mvnrepository.com/artifact/com.epam.reportportal/logger-java-log4j -->
+                <dependency>
+                    <groupId>com.epam.reportportal</groupId>
+                    <artifactId>logger-java-log4j</artifactId>
+                    <version>${rp.epam.log4j.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
