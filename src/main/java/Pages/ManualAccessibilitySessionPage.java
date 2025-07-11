@@ -53,13 +53,13 @@ public class ManualAccessibilitySessionPage {
     private static final Locator endSessionConfirm = new Locator(LocatorTypes.XPATH, "//span[contains(text(),'Yes, End Session')]");
     private static final Locator a11yMAnualHomepageLocator = new Locator(LocatorTypes.XPATH, "(//h4[normalize-space()=\"Test Your App's Accessibility on Real Device\"])");
     private static final Locator TEST_NAME = new Locator(LocatorTypes.XPATH, "//input[contains(@placeholder,'Enter test name')]");
-    public static String testName;
+    public static final ThreadLocal<String> testName = new ThreadLocal<>();
 
     public void verifyTestStartedOrNot() {
         try {
             driver.waitForElementToBeVisible(appScreen, 2);
             driver.waitForElementToBeVisible(accessibilityScannerHeading, 20);
-            ltLogger.info("Test is Started for Accessibility Testing. Wait for app to install ...");
+            softAssert.assertTrue(driver.isDisplayed(accessibilityScannerHeading, 20), "Test is Started for Accessibility Testing. Wait for app to install ...");
 
             if (driver.waitForElementToDisappear(appInstalling, 20) || driver.findElement(startScanButton).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
                 driver.waitForTime(20);
@@ -77,8 +77,8 @@ public class ManualAccessibilitySessionPage {
                 driver.click(homeButton);
                 driver.waitForTime(3);
                 driver.click(scanViewportButton);
-                if (driver.waitForExactText(numberOfPages, "View 2 of 2", 10) && driver.waitForElementToDisappear(scanningInProgress, 10))
-                    ltLogger.info("Verification scan also happened. It means scanning is working properly");
+
+                softAssert.assertTrue(driver.waitForExactText(numberOfPages, "View 2 of 2", 10) && driver.waitForElementToDisappear(scanningInProgress, 10), "Verification scan also happened. It means scanning is working properly");
             }
         } catch (Exception e) {
             throw new RuntimeException("Accessibility scan is not happening.");
@@ -88,11 +88,10 @@ public class ManualAccessibilitySessionPage {
     public void verifyTestSavingOrNot() {
         try {
             driver.click(saveTestButton);
-            testName = driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim();
+            testName.set(driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim());
             driver.click(saveReportButton, 2);
 
-            if (driver.waitForElementToDisappear(saveTestButton, 10))
-                ltLogger.info("Test has been saved.");
+            softAssert.assertTrue(driver.waitForElementToDisappear(saveTestButton, 10), "Test has been saved.");
         } catch (Exception e) {
             throw new RuntimeException("Test Save feature is not working");
         }
@@ -101,12 +100,10 @@ public class ManualAccessibilitySessionPage {
     public void verifyIssueTabAndImages() {
         try {
             driver.click(issueTabButton);
-            if (driver.isDisplayed(imageAndSkin, 5) &&
-                    driver.isDisplayed(switchModeButton, 5)) {
-                ltLogger.info("Images and Switch to live mode to continue scanning message are visible");
-                driver.waitForTime(2);
-                driver.click(liveTabButton);
-            }
+
+            softAssert.assertTrue(driver.isDisplayed(imageAndSkin, 5) && driver.isDisplayed(switchModeButton, 5), "Images and Switch to live mode to continue scanning message are visible");
+            driver.waitForTime(2);
+            driver.click(liveTabButton);
         } catch (Exception e) {
             throw new RuntimeException("Images are not coming");
         }
@@ -119,8 +116,8 @@ public class ManualAccessibilitySessionPage {
             driver.click(sampleApp, 5);
             driver.waitForElementToBeVisible(appInstalling, 10);
             ltLogger.info("Second App started installing");
-            if (driver.waitForElementToDisappear(appInstalling, 15))
-                ltLogger.info("Second App is installed");
+
+            softAssert.assertTrue(driver.waitForElementToDisappear(appInstalling, 15), "Second App is installed");
         } catch (Exception e) {
             throw new RuntimeException("Second App is not installing. Check the app if it is compatible with the Android version.");
         }
@@ -136,8 +133,8 @@ public class ManualAccessibilitySessionPage {
                 driver.waitForTime(2);
             }
             driver.click(gallery);
-            if (driver.findElement(gallerySsSection).getText().equalsIgnoreCase("Screenshots") && driver.findElement(gallerySsCount).getText().equals("0" + randomNumber))
-                ltLogger.info("Correct number of Screenshots are getting generated i.e: {}", driver.findElement(gallerySsCount).getText());
+
+            softAssert.assertTrue(driver.findElement(gallerySsSection).getText().equalsIgnoreCase("Screenshots") && driver.findElement(gallerySsCount).getText().equals("0" + randomNumber), "Correct number of Screenshots are getting generated i.e: " + driver.findElement(gallerySsCount).getText());
         } catch (Exception e) {
             throw new RuntimeException("Incorrect number of Screenshots are getting generated");
         }
@@ -152,8 +149,7 @@ public class ManualAccessibilitySessionPage {
             driver.waitForTime(5);
             driver.click(gallery);
 
-            if (driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"))
-                ltLogger.info("Correct number of Videos are getting generated i.e: {}", driver.findElement(galleryVideoCount).getText());
+            softAssert.assertTrue(driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"), "\"Correct number of Videos are getting generated i.e: " + driver.findElement(galleryVideoCount).getText());
         } catch (Exception e) {
             throw new RuntimeException("Incorrect number of Videos are getting generated");
         }
@@ -165,8 +161,7 @@ public class ManualAccessibilitySessionPage {
             driver.waitForTime(1);
             driver.click(rotate, 2);
 
-            if (driver.isDisplayed(rotatedDevice, 5))
-                ltLogger.info("Device is rotated");
+            softAssert.assertTrue(driver.isDisplayed(rotatedDevice, 5), "Device is rotated");
         } catch (Exception e) {
             throw new RuntimeException("Device rotation not working");
         }
@@ -176,8 +171,6 @@ public class ManualAccessibilitySessionPage {
         driver.click(endSessionButton);
         driver.click(endSessionConfirm, 2);
 
-        if (driver.isDisplayed(a11yMAnualHomepageLocator, 2)) {
-            ltLogger.info("Test Ended Successfully");
-        }
+        softAssert.assertTrue(driver.isDisplayed(a11yMAnualHomepageLocator, 2), "Test Ended Successfully");
     }
 }

@@ -33,6 +33,10 @@ public class ManualAccessibilityDashboardPage {
     private static final Locator issueTable = new Locator(LocatorTypes.XPATH, "//div[@class='sc-eBHhsj bojVGS']");
     private static final Locator imageCanvas = new Locator(LocatorTypes.XPATH, "//canvas");
 
+    public static final ThreadLocal<String> expectedTestName = new ThreadLocal<>();
+    public static final ThreadLocal<String> actualText = new ThreadLocal<>();
+
+
     private static final String manualDashboardUrl = EnvSetup.TEST_ENV.toLowerCase().contains("stage") ?
             "https://stage-accessibility.lambdatestinternal.com/" : "https://accessibility.lambdatest.com/";
 
@@ -40,10 +44,7 @@ public class ManualAccessibilityDashboardPage {
     public void iOpenManualDashboard() {
         try {
             driver.getURL(manualDashboardUrl);
-
-            if (driver.isDisplayed(scannedReportHeading, 10))
-                ltLogger.info("Accessibility Manual Dashboard Opened");
-
+            softAssert.assertTrue(driver.isDisplayed(scannedReportHeading, 10), "Accessibility Manual Dashboard Opened");
             driver.click(appTab);
             driver.waitForElementToBeVisible(testListDiv, 10);
         } catch (Exception e) {
@@ -53,12 +54,12 @@ public class ManualAccessibilityDashboardPage {
 
     public void iSearchForTheTest() {
         List<WebElement> testElements = driver.findElements(testList);
-        String expectedTestName = ManualAccessibilitySessionPage.testName;
+        expectedTestName.set(ManualAccessibilitySessionPage.testName.get());
         boolean found = false;
 
         for (WebElement testElement : testElements) {
-            String actualText = testElement.getText().replaceAll("[^0-9]", "");
-            if (actualText.equalsIgnoreCase(expectedTestName)) {
+            actualText.set(testElement.getText().replaceAll("[^0-9]", ""));
+            if (actualText.get().equalsIgnoreCase(expectedTestName.get())) {
                 ltLogger.info("Test id {} is found", expectedTestName);
                 testElement.click();
                 found = true;
@@ -66,21 +67,21 @@ public class ManualAccessibilityDashboardPage {
             }
         }
         if (!found) {
-            throw new RuntimeException("Test id not found in the Manual Accessibility Dashboard list");
+            throw new RuntimeException("Test name not found in the Manual Accessibility Dashboard list");
         }
     }
 
     public void iValidateAccessibilityReport() {
-        softAssert.assertTrue(driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5));
+        softAssert.assertTrue((driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5)), "Accessibility report is visible");
     }
 
     public void iValidateAllIssuesTab() {
         driver.click(allIssuesTab, 2);
-        softAssert.assertTrue(driver.isDisplayed(issueTable, 2));
+        softAssert.assertTrue(driver.isDisplayed(issueTable, 2), "Issues table is visible");
     }
 
     public void iValidateMobileView() {
         driver.click(mobileViewTab);
-        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5));
+        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5), "Image screenshot is visible");
     }
 }

@@ -315,11 +315,9 @@ public class ClientAutomationHelper extends BaseClass {
                 manualAccessibilitySessionPage.verifyTestSavingOrNot();
             }
             case "issueTab" -> manualAccessibilitySessionPage.verifyIssueTabAndImages();
-            default -> {
-                CustomAssert.fail(String.format(
-                        "The action '%s' is not recognized and does not match any case within the switch statement.",
-                        testAction));
-            }
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' inside the test is not recognized and does not match any case within the switch statement.",
+                    testAction));
         }
     }
 
@@ -332,11 +330,9 @@ public class ClientAutomationHelper extends BaseClass {
             case "recordSession" -> manualAccessibilitySessionPage.recordSession();
             case "rotate" -> manualAccessibilitySessionPage.rotate();
             case "stopTest" -> manualAccessibilitySessionPage.iStopAccessibilityTest();
-            default -> {
-                CustomAssert.fail(String.format(
-                        "The action '%s' is not recognized and does not match any case within the switch statement.",
-                        testAction));
-            }
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' in LeftNavbar section is not recognized and does not match any case within the switch statement.",
+                    testAction));
         }
     }
 
@@ -345,17 +341,14 @@ public class ClientAutomationHelper extends BaseClass {
             case "accessibilityReport" -> manualAccessibilityDashboardPage.iValidateAccessibilityReport();
             case "allIssuesTab" -> manualAccessibilityDashboardPage.iValidateAllIssuesTab();
             case "mobileView" -> manualAccessibilityDashboardPage.iValidateMobileView();
-            default -> {
-                CustomAssert.fail(String.format(
-                        "The action '%s' is not recognized and does not match any case within the switch statement.",
-                        testAction));
-            }
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' in Manual Accessibility Dashboard is not recognized and does not match any case within the switch statement.",
+                    testAction));
         }
     }
 
     public void openManualAccessibilityPage(String OS) {
-        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
-        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager, clientSoftAssert);
+        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager);
         manualAccessibilityPage.navigateToManualAccessibilityPage();
         manualAccessibilityPage.iSelectAppAndDevice(OS);
     }

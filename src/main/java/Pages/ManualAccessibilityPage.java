@@ -5,18 +5,15 @@ import factory.Locator;
 import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 
 public class ManualAccessibilityPage extends EnvSetup {
     DriverManager driver;
-    CustomSoftAssert softAssert;
     private static final Logger ltLogger = LogManager.getLogger(ManualAccessibilityPage.class);
 
-    public ManualAccessibilityPage(DriverManager driverManager, CustomSoftAssert softAssert) {
+    public ManualAccessibilityPage(DriverManager driverManager) {
         driver = driverManager;
-        this.softAssert = softAssert;
     }
 
     private static final Locator a11yManualHomepageLocator = new Locator(LocatorTypes.XPATH, "(//h4[normalize-space()=\"Test Your App's Accessibility on Real Device\"])");
@@ -34,52 +31,96 @@ public class ManualAccessibilityPage extends EnvSetup {
 
 
     public void navigateToManualAccessibilityPage() {
-        try {
-            driver.getURL(manualAccessibilityUrl);
 
-            if (driver.isDisplayed(a11yManualHomepageLocator, 10))
-                ltLogger.info("Accessibility Manual Page is Opened");
-        } catch (Exception e) {
+        driver.getURL(manualAccessibilityUrl);
+        if (driver.isDisplayed(a11yManualHomepageLocator, 10))
+            ltLogger.info("Accessibility Manual Page is Opened");
+        else
             throw new RuntimeException("Accessibility Manual Page is not Opening");
-        }
     }
+
+//    public void iSelectAppAndDevice(String OS) {
+//        try {
+//            if (OS.equalsIgnoreCase("Android")) {
+//                driver.click(androidIcon, 2);
+//                driver.click(androidApp, 2);
+//
+//                String[] androidVersions = {"15", "14", "13"};
+//                for (String version : androidVersions) {
+//                    driver.sendKeys(searchBar, version);
+//
+//                    if (!driver.isDisplayed(noDeviceFound)) {
+//                        driver.click(device);
+//                        break;
+//                    } else
+//                        throw new RuntimeException("Android Device is not present for 13, 14 or 15 right now. Please try again later when devices are present.");
+//                }
+//            } else {
+//                driver.click(iosIcon, 2);
+//                driver.click(iosApp, 2);
+//                String[] iosVersions = {"18", "17", "16"};
+//                for (String version : iosVersions) {
+//                    driver.sendKeys(searchBar, version);
+//
+//                    if (!driver.isDisplayed(noDeviceFound)) {
+//                        driver.click(device);
+//                        break;
+//                    } else
+//                        throw new RuntimeException("iOS Device is not present for 16, 17 or 18 right now. Please try again later when devices are present.");
+//                }
+//            }
+//            driver.click(startButton);
+//            ltLogger.info("Accessibility Test Initiated");
+//            driver.waitForTime(10);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Test Not started due to device unavailability");
+//        }
+//
+//    }
 
     public void iSelectAppAndDevice(String OS) {
         try {
+            Locator icon, app;
+            String[] versions;
+            String platformName;
+
             if (OS.equalsIgnoreCase("Android")) {
-                driver.click(androidIcon, 2);
-                driver.click(androidApp, 2);
-
-                String[] androidVersions = {"15", "14", "13"};
-                for (String version : androidVersions) {
-                    driver.sendKeys(searchBar, version);
-
-                    if (!driver.isDisplayed(noDeviceFound)) {
-                        driver.click(device);
-                        break;
-                    } else
-                        ltLogger.info("Android Device is not present. Please try again after some time when devices are present.");
-                }
+                icon = androidIcon;
+                app = androidApp;
+                versions = new String[]{"15", "14", "13"};
+                platformName = "Android";
             } else {
-                driver.click(iosIcon, 2);
-                driver.click(iosApp, 2);
-                String[] iosVersions = {"18", "17", "16"};
-                for (String version : iosVersions) {
-                    driver.sendKeys(searchBar, version);
+                icon = iosIcon;
+                app = iosApp;
+                versions = new String[]{"18", "17", "16"};
+                platformName = "iOS";
+            }
 
-                    if (!driver.isDisplayed(noDeviceFound)) {
-                        driver.click(device);
-                        break;
-                    } else
-                        ltLogger.info("iOS Device is not present. Please try again after some time when devices are present.");
+            driver.click(icon, 2);
+            driver.click(app, 2);
+
+            boolean deviceSelected = false;
+            for (String version : versions) {
+                driver.sendKeys(searchBar, version);
+
+                if (!driver.isDisplayed(noDeviceFound)) {
+                    driver.click(device);
+                    deviceSelected = true;
+                    break;
                 }
             }
-            driver.click(startButton);
-            ltLogger.info("Accessibility Test Initiated");
-            driver.waitForTime(10);
-        } catch (Exception e) {
-            throw new RuntimeException("Test Not started due to device unavailability");
-        }
 
+            if (!deviceSelected) {
+                throw new RuntimeException(platformName + " device is not present for any of the following versions: " + String.join(", ", versions));
+            }
+
+            driver.click(startButton);
+            ltLogger.info("Accessibility Test Initiated on {}", platformName);
+            driver.waitForTime(10);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Test not started due to device unavailability");
+        }
     }
+
 }
