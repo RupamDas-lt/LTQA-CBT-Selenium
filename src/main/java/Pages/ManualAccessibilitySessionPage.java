@@ -32,7 +32,7 @@ public class ManualAccessibilitySessionPage {
     private static final Locator issueTabButton = new Locator(LocatorTypes.XPATH, "//span//span[normalize-space()='Issue']");
     private static final Locator liveTabButton = new Locator(LocatorTypes.XPATH, "//span//span[normalize-space()='Live']");
     private static final Locator imageAndSkin = new Locator(LocatorTypes.XPATH, "//img[@alt='device-skin']");
-    private static final Locator switchModeButton = new Locator(LocatorTypes.XPATH, "//img[@alt='device-skin']");
+    private static final Locator switchModeMsg = new Locator(LocatorTypes.XPATH, "//span[normalize-space()='Switch to live mode to continue scanning']");
     private static final Locator scanningInProgress = new Locator(LocatorTypes.XPATH, "//h1[normalize-space()='Scanning for accessibility issues']");
     private static final Locator appControlsButton = new Locator(LocatorTypes.XPATH, "//span[normalize-space()='App Controls']");
     private static final Locator installNewApp = new Locator(LocatorTypes.XPATH, "//span[@id='install-new-app']");
@@ -101,7 +101,7 @@ public class ManualAccessibilitySessionPage {
         try {
             driver.click(issueTabButton);
 
-            softAssert.assertTrue(driver.isDisplayed(imageAndSkin, 5) && driver.isDisplayed(switchModeButton, 5), "Images and Switch to live mode to continue scanning message are visible");
+            softAssert.assertTrue(driver.isDisplayed(imageAndSkin, 5) && driver.isDisplayed(switchModeMsg, 5), "Images and Switch to live mode to continue scanning message are visible");
             driver.waitForTime(2);
             driver.click(liveTabButton);
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public class ManualAccessibilitySessionPage {
             driver.waitForTime(5);
             driver.click(gallery);
 
-            softAssert.assertTrue(driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"), "\"Correct number of Videos are getting generated i.e: " + driver.findElement(galleryVideoCount).getText());
+            softAssert.assertTrue(driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"), "Correct number of Videos are getting generated i.e: " + driver.findElement(galleryVideoCount).getText());
         } catch (Exception e) {
             throw new RuntimeException("Incorrect number of Videos are getting generated");
         }
