@@ -39,45 +39,6 @@ public class ManualAccessibilityPage extends EnvSetup {
             throw new RuntimeException("Accessibility Manual Page is not Opening");
     }
 
-//    public void iSelectAppAndDevice(String OS) {
-//        try {
-//            if (OS.equalsIgnoreCase("Android")) {
-//                driver.click(androidIcon, 2);
-//                driver.click(androidApp, 2);
-//
-//                String[] androidVersions = {"15", "14", "13"};
-//                for (String version : androidVersions) {
-//                    driver.sendKeys(searchBar, version);
-//
-//                    if (!driver.isDisplayed(noDeviceFound)) {
-//                        driver.click(device);
-//                        break;
-//                    } else
-//                        throw new RuntimeException("Android Device is not present for 13, 14 or 15 right now. Please try again later when devices are present.");
-//                }
-//            } else {
-//                driver.click(iosIcon, 2);
-//                driver.click(iosApp, 2);
-//                String[] iosVersions = {"18", "17", "16"};
-//                for (String version : iosVersions) {
-//                    driver.sendKeys(searchBar, version);
-//
-//                    if (!driver.isDisplayed(noDeviceFound)) {
-//                        driver.click(device);
-//                        break;
-//                    } else
-//                        throw new RuntimeException("iOS Device is not present for 16, 17 or 18 right now. Please try again later when devices are present.");
-//                }
-//            }
-//            driver.click(startButton);
-//            ltLogger.info("Accessibility Test Initiated");
-//            driver.waitForTime(10);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Test Not started due to device unavailability");
-//        }
-//
-//    }
-
     public void iSelectAppAndDevice(String OS) {
         try {
             Locator icon, app;
