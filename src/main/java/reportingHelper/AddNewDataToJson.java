@@ -3,14 +3,23 @@ package reportingHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import factory.SoftAssertionMessages;
+import factory.SoftAssertionMessagesAccessibility;
+import factory.SoftAssertionMessagesFalcon;
 import utility.BaseClass;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import static utility.FrameworkConstants.PRODUCT_NAME;
+import static utility.FrameworkConstants.REWRITE_EXISTING_DATA;
+
 public class AddNewDataToJson extends BaseClass {
-    private static final String FILE_PATH = "src/main/java/reportingHelper/dataset/testFailureAnalysis.json";
+    private static String FILE_PATH;
+    private static final String FILE_PATH_SELENIUM = "src/main/java/reportingHelper/dataset/testFailureAnalysis.json";
+    private static final String FILE_PATH_FALCON = "src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json";
+    private static final String FILE_PATH_ACCESSIBILITY = "src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json";
 
     public static void updateJsonFile(Map<String, String> inputMap, boolean rewriteExisting) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -51,27 +60,43 @@ public class AddNewDataToJson extends BaseClass {
         mapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, rootNode);
     }
 
-    public static void main(String[] args) throws Exception {
-        // Default to false if env var or system property not set
-        boolean rewriteExisting = false;
+    private static Map.Entry<String, Class<? extends Enum<?>>> getProductConfiguration(String productName) {
+        return switch (productName) {
+            case "falcon" -> Map.entry(FILE_PATH_FALCON, SoftAssertionMessagesFalcon.class);
+            case "accessibility" -> Map.entry(FILE_PATH_ACCESSIBILITY, SoftAssertionMessagesAccessibility.class);
+            default -> Map.entry(FILE_PATH_SELENIUM, SoftAssertionMessages.class);
+        };
+    }
 
-        // Check system property first (passed via -D in mvn exec)
-        String sysProp = System.getProperty("REWRITE_EXISTING_DATA");
-        if (sysProp != null) {
-            rewriteExisting = Boolean.parseBoolean(sysProp);
-        } else {
-            // fallback: check environment variable (optional)
-            String envVar = System.getenv("REWRITE_EXISTING_DATA");
-            if (envVar != null) {
-                rewriteExisting = Boolean.parseBoolean(envVar);
+    private static HashMap<String, String> processMessages(Class<? extends Enum<?>> messageEnumClass) {
+        HashMap<String, String> map = new HashMap<>();
+        try {
+            Method valuesMethod = messageEnumClass.getMethod("values");
+            Enum<?>[] messages = (Enum<?>[]) valuesMethod.invoke(null);
+
+            Method getValueMethod = messageEnumClass.getMethod("getValue");
+
+            for (Enum<?> message : messages) {
+                String value = (String) getValueMethod.invoke(message);
+                map.put(stringToSha256Hex(value), value);
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process messages", e);
         }
+        return map;
+    }
 
-        HashMap<String, String> assertionErrorToHashKeyMap = new HashMap<>();
-        for (SoftAssertionMessages message : SoftAssertionMessages.values()) {
-            String hashKey = stringToSha256Hex(message.getValue());
-            assertionErrorToHashKeyMap.put(hashKey, message.getValue());
-        }
+    public static void main(String[] args) throws Exception {
+        // Get configuration from system properties with defaults
+        String productName = System.getProperty(PRODUCT_NAME, "selenium").toLowerCase();
+        boolean rewriteExisting = Boolean.parseBoolean(System.getProperty(REWRITE_EXISTING_DATA, "false"));
+
+        // Determine file path and enum class based on product
+        Map.Entry<String, Class<? extends Enum<?>>> config = getProductConfiguration(productName);
+        FILE_PATH = config.getKey();
+
+        // Process messages
+        HashMap<String, String> assertionErrorToHashKeyMap = processMessages(config.getValue());
 
         updateJsonFile(assertionErrorToHashKeyMap, rewriteExisting);
     }

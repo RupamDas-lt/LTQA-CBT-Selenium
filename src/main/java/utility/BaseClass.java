@@ -11,7 +11,6 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import factory.SoftAssertionMessages;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -854,14 +853,37 @@ public class BaseClass {
         }
     }
 
-    public static String softAssertMessageFormat(SoftAssertionMessages messageWithPlaceHolders, Object... args) {
+    /**
+     * Generic method to format soft assertion messages
+     *
+     * @param messageWithPlaceHolders Enum instance containing the message template
+     * @param args                    Arguments to format into the message
+     * @return Formatted message string
+     */
+    public static <T extends Enum<T> & MessageHolder> String softAssertMessageFormat(
+            T messageWithPlaceHolders, Object... args) {
+
         final String KEY = "key";
         final String MESSAGE_TEMPLATE = "message_template";
-        String hashKey = BaseClass.stringToSha256Hex(messageWithPlaceHolders.getValue());
-        String message = String.format(messageWithPlaceHolders.getValue(), args);
+
+        // Get the message template from the enum, message with placeholders
+        String template = messageWithPlaceHolders.getValue();
+
+        // Create SHA-256 hash of the template, this is the key against which the data is stored in the json
+        String hashKey = BaseClass.stringToSha256Hex(template);
+
+        String message = String.format(template, args);
         EnvSetup.ASSERTION_ERROR_TO_HASH_KEY_MAP.get()
-                .put(message, Map.of(KEY, hashKey, MESSAGE_TEMPLATE, messageWithPlaceHolders.getValue()));
+                .put(message, Map.of(
+                        KEY, hashKey,
+                        MESSAGE_TEMPLATE, template
+                ));
+
         return message;
+    }
+
+    public interface MessageHolder {
+        String getValue();
     }
 
     public void pushCustomFailureDataToThreadLocal(String message) {
