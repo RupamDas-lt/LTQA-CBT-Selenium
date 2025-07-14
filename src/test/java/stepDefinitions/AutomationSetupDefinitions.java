@@ -325,4 +325,26 @@ public class AutomationSetupDefinitions {
                 TEST_SESSION_ID_QUEUE.get().peek();
         automationHelper.getBuildIdFromSessionIdAndStoreItToEnvVar(sessionId);
     }
+
+    /// --------------------------------- Accessibility related step definitions ---------------------------------
+
+    @Then("I open Accessibility Manual Home page and select the App and the device to start the Manual Accessibility test on ([^\"]*)$")
+    public void iOpenAccessibilityManualPage(String OS) {
+        clientAutomationHelper.openManualAccessibilityPage(OS);
+    }
+
+    @Then("^I verify that ([a-zA-Z0-9_=,: ]+)$")
+    public void iVerifyManualAccessibility(String a11yManualTestActions) {
+        clientAutomationHelper.iVerifyManualAccessibility(a11yManualTestActions);
+    }
+
+    @Then("^I verify the Left Navbar features like ([a-zA-Z0-9_=,: ]+)$")
+    public void iVerifyLeftNavbar(String lefNavbarTestActions) {
+        clientAutomationHelper.iVerifyLeftNavbar(lefNavbarTestActions);
+    }
+
+    @Then("^I validate the ([a-zA-Z0-9_=,: ]+)$")
+    public void iVerifyManualDashboardReport(String manualDashboardTestActions) {
+        clientAutomationHelper.iVerifyManualDashboardReport(manualDashboardTestActions);
+    }
 }

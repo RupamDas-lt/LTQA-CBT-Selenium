@@ -304,4 +304,78 @@ public class ClientAutomationHelper extends BaseClass {
                 throw new RuntimeException("Unsupported link type: " + linkType);
         }
     }
+
+    public void a11yManualRunTestActions(String testAction) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        switch (testAction) {
+            case "testStartedAndAppInstalled" -> manualAccessibilitySessionPage.verifyTestStartedOrNot();
+            case "scanHappeningAndTestGettingSaved" -> {
+                manualAccessibilitySessionPage.verifyScanHappeningOrNot();
+                manualAccessibilitySessionPage.verifyTestSavingOrNot();
+            }
+            case "issueTab" -> manualAccessibilitySessionPage.verifyIssueTabAndImages();
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' inside the test is not recognized and does not match any case within the switch statement.",
+                    testAction));
+        }
+    }
+
+    public void lefNavbarTestActions(String testAction) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilitySessionPage manualAccessibilitySessionPage = new ManualAccessibilitySessionPage(driverManager, clientSoftAssert);
+        switch (testAction) {
+            case "appControls" -> manualAccessibilitySessionPage.verifyAppControls();
+            case "screenshot" -> manualAccessibilitySessionPage.screenshot();
+            case "recordSession" -> manualAccessibilitySessionPage.recordSession();
+            case "rotate" -> manualAccessibilitySessionPage.rotate();
+            case "stopTest" -> manualAccessibilitySessionPage.iStopAccessibilityTest();
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' in LeftNavbar section is not recognized and does not match any case within the switch statement.",
+                    testAction));
+        }
+    }
+
+    public void runDashboardTestActions(ManualAccessibilityDashboardPage manualAccessibilityDashboardPage, String testAction) {
+        switch (testAction) {
+            case "accessibilityReport" -> manualAccessibilityDashboardPage.iValidateAccessibilityReport();
+            case "allIssuesTab" -> manualAccessibilityDashboardPage.iValidateAllIssuesTab();
+            case "mobileView" -> manualAccessibilityDashboardPage.iValidateMobileView();
+            default -> CustomAssert.fail(String.format(
+                    "The test action '%s' in Manual Accessibility Dashboard is not recognized and does not match any case within the switch statement.",
+                    testAction));
+        }
+    }
+
+    public void openManualAccessibilityPage(String OS) {
+        ManualAccessibilityPage manualAccessibilityPage = new ManualAccessibilityPage(driverManager);
+        manualAccessibilityPage.navigateToManualAccessibilityPage();
+        manualAccessibilityPage.iSelectAppAndDevice(OS);
+    }
+
+    public void iVerifyManualAccessibility(String a11yManualTestActions) {
+        String[] testActionsArray = a11yManualTestActions.split(",");
+        for (String a11yManualTestAction : testActionsArray) {
+            a11yManualRunTestActions(a11yManualTestAction);
+        }
+    }
+
+    public void iVerifyLeftNavbar(String leftNavbarTestActions) {
+        String[] testActionsArray = leftNavbarTestActions.split(",");
+        for (String testAction : testActionsArray) {
+            lefNavbarTestActions(testAction);
+        }
+    }
+
+    public void iVerifyManualDashboardReport(String dashboardTestActions) {
+        CustomSoftAssert clientSoftAssert = EnvSetup.CLIENT_SOFT_ASSERT.get();
+        ManualAccessibilityDashboardPage manualAccessibilityDashboardPage = new ManualAccessibilityDashboardPage(driverManager, clientSoftAssert);
+        manualAccessibilityDashboardPage.iOpenManualDashboard();
+        manualAccessibilityDashboardPage.iSearchForTheTest();
+
+        String[] testActionsArray = dashboardTestActions.split(",");
+        for (String testAction : testActionsArray) {
+            runDashboardTestActions(manualAccessibilityDashboardPage, testAction);
+        }
+    }
 }
