@@ -1,9 +1,10 @@
 package factory;
 
 import lombok.Getter;
+import utility.BaseClass;
 
 @Getter
-public enum SoftAssertionMessages {
+public enum SoftAssertionMessages implements BaseClass.MessageHolder {
 
     /*************************************************************
      * If you are adding new values to this enum, please          *

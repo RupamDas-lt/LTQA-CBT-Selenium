@@ -107,6 +107,8 @@ public class FrameworkConstants extends BaseClass {
     public static final String TEST_ATTEMPT = "TEST_ATTEMPT";
     public static final String JOB_PURPOSE = "JOB_PURPOSE";
     public static final String RESTORE_EXISTING_AUTO_HEAL_BASELINES = "RESTORE_EXISTING_AUTO_HEAL_BASELINES";
+    public static final String PRODUCT_NAME = "PRODUCT_NAME";
+    public static final String REWRITE_EXISTING_DATA = "REWRITE_EXISTING_DATA";
 
     /// RP keys
     public static final Set<String> REPORT_PORTAL_KEYS = Set.of("rp.endpoint", "rp.api.key", "rp.project", "rp.launch");
