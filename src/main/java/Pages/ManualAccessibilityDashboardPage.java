@@ -12,8 +12,8 @@ import utility.EnvSetup;
 
 import java.util.List;
 
-import static factory.SoftAssertionMessagesAccessibility.PAGE_OPENED;
-import static factory.SoftAssertionMessagesAccessibility.REPORT_VISIBLE;
+import static factory.SoftAssertionMessagesAccessibility.ERROR_IN_OPENING_PAGE;
+import static factory.SoftAssertionMessagesAccessibility.REPORT_NOT_VISIBLE;
 
 public class ManualAccessibilityDashboardPage extends BaseClass {
 
@@ -48,7 +48,7 @@ public class ManualAccessibilityDashboardPage extends BaseClass {
     public void iOpenManualDashboard() {
         try {
             driver.getURL(manualDashboardUrl);
-            softAssert.assertTrue(driver.isDisplayed(scannedReportHeading, 10), softAssertMessageFormat(PAGE_OPENED, "Manual Accessibility Dashboard"));
+            softAssert.assertTrue(driver.isDisplayed(scannedReportHeading, 10), softAssertMessageFormat(ERROR_IN_OPENING_PAGE, "Manual Accessibility Dashboard"));
             driver.click(appTab);
             driver.waitForElementToBeVisible(testListDiv, 10);
         } catch (Exception e) {
@@ -76,16 +76,16 @@ public class ManualAccessibilityDashboardPage extends BaseClass {
     }
 
     public void iValidateAccessibilityReport() {
-        softAssert.assertTrue((driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5)), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "report"));
+        softAssert.assertTrue((driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5)), softAssertMessageFormat(REPORT_NOT_VISIBLE, "Mobile Manual Accessibility", "report"));
     }
 
     public void iValidateAllIssuesTab() {
         driver.click(allIssuesTab, 2);
-        softAssert.assertTrue(driver.isDisplayed(issueTable, 2), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "issues"));
+        softAssert.assertTrue(driver.isDisplayed(issueTable, 2), softAssertMessageFormat(REPORT_NOT_VISIBLE, "Mobile Manual Accessibility", "issues"));
     }
 
     public void iValidateMobileView() {
         driver.click(mobileViewTab);
-        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "screenshots"));
+        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5), softAssertMessageFormat(REPORT_NOT_VISIBLE, "Mobile Manual Accessibility", "screenshots"));
     }
 }

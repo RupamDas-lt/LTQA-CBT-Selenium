@@ -62,7 +62,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
         try {
             driver.waitForElementToBeVisible(appScreen, 2);
             driver.waitForElementToBeVisible(accessibilityScannerHeading, 20);
-            softAssert.assertTrue(driver.isDisplayed(accessibilityScannerHeading, 20), softAssertMessageFormat(TEST_STARTED, "Accessibility Testing"));
+            softAssert.assertTrue(driver.isDisplayed(accessibilityScannerHeading, 20), softAssertMessageFormat(ERROR_IN_STARTING_TEST, "Accessibility Testing"));
             if (driver.waitForElementToDisappear(appInstalling, 20) || driver.findElement(startScanButton).getAttribute("aria-disabled").equalsIgnoreCase("false")) {
                 driver.waitForTime(20);
                 driver.click(startScanButton);
@@ -80,7 +80,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
                 driver.waitForTime(3);
                 driver.click(scanViewportButton);
 
-                softAssert.assertTrue(driver.waitForExactText(numberOfPages, "View 2 of 2", 10) && driver.waitForElementToDisappear(scanningInProgress, 10), softAssertMessageFormat(SCAN_WORKING, "Accessibility Manual"));
+                softAssert.assertTrue(driver.waitForExactText(numberOfPages, "View 2 of 2", 10) && driver.waitForElementToDisappear(scanningInProgress, 10), softAssertMessageFormat(ERROR_IN_SCANNING, "Accessibility Manual"));
             }
         } catch (Exception e) {
             throw new RuntimeException("Accessibility scan is not happening.");
@@ -93,7 +93,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
             testName.set(driver.findElement(TEST_NAME).getAttribute("value").replaceFirst("App Accessibility Test \\|\\s*", "").trim());
             driver.click(saveReportButton, 2);
 
-            softAssert.assertTrue(driver.waitForElementToDisappear(saveTestButton, 10), softAssertMessageFormat(TEST_SAVED));
+            softAssert.assertTrue(driver.waitForElementToDisappear(saveTestButton, 10), softAssertMessageFormat(ERROR_IN_TEST_SAVING));
         } catch (Exception e) {
             throw new RuntimeException("Test Save feature is not working");
         }
@@ -103,10 +103,10 @@ public class ManualAccessibilitySessionPage extends BaseClass {
         try {
             driver.click(issueTabButton);
 
-            softAssert.assertTrue(driver.isDisplayed(imageAndSkin, 5) && driver.isDisplayed(switchModeMsg, 5), softAssertMessageFormat(SWITCHED_TO, "Issue tab"));
+            softAssert.assertTrue(driver.isDisplayed(imageAndSkin, 5) && driver.isDisplayed(switchModeMsg, 5), softAssertMessageFormat(ERROR_IN_TAB_SWITCHING, "Issue tab"));
             driver.waitForTime(2);
             driver.click(liveTabButton);
-            softAssert.assertTrue(driver.isDisplayed(appScreen, 5), softAssertMessageFormat(SWITCHED_TO, "Live tab"));
+            softAssert.assertTrue(driver.isDisplayed(appScreen, 5), softAssertMessageFormat(ERROR_IN_TAB_SWITCHING, "Live tab"));
         } catch (Exception e) {
             throw new RuntimeException("Images are not coming");
         }
@@ -120,7 +120,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
             driver.waitForElementToBeVisible(appInstalling, 10);
             ltLogger.info("Second App started installing");
 
-            softAssert.assertTrue(driver.waitForElementToDisappear(appInstalling, 15), softAssertMessageFormat(APP_IS_INSTALLED));
+            softAssert.assertTrue(driver.waitForElementToDisappear(appInstalling, 15), softAssertMessageFormat(ERROR_IN_APP_INSTALLING));
         } catch (Exception e) {
             throw new RuntimeException("Second App is not installing. Check the app if it is compatible with the Android version.");
         }
@@ -137,7 +137,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
             }
             driver.click(gallery);
 
-            softAssert.assertTrue(driver.findElement(gallerySsSection).getText().equalsIgnoreCase("Screenshots") && driver.findElement(gallerySsCount).getText().equals("0" + randomNumber), softAssertMessageFormat(GALLERY_VERIFICATION, "Screenshots") + driver.findElement(gallerySsCount).getText());
+            softAssert.assertTrue(driver.findElement(gallerySsSection).getText().equalsIgnoreCase("Screenshots") && driver.findElement(gallerySsCount).getText().equals("0" + randomNumber), softAssertMessageFormat(ERROR_IN_GALLERY_VERIFICATION, "Screenshots") + driver.findElement(gallerySsCount).getText());
         } catch (Exception e) {
             throw new RuntimeException("Incorrect number of Screenshots are getting generated");
         }
@@ -152,7 +152,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
             driver.waitForTime(5);
             driver.click(gallery);
 
-            softAssert.assertTrue(driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"), softAssertMessageFormat(GALLERY_VERIFICATION, "Videos") + driver.findElement(galleryVideoCount).getText());
+            softAssert.assertTrue(driver.findElement(galleryVideoSection).getText().equalsIgnoreCase("Videos") && driver.findElement(galleryVideoCount).getText().equals("01"), softAssertMessageFormat(ERROR_IN_GALLERY_VERIFICATION, "Videos") + driver.findElement(galleryVideoCount).getText());
         } catch (Exception e) {
             throw new RuntimeException("Incorrect number of Videos are getting generated");
         }
@@ -164,7 +164,7 @@ public class ManualAccessibilitySessionPage extends BaseClass {
             driver.waitForTime(1);
             driver.click(rotate, 2);
 
-            softAssert.assertTrue(driver.isDisplayed(rotatedDevice, 5), softAssertMessageFormat(DEVICE_ROTATED));
+            softAssert.assertTrue(driver.isDisplayed(rotatedDevice, 5), softAssertMessageFormat(ERROR_IN_DEVICE_ROTATION));
         } catch (Exception e) {
             throw new RuntimeException("Device rotation not working");
         }
@@ -174,6 +174,6 @@ public class ManualAccessibilitySessionPage extends BaseClass {
         driver.click(endSessionButton);
         driver.click(endSessionConfirm, 2);
 
-        softAssert.assertTrue(driver.isDisplayed(a11yMAnualHomepageLocator, 2), softAssertMessageFormat(TEST_ENDED, "Manual Accessibility"));
+        softAssert.assertTrue(driver.isDisplayed(a11yMAnualHomepageLocator, 2), softAssertMessageFormat(ERROR_IN_ENDING_TEST, "Manual Accessibility"));
     }
 }
