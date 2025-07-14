@@ -129,6 +129,10 @@ public enum SoftAssertionMessages implements BaseClass.MessageHolder {
     SSE_VERIFICATION_FAILURE_ERROR_MESSAGE_1("SSE verification failed. Expected status: %s, Actual status: %s"),
     SSE_VERIFICATION_FAILURE_ERROR_MESSAGE_2("SSE verification failed. Expected message to be present: %s"),
     CONTENT_MISMATCH_FOR_DOWNLOADED_FILE_ERROR_MESSAGE("Content of the file: %s, received using Lambda file-content hook doesn't match"),
+    UNABLE_TO_OPEN_URL_IN_NEW_TAB("Unable to open %s in new tab"),
+    UNABLE_TO_CLOSE_CURRENT_TAB_USING_SPECIFIC_METHOD_ERROR_MESSAGE("Unable to close current tab using %s method"),
+    UNABLE_TO_QUIT_DRIVER_ERROR_MESSAGE("Unable to quit driver. Error: %s"),
+    INCORRECT_USER_AGENT_ERROR_MESSAGE("Incorrect user agent. Expected: %s, Actual: %s"),
 
     //  CLIENT side error messages
     USER_IS_NOT_ABLE_TO_LOGGED_IN_CLIENT_ERROR_MESSAGE("User is not logged in"),

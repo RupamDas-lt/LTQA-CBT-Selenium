@@ -218,6 +218,12 @@ public class AutomationHelper extends BaseClass {
                 case "fetchFileContentUsingHooks":
                     getDownloadedFileContentUsingLambdaHooks();
                     break;
+                case "closeWindowAndDriverQuit":
+                    closeWindowAndDriverQuit();
+                    break;
+                case "checkUserAgent":
+                    checkUserAgent();
+                    break;
                 case "networkLog":
                 default:
                     baseTest();
@@ -227,7 +233,7 @@ public class AutomationHelper extends BaseClass {
             TEST_REPORT.get().put("test_actions_failures", Map.of(actionName, e.getMessage()));
             throw new RuntimeException("Test action " + actionName + " failed", e);
         }
-        if (!actionName.toLowerCase().contains("timeout") && setTestContextBasedOnActions) {
+        if (!actionName.toLowerCase().contains("timeout") && !actionName.toLowerCase().contains("driverquit") && setTestContextBasedOnActions) {
             LTHooks.endStepContext(driverManager, actionName);
         }
         SOFT_ASSERT.set(softAssert);
@@ -1803,6 +1809,9 @@ public class AutomationHelper extends BaseClass {
         CustomSoftAssert softAssert = SOFT_ASSERT.get();
         driverManager.getURL(INTERNET_HEROKU_APP_ABTEST);
         driverManager.getURLInNewTab(INTERNET_HEROKU_APP_ADD_REMOVE_ELEMENT_URL);
+        Set<String> windowHandles = driverManager.getWindowHandles();
+        CustomAssert.assertTrue(windowHandles.size() == 2, softAssertMessageFormat(UNABLE_TO_OPEN_URL_IN_NEW_TAB, INTERNET_HEROKU_APP_ADD_REMOVE_ELEMENT_URL));
+
         driverManager.switchToTab(1);
 
         String urlInSecondTab = driverManager.getCurrentURL();
@@ -1817,22 +1826,12 @@ public class AutomationHelper extends BaseClass {
         SOFT_ASSERT.set(softAssert);
     }
 
-    @SuppressWarnings("unchecked")
-    private String extractLanguageFromCapabilities() {
-        Map<String, Object> chromeOptions = (Map<String, Object>) TEST_CAPS_MAP.get().getOrDefault(CHROME_OPTIONS, new HashMap<>());
-        List<String> chromeArgs = (List<String>) chromeOptions.getOrDefault("args", new ArrayList<String>());
-        return chromeArgs.stream()
-                .filter(arg -> arg.startsWith("lang="))
-                .map(arg -> arg.substring("lang=".length()))
-                .findFirst()
-                .orElse("en");
-    }
-
     private void detectLanguageSetFromBrowserOptions() {
         CustomSoftAssert softAssert = SOFT_ASSERT.get();
-        String expectedLanguage = extractLanguageFromCapabilities();
+        String expectedLanguage = extractSpecificChromeArgumentValueFromCapabilityMap("lang", "en");
         driverManager.getURL(BROWSER_LANGUAGE_CHECK_URL);
         String actualLanguage = driverManager.getText(browserLanguage, 5).toLowerCase();
+        ltLogger.info("Expected browser language: {}, Actual browser language: {}", expectedLanguage, actualLanguage);
         softAssert.assertTrue(actualLanguage.startsWith(expectedLanguage.toLowerCase()),
                 softAssertMessageFormat(BROWSER_LANGUAGE_VERIFICATION_FAILURE_ERROR_MESSAGE, expectedLanguage, actualLanguage));
         SOFT_ASSERT.set(softAssert);
@@ -1883,6 +1882,59 @@ public class AutomationHelper extends BaseClass {
         ltLogger.info("Verifying session error message. Expected: {}, Actual: {}", expectedMessage, actualMessage);
         softAssert.assertTrue(actualMessage.contains(expectedMessage),
                 softAssertMessageFormat(SESSION_ERROR_MESSAGE_VERIFICATION_FAILURE_ERROR_MESSAGE, expectedMessage, actualMessage));
+        SOFT_ASSERT.set(softAssert);
+    }
+
+    public void closeWindowAndDriverQuit() {
+        // Open URLs in two tabs and verify
+        driverManager.getURL(INTERNET_HEROKU_APP_ABTEST);
+        driverManager.getURLInNewTab(INTERNET_HEROKU_APP_BROKEN_IMAGES_URL);
+        Set<String> windowHandles = driverManager.getWindowHandles();
+        CustomAssert.assertTrue(windowHandles.size() == 2,
+                softAssertMessageFormat(UNABLE_TO_OPEN_URL_IN_NEW_TAB, INTERNET_HEROKU_APP_BROKEN_IMAGES_URL));
+
+        // Close first tab using JS
+        CustomSoftAssert softAssert = SOFT_ASSERT.get();
+        driverManager.switchToTab(1);
+        driverManager.closeCurrentTabUsingJS();
+        softAssert.assertTrue(driverManager.getWindowHandles().size() == 1,
+                softAssertMessageFormat(UNABLE_TO_CLOSE_CURRENT_TAB_USING_SPECIFIC_METHOD_ERROR_MESSAGE, "js execution"));
+
+        // Close remaining tab
+        driverManager.switchToTab(0);
+        driverManager.closeCurrentTab();
+
+
+        // Verify all tabs are closed and quit driver
+        int finalTabsCount = 0;
+        try {
+            finalTabsCount = driverManager.getWindowHandles().size();
+        } catch (Exception e) {
+            ltLogger.warn("Exception occurred while getting window handles: {}", e.getMessage());
+        } finally {
+            softAssert.assertTrue(finalTabsCount == 0,
+                    softAssertMessageFormat(UNABLE_TO_CLOSE_CURRENT_TAB_USING_SPECIFIC_METHOD_ERROR_MESSAGE, "driver.quit()"));
+        }
+
+        // Quit driver
+        try {
+            driverManager.quit();
+            ltLogger.info("Driver quit successfully after closing all tabs.");
+        } catch (Exception e) {
+            softAssert.fail(softAssertMessageFormat(UNABLE_TO_QUIT_DRIVER_ERROR_MESSAGE, e.getMessage()));
+        } finally {
+            SOFT_ASSERT.set(softAssert);
+        }
+    }
+
+    public void checkUserAgent() {
+        CustomSoftAssert softAssert = SOFT_ASSERT.get();
+        String actualUserAgent = driverManager.executeScriptAndFetchValue(jsToGetTheUserAgent).toString();
+        String expectedUserAgent =
+                extractSpecificChromeArgumentValueFromCapabilityMap("--user-agent", "default user agent");
+        ltLogger.info("Verifying User-Agent. Expected: {}, Actual: {}", expectedUserAgent, actualUserAgent);
+        softAssert.assertEquals(actualUserAgent, expectedUserAgent, softAssertMessageFormat(INCORRECT_USER_AGENT_ERROR_MESSAGE,
+                expectedUserAgent, actualUserAgent));
         SOFT_ASSERT.set(softAssert);
     }
 }

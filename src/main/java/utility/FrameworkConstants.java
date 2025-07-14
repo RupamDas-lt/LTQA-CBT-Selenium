@@ -406,7 +406,9 @@ public class FrameworkConstants extends BaseClass {
     public static final String jsToGetVideoDurationFromDOM = "return document.getElementsByTagName('video')[0].duration";
     public static final String jsToGetVideoCurrentTimeStampFromDOM = "return document.getElementsByTagName('video')[0].currentTime";
     public static final String jsToNavigateToUrl = "window.open('%s')";
+    public static final String jsToCloseTab = "window.close();";
     public static final String jsToScrollElementIntoView = "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });";
+    public static final String jsToGetTheUserAgent = "return navigator.userAgent;";
 
     /// Runtime constants
     public static final Map<String, String> USER_TO_BEARER_TOKEN_MAP = new HashMap<>();
