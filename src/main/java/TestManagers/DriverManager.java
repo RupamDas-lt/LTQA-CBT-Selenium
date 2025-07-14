@@ -340,6 +340,13 @@ public class DriverManager extends BaseClass {
         }
     }
 
+    public Set<String> getWindowHandles() {
+        ltLogger.info("Getting all window handles.");
+        Set<String> windowHandles = driver.getWindowHandles();
+        ltLogger.info("Found {} window handles: {}", windowHandles.size(), windowHandles);
+        return windowHandles;
+    }
+
     public void switchToTab(int tabIndex) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -356,6 +363,17 @@ public class DriverManager extends BaseClass {
     public void closeCurrentTab() {
         ltLogger.info("Closing the current tab");
         driver.close();
+    }
+
+    public void closeCurrentTabUsingJS() {
+        ltLogger.info("Closing the current tab using JavaScript");
+        try {
+            executeScript(jsToCloseTab);
+            ltLogger.info("Current tab closed successfully using JavaScript.");
+        } catch (Exception e) {
+            ltLogger.error("Failed to close the current tab using JavaScript. Error: {}", e.getMessage());
+            throw new RuntimeException("Failed to close the current tab using JS", e);
+        }
     }
 
     public void closeCurrentTabAndSwitchContextToLastTab() {

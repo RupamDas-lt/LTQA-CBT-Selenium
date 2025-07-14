@@ -1013,5 +1013,33 @@
     "sub_category": "safari-cross-site-blocking-issues",
     "priority": "p1",
     "isKnown": "false"
+  },
+  "b19a40d0bc2bcf472263db5b06fc4252df6a03049f8a14b48c9bf016fc5803c9": {
+    "message": "Unable to close current tab using %s method",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "close-tab-issues",
+    "priority": "p1",
+    "isKnown": "false"
+  },
+  "5a2ceb7f4c269ad343fe7eb6cbc57a84fecac0c63ea7e29abffef69765b60324": {
+    "message": "Incorrect user agent. Expected: %s, Actual: %s",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "user-agent-mismatch-issues",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "0a0bff6fa81ab95d9becc2726caa7d57fcc271436115d7fc19b7eec2edb680e0": {
+    "message": "Unable to open %s in new tab",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "unable-to-open-new-tab",
+    "priority": "p2",
+    "isKnown": "false"
+  },
+  "0917729e4332dd39c3d15e0da0aef6ec18673197abbdcd88d5b09d96e5a9b556": {
+    "message": "Unable to quit driver. Error: %s",
+    "category": "selenium-basic-functionality-failures",
+    "sub_category": "unable-to-quit-driver",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }

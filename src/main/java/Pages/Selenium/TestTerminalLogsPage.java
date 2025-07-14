@@ -1,4 +1,4 @@
-package Pages;
+package Pages.Selenium;
 
 import TestManagers.DriverManager;
 

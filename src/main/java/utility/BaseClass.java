@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static utility.EnvSetup.TEST_CAPS_MAP;
 import static utility.FrameworkConstants.*;
 
 public class BaseClass {
@@ -897,6 +898,19 @@ public class BaseClass {
             ltLogger.info("Hash key found for the message: {}. Map: {}", message, hashKeyToMessageTemplateMap);
             EnvSetup.FAILED_ASSERTION_ERROR_TO_HASH_KEY_MAP.get().put(message, hashKeyToMessageTemplateMap.get(KEY));
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public String extractSpecificChromeArgumentValueFromCapabilityMap(String name, String... defaultValue) {
+        String defaultVal = defaultValue.length > 0 ? defaultValue[0] : "default value of " + name;
+        Map<String, Object> chromeOptions = (Map<String, Object>) TEST_CAPS_MAP.get().getOrDefault(CHROME_OPTIONS, new HashMap<>());
+        List<String> chromeArgs = (List<String>) chromeOptions.getOrDefault("args", new ArrayList<String>());
+        String finalName = name + "=";  // Ensure we are looking for the exact argument format
+        return chromeArgs.stream()
+                .filter(arg -> arg.startsWith(finalName))
+                .map(arg -> arg.substring(finalName.length()))
+                .findFirst()
+                .orElse(defaultVal);
     }
 
 }
