@@ -71,8 +71,7 @@ public class AddNewDataToJson extends BaseClass {
     private static HashMap<String, String> processMessages(Class<? extends Enum<?>> messageEnumClass) {
         HashMap<String, String> map = new HashMap<>();
         try {
-            Method valuesMethod = messageEnumClass.getMethod("values");
-            Enum<?>[] messages = (Enum<?>[]) valuesMethod.invoke(null);
+            Enum<?>[] messages = messageEnumClass.getEnumConstants();
 
             Method getValueMethod = messageEnumClass.getMethod("getValue");
 
@@ -81,7 +80,7 @@ public class AddNewDataToJson extends BaseClass {
                 map.put(stringToSha256Hex(value), value);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to process messages", e);
+            throw new RuntimeException("Failed to process messages for enum class: " + messageEnumClass.getSimpleName(), e);
         }
         return map;
     }
