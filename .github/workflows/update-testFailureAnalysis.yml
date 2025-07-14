@@ -83,25 +83,25 @@ jobs:
           echo "Update needed for Falcon: ${{ steps.check_changes.outputs.update_needed_falcon }}"
 
       - name: Run selenium update if needed
-        if: steps.check_changes.outputs.update_selenium == 'true'
+        if: steps.check_changes.outputs.update_needed_selenium == 'true'
         run: |
           echo "Updating selenium test failure analysis..."
           mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson"
 
       - name: Run falcon update if needed
-        if: steps.check_changes.outputs.update_falcon == 'true'
+        if: steps.check_changes.outputs.update_needed_falcon == 'true'
         run: |
           echo "Updating falcon test failure analysis..."
           mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -DPRODUCT_NAME=falcon
 
       - name: Run accessibility update if needed
-        if: steps.check_changes.outputs.update_accessibility == 'true'
+        if: steps.check_changes.outputs.update_needed_accessibility == 'true'
         run: |
           echo "Updating accessibility test failure analysis..."
           mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -DPRODUCT_NAME=accessibility
 
       - name: Commit all changes together
-        if: ${{ steps.check_changes.outputs.update_selenium == 'true' || steps.check_changes.outputs.update_falcon == 'true' || steps.check_changes.outputs.update_accessibility == 'true' }}
+        if: ${{ steps.check_changes.outputs.update_needed_selenium == 'true' || steps.check_changes.outputs.update_needed_falcon == 'true' || steps.check_changes.outputs.update_needed_accessibility == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -115,5 +115,5 @@ jobs:
           git push origin HEAD:${{ github.head_ref }}
 
       - name: Notify no updates needed
-        if: ${{ steps.check_changes.outputs.update_selenium == 'false' && steps.check_changes.outputs.update_falcon == 'false' && steps.check_changes.outputs.update_accessibility == 'false' }}
+        if: ${{ steps.check_changes.outputs.update_needed_selenium == 'false' && steps.check_changes.outputs.update_needed_falcon == 'false' && steps.check_changes.outputs.update_needed_accessibility == 'false' }}
         run: echo "No updates to test failure analysis JSON files needed."
