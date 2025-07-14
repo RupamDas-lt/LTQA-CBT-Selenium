@@ -6,12 +6,16 @@ import factory.LocatorTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebElement;
+import utility.BaseClass;
 import utility.CustomSoftAssert;
 import utility.EnvSetup;
 
 import java.util.List;
 
-public class ManualAccessibilityDashboardPage {
+import static factory.SoftAssertionMessagesAccessibility.PAGE_OPENED;
+import static factory.SoftAssertionMessagesAccessibility.REPORT_VISIBLE;
+
+public class ManualAccessibilityDashboardPage extends BaseClass {
 
     DriverManager driver;
     CustomSoftAssert softAssert;
@@ -44,7 +48,7 @@ public class ManualAccessibilityDashboardPage {
     public void iOpenManualDashboard() {
         try {
             driver.getURL(manualDashboardUrl);
-            softAssert.assertTrue(driver.isDisplayed(scannedReportHeading, 10), "Accessibility Manual Dashboard Opened");
+            softAssert.assertTrue(driver.isDisplayed(scannedReportHeading, 10), softAssertMessageFormat(PAGE_OPENED, "Manual Accessibility Dashboard"));
             driver.click(appTab);
             driver.waitForElementToBeVisible(testListDiv, 10);
         } catch (Exception e) {
@@ -72,16 +76,16 @@ public class ManualAccessibilityDashboardPage {
     }
 
     public void iValidateAccessibilityReport() {
-        softAssert.assertTrue((driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5)), "Accessibility report is visible");
+        softAssert.assertTrue((driver.isDisplayed(mostSevereIssues, 5) && driver.isDisplayed(wcagGuidelines, 5)), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "report"));
     }
 
     public void iValidateAllIssuesTab() {
         driver.click(allIssuesTab, 2);
-        softAssert.assertTrue(driver.isDisplayed(issueTable, 2), "Issues table is visible");
+        softAssert.assertTrue(driver.isDisplayed(issueTable, 2), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "issues"));
     }
 
     public void iValidateMobileView() {
         driver.click(mobileViewTab);
-        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5), "Image screenshot is visible");
+        softAssert.assertTrue(driver.isDisplayed(imageCanvas, 5), softAssertMessageFormat(REPORT_VISIBLE, "Mobile Manual Accessibility", "screenshots"));
     }
 }
