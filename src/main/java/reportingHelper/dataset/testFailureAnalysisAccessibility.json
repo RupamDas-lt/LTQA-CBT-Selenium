@@ -1,72 +1,72 @@
 {
-  "f19c0f8f10f8c5c59bde1f2b970aff70e72b70d4a9afa10fa6933aac772e60c4" : {
-    "message" : "App is not getting installed",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "f19c0f8f10f8c5c59bde1f2b970aff70e72b70d4a9afa10fa6933aac772e60c4": {
+    "message": "App is not getting installed",
+    "category": "accessibility",
+    "sub_category": "app_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "f3697acf1971a0888f2fce507316f7e1c6a6a4774013befc4c018ab4e90f1298" : {
-    "message" : "Test screen is not switched to %s",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "f3697acf1971a0888f2fce507316f7e1c6a6a4774013befc4c018ab4e90f1298": {
+    "message": "Test screen is not switched to %s",
+    "category": "ui",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "b0d32b83eb344b0c4108e5c6f65a8816b165273c97661bcc2093f48a02b465ac" : {
-    "message" : "Incorrect number of %s are getting generated i.e: ",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "b0d32b83eb344b0c4108e5c6f65a8816b165273c97661bcc2093f48a02b465ac": {
+    "message": "Incorrect number of %s are getting generated i.e: ",
+    "category": "artefacts",
+    "sub_category": "left_navbar_related_issue",
+    "priority": "p2",
+    "isKnown": "false"
   },
-  "9f781e7b4cf3a3bfaffd6bc0bd4b16e0f307c7b6279ee976ddfa726dd70e5c07" : {
-    "message" : "Device not rotated",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "9f781e7b4cf3a3bfaffd6bc0bd4b16e0f307c7b6279ee976ddfa726dd70e5c07": {
+    "message": "Device not rotated",
+    "category": "ui",
+    "sub_category": "left_navbar_related_issue",
+    "priority": "p1",
+    "isKnown": "false"
   },
-  "9bb6f0236d145b9b6958275a3f76c3234dc2212d3a5bc315feaac541e0f199cd" : {
-    "message" : "Test has not been saved",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "9bb6f0236d145b9b6958275a3f76c3234dc2212d3a5bc315feaac541e0f199cd": {
+    "message": "Test has not been saved",
+    "category": "ui",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "896a7607e1cb021f41fac810a0dfa05b7859cc8702df8f9ebdd6627fd571ae43" : {
-    "message" : "%s Test not Ended Successfully",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "896a7607e1cb021f41fac810a0dfa05b7859cc8702df8f9ebdd6627fd571ae43": {
+    "message": "%s Test not Ended Successfully",
+    "category": "ui",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "a2753a43119e858943021643345d74a835557f0491898294bae5aeb4af1e5a40" : {
-    "message" : "%s %s is not visible",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "a2753a43119e858943021643345d74a835557f0491898294bae5aeb4af1e5a40": {
+    "message": "%s %s is not visible",
+    "category": "artefacts",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "ba6a555a489ffd6d49a66a647fd92bd2a381c9b603f399cbb41cc489feabed14" : {
-    "message" : "Test is not getting Started for %s",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "ba6a555a489ffd6d49a66a647fd92bd2a381c9b603f399cbb41cc489feabed14": {
+    "message": "Test is not getting Started for %s",
+    "category": "ui",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "fce4013c0f550f0c17dcda3eac9d390cc49f8647df6c37d71ef30be11fd50750" : {
-    "message" : "Scan is not working for %s",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "fce4013c0f550f0c17dcda3eac9d390cc49f8647df6c37d71ef30be11fd50750": {
+    "message": "Scan is not working for %s",
+    "category": "ui",
+    "sub_category": "accessibility_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   },
-  "800fd4e10fa72121c2dd98339df4d14543250844d3fe5cb377e063cc3e3211e4" : {
-    "message" : "%s page is not opened",
-    "category" : "artefacts|api|ui|performance|security|accessibility",
-    "sub_category" : "custom_sub_category_value",
-    "priority" : "p0|p1|p2|p3|p4",
-    "isKnown" : "true|false"
+  "800fd4e10fa72121c2dd98339df4d14543250844d3fe5cb377e063cc3e3211e4": {
+    "message": "%s page is not opened",
+    "category": "ui",
+    "sub_category": "accessibility_dashboard_related_issue",
+    "priority": "p0",
+    "isKnown": "false"
   }
 }
