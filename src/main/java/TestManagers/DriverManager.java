@@ -24,6 +24,7 @@ import utility.BaseClass;
 import utility.EnvSetup;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -121,6 +122,19 @@ public class DriverManager extends BaseClass {
             driver.manage().timeouts().implicitlyWait(setImplicitWait);
         }
         return isElementGone;
+    }
+
+    public boolean waitForExactText(Locator locator, String expectedText, int timeoutSeconds) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+        By byLocator = toBy(locator);
+        return wait.until(driver -> {
+            try {
+                String actualText = driver.findElement(byLocator).getText();
+                return expectedText.equals(actualText);
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        });
     }
 
     public void createTestDriver() {
