@@ -47,41 +47,40 @@ jobs:
           cat changed_files.txt >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Determine which updates are needed
-        id: check_changes
+      - name: Run condition check
+        id: check_change
         run: |
           changed_files="${{ steps.files.outputs.changed_files }}"
           echo "Files changed since main:"
           echo "$changed_files"
-          
-          # Initialize outputs
-          echo "update_selenium=false" >> $GITHUB_OUTPUT
-          echo "update_falcon=false" >> $GITHUB_OUTPUT
-          echo "update_accessibility=false" >> $GITHUB_OUTPUT
-          
-          # Check selenium case
-          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessages.java" && \
-             ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysis.json"; then
-            echo "update_selenium=true" >> $GITHUB_OUTPUT
+          update_needed_selenium="false"
+          update_needed_accessibility="false"
+          update_needed_falcon="false"
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessages.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysis.json"; then
+              update_needed_selenium="true"
+            fi
           fi
-          
-          # Check falcon case
-          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesFalcon.java" && \
-             ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json"; then
-            echo "update_falcon=true" >> $GITHUB_OUTPUT
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesAccessibility.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json"; then
+              update_needed_accessibility="true"
+            fi
           fi
-          
-          # Check accessibility case
-          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesAccessibility.java" && \
-             ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json"; then
-            echo "update_accessibility=true" >> $GITHUB_OUTPUT
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesFalcon.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json"; then
+              update_needed_falcon="true"
+            fi
           fi
-          
-          echo "Update flags:"
-          echo "Selenium: ${{ steps.check_changes.outputs.update_selenium }}"
-          echo "Falcon: ${{ steps.check_changes.outputs.update_falcon }}"
-          echo "Accessibility: ${{ steps.check_changes.outputs.update_accessibility }}"
+          echo "update_needed_selenium=$update_needed_selenium" >> $GITHUB_OUTPUT
+          echo "update_needed_accessibility=$update_needed_accessibility" >> $GITHUB_OUTPUT
+          echo "update_needed_falcon=$update_needed_falcon" >> $GITHUB_OUTPUT
         shell: bash
+
+      - name: Debug outputs
+        run: |
+          echo "Update needed for Selenium: ${{ steps.check_change.outputs.update_needed_selenium }}"
+          echo "Update needed for Accessibility: ${{ steps.check_change.outputs.update_needed_accessibility }}"
+          echo "Update needed for Falcon: ${{ steps.check_change.outputs.update_needed_falcon }}"
 
       - name: Run selenium update if needed
         if: steps.check_changes.outputs.update_selenium == 'true'
