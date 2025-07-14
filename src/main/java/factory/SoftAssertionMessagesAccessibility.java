@@ -29,7 +29,6 @@ public enum SoftAssertionMessagesAccessibility implements BaseClass.MessageHolde
      * enum value.                                                *
      ************************************************************/
 
-    SAMPLE_MESSAGE("Sample assertion failure message. Actual value: %s, Expected value: %s"),
     TEST_STARTED("Test is Started for %s"),
     SCAN_WORKING("Scan is working for %s"),
     TEST_SAVED("Test has been saved"),
