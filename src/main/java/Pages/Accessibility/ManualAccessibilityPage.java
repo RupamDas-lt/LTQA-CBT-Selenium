@@ -1,4 +1,4 @@
-package Pages;
+package Pages.Accessibility;
 
 import TestManagers.DriverManager;
 import factory.Locator;

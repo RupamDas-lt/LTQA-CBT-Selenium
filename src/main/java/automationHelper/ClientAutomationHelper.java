@@ -1,6 +1,10 @@
 package automationHelper;
 
-import Pages.*;
+import Pages.Accessibility.ManualAccessibilityDashboardPage;
+import Pages.Accessibility.ManualAccessibilityPage;
+import Pages.Accessibility.ManualAccessibilitySessionPage;
+import Pages.Selenium.*;
+import Pages.Shared.LoginPage;
 import TestManagers.CapabilityManager;
 import TestManagers.DriverManager;
 import com.mysql.cj.util.StringUtils;

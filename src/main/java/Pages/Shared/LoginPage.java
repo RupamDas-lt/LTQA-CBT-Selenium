@@ -1,4 +1,4 @@
-package Pages;
+package Pages.Shared;
 
 import TestManagers.DriverManager;
 import automationHelper.AutomationAPIHelper;
