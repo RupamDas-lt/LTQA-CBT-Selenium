@@ -140,6 +140,15 @@ To rerun failed tests:
   CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DJOB_PURPOSE="true"
 ```
 
+- **`PRODUCT_NAME`**: Based on the product name, the failure analysis data set will be picked. Example: If falcon is
+  used, then
+  the failure analysis data set will be picked from
+  `src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json`.
+
+```bash
+  CUCUMBER_FILTER_TAGS="@test_tag" mvn test -DENV=prod -DPARALLEL=10 -DPRODUCT_NAME="falcon"
+```
+
 ---
 
 ## Tunnel
@@ -219,6 +228,15 @@ _source
 
 ```bash
   mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -Dexec.args="$*" -DREWRITE_EXISTING_DATA=true
+```
+
+- To specify the product name for which you want to add the data, you can use the `-DPRODUCT_NAME` flag. This will
+  ensure that the data is added to the correct dataset file. Based on the product name, it will pick the specific
+  assertion message holder and the corresponding dataset (.json) file.
+
+```bash
+  mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -Dexec.args="$*" -DPRODUCT_NAME=your_product_name
+
 ```
 
 ---

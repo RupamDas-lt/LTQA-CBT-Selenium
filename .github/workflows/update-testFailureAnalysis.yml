@@ -1,11 +1,11 @@
-name: Update Test Failure Analysis JSON file
+name: Update Test Failure Analysis JSON files
 
 on:
   pull_request:
     branches:
       - main
     types:
-      - synchronize   # runs on new commits pushed to PR
+      - synchronize
       - opened
       - reopened
       - labeled
@@ -48,32 +48,72 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run condition check
-        id: check_change
+        id: check_changes
         run: |
           changed_files="${{ steps.files.outputs.changed_files }}"
           echo "Files changed since main:"
           echo "$changed_files"
-          update_needed="false"
+          update_needed_selenium="false"
+          update_needed_accessibility="false"
+          update_needed_falcon="false"
           if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessages.java"; then
             if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysis.json"; then
-              update_needed="true"
+              update_needed_selenium="true"
             fi
           fi
-          echo "update_needed=$update_needed" >> $GITHUB_OUTPUT
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesAccessibility.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json"; then
+              update_needed_accessibility="true"
+            fi
+          fi
+          if echo "$changed_files" | grep -q "src/main/java/factory/SoftAssertionMessagesFalcon.java"; then
+            if ! echo "$changed_files" | grep -q "src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json"; then
+              update_needed_falcon="true"
+            fi
+          fi
+          echo "update_needed_selenium=$update_needed_selenium" >> $GITHUB_OUTPUT
+          echo "update_needed_accessibility=$update_needed_accessibility" >> $GITHUB_OUTPUT
+          echo "update_needed_falcon=$update_needed_falcon" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Run update if needed
-        if: steps.check_change.outputs.update_needed == 'true'
+      - name: Debug outputs
         run: |
-          echo "Running maven command to update JSON"
+          echo "Update needed for Selenium: ${{ steps.check_changes.outputs.update_needed_selenium }}"
+          echo "Update needed for Accessibility: ${{ steps.check_changes.outputs.update_needed_accessibility }}"
+          echo "Update needed for Falcon: ${{ steps.check_changes.outputs.update_needed_falcon }}"
+
+      - name: Run selenium update if needed
+        if: steps.check_changes.outputs.update_needed_selenium == 'true'
+        run: |
+          echo "Updating selenium test failure analysis..."
           mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson"
+
+      - name: Run falcon update if needed
+        if: steps.check_changes.outputs.update_needed_falcon == 'true'
+        run: |
+          echo "Updating falcon test failure analysis..."
+          mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -DPRODUCT_NAME=falcon
+
+      - name: Run accessibility update if needed
+        if: steps.check_changes.outputs.update_needed_accessibility == 'true'
+        run: |
+          echo "Updating accessibility test failure analysis..."
+          mvn compile exec:java -Dexec.mainClass="reportingHelper.AddNewDataToJson" -DPRODUCT_NAME=accessibility
+
+      - name: Commit all changes together
+        if: ${{ steps.check_changes.outputs.update_needed_selenium == 'true' || steps.check_changes.outputs.update_needed_falcon == 'true' || steps.check_changes.outputs.update_needed_accessibility == 'true' }}
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/main/java/reportingHelper/dataset/testFailureAnalysis.json
-          git commit -m "chore: update testFailureAnalysis.json from SoftAssertionMessages.java changes" || echo "No changes to commit"
+          
+          # Add all possible JSON files that might have changed
+          git add src/main/java/reportingHelper/dataset/testFailureAnalysis.json || true
+          git add src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json || true
+          git add src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json || true
+          
+          git commit -m "chore: update test failure analysis JSON files" || echo "No changes to commit"
           git push origin HEAD:${{ github.head_ref }}
 
-      - name: Notify no update needed
-        if: steps.check_change.outputs.update_needed == 'false'
-        run: echo "No update to testFailureAnalysis.json needed."
-
+      - name: Notify no updates needed
+        if: ${{ steps.check_changes.outputs.update_needed_selenium == 'false' && steps.check_changes.outputs.update_needed_falcon == 'false' && steps.check_changes.outputs.update_needed_accessibility == 'false' }}
+        run: echo "No updates to test failure analysis JSON files needed."

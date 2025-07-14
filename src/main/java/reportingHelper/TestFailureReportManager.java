@@ -15,14 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 import static utility.EnvSetup.*;
-import static utility.FrameworkConstants.PUT_CUSTOM_DATA_TO_SUMO_PAYLOAD;
-import static utility.FrameworkConstants.TEST_ATTEMPT;
+import static utility.FrameworkConstants.*;
 
 public class TestFailureReportManager extends BaseClass {
 
     private final Logger ltLogger = LogManager.getLogger(TestFailureReportManager.class);
 
-    private static final String dataPath = "src/main/java/reportingHelper/dataset/testFailureAnalysis.json";
+    private static final String dataPath = getDataPath();
+    private static final String dataPathSelenium = "src/main/java/reportingHelper/dataset/testFailureAnalysis.json";
+    private static final String dataPathFalcon = "src/main/java/reportingHelper/dataset/testFailureAnalysisFalcon.json";
+    private static final String dataPathAccessibility = "src/main/java/reportingHelper/dataset/testFailureAnalysisAccessibility.json";
 
     // Holder class for lazy initialization (thread-safe by JVM)
     private static class Holder {
@@ -33,6 +35,15 @@ public class TestFailureReportManager extends BaseClass {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readTree(new TestFailureReportManager().getFileWithFileLock(dataPath));
         }
+    }
+
+    public static String getDataPath() {
+        String productName = System.getProperty(PRODUCT_NAME, "selenium");
+        return switch (productName.toLowerCase()) {
+            case "falcon" -> dataPathFalcon;
+            case "accessibility" -> dataPathAccessibility;
+            default -> dataPathSelenium;
+        };
     }
 
     // Public method to access the data (initializes on first call)
