@@ -48,7 +48,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Run condition check
-        id: check_change
+        id: check_changes
         run: |
           changed_files="${{ steps.files.outputs.changed_files }}"
           echo "Files changed since main:"
@@ -78,9 +78,9 @@ jobs:
 
       - name: Debug outputs
         run: |
-          echo "Update needed for Selenium: ${{ steps.check_change.outputs.update_needed_selenium }}"
-          echo "Update needed for Accessibility: ${{ steps.check_change.outputs.update_needed_accessibility }}"
-          echo "Update needed for Falcon: ${{ steps.check_change.outputs.update_needed_falcon }}"
+          echo "Update needed for Selenium: ${{ steps.check_changes.outputs.update_needed_selenium }}"
+          echo "Update needed for Accessibility: ${{ steps.check_changes.outputs.update_needed_accessibility }}"
+          echo "Update needed for Falcon: ${{ steps.check_changes.outputs.update_needed_falcon }}"
 
       - name: Run selenium update if needed
         if: steps.check_changes.outputs.update_selenium == 'true'
