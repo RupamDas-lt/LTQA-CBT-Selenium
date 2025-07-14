@@ -64,7 +64,7 @@ public class TunnelManager extends BaseClass implements Runnable {
         BaseClass baseClass = new BaseClass();
         String tunnelEnv = env.toLowerCase().contains("stage") ? "stage" : "prod";
         if (tunnelEnv.equals("stage")) {
-            baseClass.runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY, false, "-env stage");
+            baseClass.runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY, false, "--env stage");
         } else {
             baseClass.runBashScriptWithFlags(BASH_SCRIPT_PATH_FOR_DOWNLOADING_TUNNEL_BINARY, false);
         }
